@@ -7630,6 +7630,17 @@ const _fa=new V3(),_fb=new V3(),_fc=new V3();
       const P=s.m.position;_fb.copy(P).addScaledVector(s.v,dt*1.15);_fa.subVectors(_fb,P);const L2=_fa.lengthSq()||1e-9;let best=null,bd=1e9;
       for(const q of T){const t=clamp(_fc.subVectors(q,P).dot(_fa)/L2,0,1);const cx=P.x+_fa.x*t,cy=P.y+_fa.y*t,cz=P.z+_fa.z*t,d=Math.hypot(q.x-cx,q.y-cy,q.z-cz);if(d<R&&d<bd){bd=d;best=[cx,cy,cz];}}
       if(best){P.set(best[0],best[1],best[2]);s.v.setLength(0.001);s.life=0;s.prev&&s.prev.copy(P);}}}}catch(e){}return t0.apply(this,arguments);};}
+// ---------------------------------------------------------------- 😠 REVENGE button (on screen + main menu): shoots back at whoever shoots at you — even if they miss
+function revSet(on){ASSIST.revenge=on==null?!ASSIST.revenge:!!on;LS.set('asRev',ASSIST.revenge);if(!ASSIST.revenge)ASSIST.revId=null;toast(ASSIST.revenge?'😠 REVENGE ON — anyone who shoots at you gets shot back automatically':'Revenge off',2500);asBtn();}
+function revTarget(id,name){if(!ASSIST.revenge||!id||id===mp.id||!mp.peers[id]||DZ.dead)return;if(ASSIST.revId!==id){ASSIST.revId=id;toast('😠 REVENGE on '+(name||mp.peers[id].name)+'!',1500);beep(300,0.2,0.07);}ASSIST.revT=performance.now()+60000;}
+// a blast near you (missed or not) → revenge on whoever fired it
+{const e0=explode;explode=function(p,r,dr,own,byName,byId){try{const by=DZ.bi||byId,me=dzMe();if(me&&by&&by!==mp.id&&me.distanceTo(p)<Math.max(8,(r||4)*2))revTarget(by,DZ.bn||byName);}catch(e){}return e0.apply(this,arguments);};}
+// an AI rocket fired at you → revenge right away
+{const f0=dzBotFire;dzBotFire=function(B,tg){const r=f0.apply(this,arguments);try{const me=dzMe();if(me&&tg&&tg.distanceTo(me)<8)revTarget(B.id,B.name);}catch(e){}return r;};}
+// on-screen button
+{const b0=asBtn;asBtn=function(){b0.apply(this,arguments);let v=$('revBtn');if(!v){v=document.createElement('button');v.id='revBtn';v.className='btn';v.style.cssText=$('asBtn').style.cssText;v.onclick=()=>revSet();$('asBox').insertBefore(v,$('asRf'));}
+  const tg=ASSIST.revId&&mp.peers[ASSIST.revId];v.textContent=ASSIST.revenge?(tg?'😠 Revenge → '+tg.name.replace('🤖 ',''):'😠 Revenge: ON'):'😠 Revenge: off';v.style.borderColor=ASSIST.revenge?'#ff3b30':'rgba(255,255,255,0.3)';};}
+{const m0=mainItems;mainItems=function(){const L=m0();L.splice(2,0,mItem(()=>'😠 Revenge mode (shoot back at whoever shoots you): '+(ASSIST.revenge?'ON':'off'),()=>revSet()));return L;};}
 
 // =====================================================================================
 // ===== 🌎 REAL WORLD MAP (CesiumJS): the real Earth from satellite photos + real hills, starting over the farm =====
