@@ -6825,8 +6825,8 @@ function truckGoto(){if(typeof CES!=='undefined'&&CES.on){toast('🚒 The fire t
 {const f0=fireItems;fireItems=function(){const L=f0();L.splice(1,0,mItem('🚒 Take me to the fire truck',()=>truckGoto()));return L;};}
 
 // ================================================================ 🤖 AI PILOTS: other drones flying around with their own pilots — they race the hoops, do flips, chase you, fight fires.
-// 🧠 Claude can be their brain (needs an Anthropic API key, typed in once). If Claude can't be reached it says so and the built-in AI flies them.
-const AIB={n:LS.get('aiN',0),L:[],claude:LS.get('aiClaude',false),key:LS.get('aiKey',''),ok:null,busy:false,t:0,err:''};
+// 🧠 Brain: the built-in AI, or a local Ollama computer on the Wi-Fi (no internet, no keys).
+const AIB={n:LS.get('aiN',0),L:[],claude:LS.get('aiClaude',false),key:'',ok:null,busy:false,t:0,err:''};
 const AI_NAMES=['🤖 Ace','🤖 Blaze','🤖 Comet','🤖 Dash','🤖 Echo','🤖 Fizz','🤖 Gizmo','🤖 Hawk','🤖 Iggy','🤖 Jet'],AI_COLS=['#ff3b30','#34c759','#0a84ff','#ff9f0a','#bf5af2','#ff2d55','#64d2ff','#ffd60a','#30d158','#ac8e68'];
 const AI_KINDS=['drone','plane','boat','drone','car','sub','heli','drone','plane','boat'];
 function aiSpec(i){const k=AI_KINDS[i%AI_KINDS.length];if(k!=='drone'){const V=k==='sub'?VPRESETS.boat.sub:k==='car'?(VPRESETS.car.crawler||Object.values(VPRESETS.car)[0]):k==='boat'?VPRESETS.boat.speed:Object.values(VPRESETS[k]||{})[0];if(V){const sp=sanitize(JSON.parse(JSON.stringify(V)));sp.colors=Object.assign({},sp.colors,{body:AI_COLS[i]});sp.name=AI_NAMES[i].replace('🤖 ','')+'\'s '+k;return sp;}}const sp=sanitize(PRESETS.mini);sp.name=AI_NAMES[i].replace('🤖 ','');sp.colors=Object.assign({},sp.colors,{body:AI_COLS[i],arms:'#333333'});return sp;}
@@ -6865,25 +6865,8 @@ function aiTick(dt){if(!AIB.L.length)return;const now=performance.now();
     _ae2.set(clamp(-hs*0.035,-0.5,0.5)+(B.flip?B.flip:0),B.yaw,0,'YXZ');B.q.setFromEuler(_ae2);
     mpRecv({id:B.id,n:B.name,t:'s',p:[B.p.x,B.p.y,B.p.z],r:[B.q.x,B.q.y,B.q.z,B.q.w],v:[B.v.x,B.v.y,B.v.z],st:B.mode==='landed'?'landed':'flying',a:1,sp:B.mode==='landed'?0:60,pl:[B.pil.x,H(B.pil.x,B.pil.z),B.pil.z]});}}
 function aiDrop(B){fireTex();if(FIRE.drops.length>320)return;const m=new THREE.Mesh(FIRE.dg||(FIRE.dg=new THREE.SphereGeometry(0.07,5,4)),FIRE.dm||(FIRE.dm=new THREE.MeshBasicMaterial({color:0x9fdcff,transparent:true,opacity:0.75})));m.position.set(B.p.x,B.p.y-0.3,B.p.z);scene.add(m);FIRE.drops.push({m,v:new V3((Math.random()-0.5)*1.4,-1,(Math.random()-0.5)*1.4)});}
-// 🧠 Claude as the brain: every few seconds it gets a short report and answers with a plan for each bot
-async function aiAskClaude(){if(!AIB.key){if(AIB.ok!==false){AIB.ok=false;AIB.err='no API key';toast('❌ Couldn\'t connect to Claude (no API key) — the built-in AI is flying the bots',4000);}return;}
-  AIB.busy=true;try{const fires=FIRE.L.slice(0,8).map(F=>[Math.round(F.x),Math.round(F.z)]);const bots=AIB.L.map(B=>({name:B.name.replace('🤖 ',''),x:Math.round(B.p.x),y:Math.round(B.p.y),z:Math.round(B.p.z),doing:B.goal?B.goal.kind:B.mode}));
-    const prompt='You are the brain for AI drone pilots in a kids\' RC flying game in the woods. Player "'+(CFG.name||'Madison')+'" is at x='+Math.round(D.pos.x)+' z='+Math.round(D.pos.z)+' height '+Math.round(D.pos.y-H(D.pos.x,D.pos.z))+'m. Fires burning at: '+JSON.stringify(fires)+'. Bots: '+JSON.stringify(bots)+'. Tracks: '+Object.keys(courses).filter(k=>!courses[k].custom).slice(0,8).join(',')+'.\nReply ONLY with a JSON array, one object per bot you want to change: {"name":..., "do":"go"|"fire"|"chase"|"flip"|"land"|"race", "x":number, "z":number, "h":number, "track":string, "say":"a short friendly chat line or empty"}. Keep it fun and kind.';
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':AIB.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-haiku-5-5',max_tokens:500,messages:[{role:'user',content:prompt}]})});
-    if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();const txt=(j.content||[]).map(c=>c.text||'').join('');const arr=JSON.parse(txt.slice(txt.indexOf('['),txt.lastIndexOf(']')+1));
-    if(AIB.ok!==true){AIB.ok=true;toast('🧠 Connected to Claude — Claude is now deciding what the bots do',3000);}
-    arr.forEach(o=>{const B=AIB.L.find(b=>b.name.replace('🤖 ','').toLowerCase()===String(o.name||'').toLowerCase());if(!B||B.mode!=='fly')return;const d=String(o.do||'go');
-      if(d==='fire'&&FIRE.L.length){const F=FIRE.L.reduce((a,f)=>Math.hypot(f.x-(o.x||0),f.z-(o.z||0))<Math.hypot(a.x-(o.x||0),a.z-(o.z||0))?f:a);B.goal={x:F.x,z:F.z,h:7,kind:'fire',F};}
-      else if(d==='race'&&courses[o.track])B.goal={kind:'race',C:courses[o.track],i:0};else if(d==='chase')B.goal={kind:'chase',t:12};else if(d==='flip')B.goal={kind:'flip',t:1.5};
-      else if(d==='land')B.goal={x:+o.x||PAD.x,z:+o.z||PAD.z,h:0,kind:'land'};else if(isFinite(+o.x)&&isFinite(+o.z))B.goal={x:+o.x,z:+o.z,h:clamp(+o.h||18,4,60),kind:'go'};
-      B.t=12;if(o.say)B.say=String(o.say).slice(0,80);});}
-  catch(e){AIB.err=String(e.message||e);if(AIB.ok!==false){toast('❌ Couldn\'t connect to Claude ('+AIB.err+') — the built-in AI is flying the bots',4500);}AIB.ok=false;}
-  AIB.busy=false;}
-function aiItems(){return[mInfo('🤖 AI pilots fly their own drones: they race the tracks, do flips, chase you, and help put out fires. They only show up in your game.'),
-  mItem(()=>'🤖 AI pilots: '+(AIB.n||'off')+'  ◀ ▶',()=>aiSet(AIB.n>=10?0:AIB.n+1),d=>aiSet(AIB.n+d)),
-  mItem(()=>'🧠 Brain: '+(AIB.claude?'Claude'+(AIB.ok===true?' (connected ✅)':AIB.ok===false?' (couldn\'t connect — built-in AI flying)':' (connecting…)'):'built-in AI'),()=>{AIB.claude=!AIB.claude;LS.set('aiClaude',AIB.claude);AIB.ok=null;AIB.t=0;}),
-  mItem(()=>'🔑 Claude API key: '+(AIB.key?'saved (tap to change)':'none — tap to paste one'),()=>{const k=prompt('Paste an Anthropic API key so Claude can fly the bots (it stays on this computer). Leave empty to remove it.',AIB.key||'');if(k==null)return;AIB.key=k.trim();LS.set('aiKey',AIB.key);AIB.ok=null;AIB.t=0;}),
-  mInfo('Without a key (or if the internet blocks it), you\'ll see "Couldn\'t connect to Claude" and the built-in AI keeps flying them.'),mItem('◀ Back',()=>menuBack())];}
+function aiAskClaude(){AIB.busy=false;} // no cloud AI: the brain is the local Ollama computer (see aiAskLocal)
+function aiItems(){return[];}
 {const m0=mainItems;mainItems=function(){const L=m0();const i=L.findIndex(it=>{try{return /Races & games/.test(it.label());}catch(e){return false;}});L.splice(i+1,0,mItem(()=>'🤖 AI pilots'+(AIB.n?' ('+AIB.n+' flying)':'')+' ▸',()=>menuPush('🤖 AI pilots',aiItems())));return L;};}
 {const f0=fireTick;fireTick=function(dt){const r=f0.apply(this,arguments);try{aiTick(dt);}catch(e){console.warn('ai',e);}return r;};}
 setTimeout(()=>{if(AIB.n&&started)aiSet(AIB.n);else if(AIB.n){const iv=setInterval(()=>{if(started){clearInterval(iv);aiSet(AIB.n);}},500);}},1500);
@@ -6976,7 +6959,7 @@ function campItems(){return[mItem(()=>'➕ Spawn another AI camper ('+CAMPERS.L.
   L.splice(i+1,0,mItem('📣 Shout to the AI (help! fire! get in the truck!) ▸',()=>menuPush('📣 Shout',shoutItems())),mItem(()=>'🧑‍🚒 AI campers ('+CAMPERS.L.length+') — spawn more ▸',()=>menuPush('🧑‍🚒 AI campers',campItems())));return L;};}
 {const f0=fireItems;fireItems=function(){const L=f0();L.splice(2,0,mItem(()=>'➕ Spawn another AI camper ('+CAMPERS.L.length+' now)',()=>campAdd()),mItem('📣 Shout to the AI ▸',()=>menuPush('📣 Shout',shoutItems())));return L;};}
 
-// ================================================================ 🖥 CONSOLE (the ` ~ key): every message + what's connected (multiplayer, DJI remote, controller, Phone Link, Claude AI)
+// ================================================================ 🖥 CONSOLE (the ` ~ key): every message + what's connected (multiplayer, DJI remote, controller, Phone Link, AI)
 const CONS={L:[],open:false};
 function consLog(txt,kind){CONS.L.push({t:new Date(),txt:String(txt),kind:kind||'info'});if(CONS.L.length>300)CONS.L.shift();if(CONS.open)consDraw();}
 {const t0=toast;toast=function(m,ms){if(m)consLog(m,'msg');return t0.apply(this,arguments);};}
@@ -6989,7 +6972,7 @@ function consStatus(){const ok=(b,y,n)=>b?'<span style="color:#33ff66">✅ '+y+'
     ok(typeof djiLive==='function'&&djiLive(),'DJI remote connected','DJI remote not connected'),
     ok(!!gp,'Controller: '+(gp?gp.id.slice(0,40):''),'No USB controller / InterLink found (move a stick to wake it)'),
     ok(!!window._relay,'Phone Link helper running','Phone Link helper not running'),
-    AIB.claude?ok(AIB.ok===true,'Claude AI connected — flying the bots','Claude AI not connected'+(AIB.err?' ('+AIB.err+')':'')+' — built-in AI flying'):'<span style="opacity:.7">🧠 Claude AI: off (built-in AI)</span>',
+    AIB.claude?ok(AIB.ok===true,'AI connected — flying the bots','AI not connected'+(AIB.err?' ('+AIB.err+')':'')+' — built-in AI flying'):'<span style="opacity:.7">🧠 AI: off (built-in AI)</span>',
     '🤖 AI pilots: '+(AIB.n||0)+' · 🧑‍🚒 campers: '+CAMPERS.L.length+' · 🔥 fires: '+FIRE.L.length+' · 💰 '+ECO.coins+(typeof CES!=='undefined'&&CES.on?' · 🌎 real world: '+(CES.ready?'loaded':'loading'):'')].join('<br>');}
 function consDraw(){let el=$('consP');if(!el){el=document.createElement('div');el.id='consP';el.style.cssText='position:fixed;left:0;right:0;top:0;height:46vh;z-index:90;background:rgba(5,10,8,0.93);color:#cfe;font:12px ui-monospace,Menlo,monospace;padding:10px 12px;overflow:auto;border-bottom:2px solid #33ff66;display:none';
     el.addEventListener('pointerdown',e=>e.stopPropagation());document.body.appendChild(el);}
@@ -6999,7 +6982,7 @@ function consDraw(){let el=$('consP');if(!el){el=document.createElement('div');e
 addEventListener('keydown',e=>{if(e.code==='Backquote'&&!(document.activeElement&&/INPUT|TEXTAREA/.test(document.activeElement.tagName))){CONS.open=!CONS.open;consDraw();e.preventDefault();e.stopPropagation();}},true);
 setInterval(()=>{if(CONS.open)consDraw();},1500);
 // remember connection changes in the console
-(function(){let last='';setInterval(()=>{try{const s=[mpOpen()?'mp+':'mp-',(typeof djiLive==='function'&&djiLive())?'dji+':'dji-',AIB.ok===true?'ai+':AIB.ok===false?'ai-':'ai?'].join(' ');if(s!==last){if(last)consLog('🔌 '+(mpOpen()?'Multiplayer connected':'Multiplayer not connected')+' · '+((typeof djiLive==='function'&&djiLive())?'DJI remote connected':'DJI remote not connected')+(AIB.claude?' · '+(AIB.ok===true?'Claude AI connected':'Claude AI not connected'):''),'info');last=s;}}catch(e){}},2000);})();
+(function(){let last='';setInterval(()=>{try{const s=[mpOpen()?'mp+':'mp-',(typeof djiLive==='function'&&djiLive())?'dji+':'dji-',AIB.ok===true?'ai+':AIB.ok===false?'ai-':'ai?'].join(' ');if(s!==last){if(last)consLog('🔌 '+(mpOpen()?'Multiplayer connected':'Multiplayer not connected')+' · '+((typeof djiLive==='function'&&djiLive())?'DJI remote connected':'DJI remote not connected')+(AIB.claude?' · '+(AIB.ok===true?'AI connected':'AI not connected'):''),'info');last=s;}}catch(e){}},2000);})();
 
 // ================================================================ 🦴 falling hurts: walk off (or jump off) the fire tower → broken leg. You limp until you HEAL (Menu → 🩹 Heal)
 const HURT={leg:false};
@@ -7192,7 +7175,7 @@ function dangerItems(){return[mInfo('Rockets work any time — flying, driving o
 {const b0=battleItems;battleItems=function(){const L=b0();L.splice(1,0,mItem(()=>'💥 Danger mode (any time, no timer): '+(DZ.on?'ON':'off')+' ▸',()=>menuPush('💥 Danger mode',dangerItems())));return L;};}
 
 // ================================================================ 🤖 AI pilots play like a real player: they switch between drones, planes, helis, boats, subs and cars,
-// roam the whole map, visit places, race, chase, do tricks, fight fires — and Claude (when connected) picks their vehicle + plan.
+// roam the whole map, visit places, race, chase, do tricks, fight fires — and the local AI computer (when connected) picks their vehicle + plan.
 const AI_VK=['drone','plane','heli','boat','sub','car'],AI_VIC={drone:'🚁',plane:'✈️',heli:'🚁',boat:'🚤',sub:'🐟',car:'🚙'};
 function aiPlaces(){const L=[{n:'the launch pad',x:PAD.x,z:PAD.z},{n:'the fire tower',x:FT.x,z:FT.z},{n:'the campsite',x:16,z:-14},{n:'the meadow',x:(MEADOW.x0+MEADOW.x1)/2,z:0},{n:'the lake',x:LAKE.x,z:LAKE.z,water:1},
     {n:'the airfield',x:FLD.x,z:FLD.z},{n:'the dirt track',x:-60,z:30},{n:'the arena',x:(ARENA.x0+ARENA.x1)/2,z:(ARENA.z0+ARENA.z1)/2},{n:'the fire truck',x:TRUCK.x,z:TRUCK.z}];
@@ -7249,20 +7232,6 @@ aiVehTick=function(B,dt){const k=B.kind;B.ph+=dt;if(!B.wp||B.wpT<=0){B.wp=aiPick
 {const m0=aiMake;aiMake=function(i){const B=m0.apply(this,arguments);const kind=AI_VK[Math.floor(Math.random()*AI_VK.length)];B.kind=kind;aiStartAt(B,kind);aiRespawnQuiet(B);B.swT=30+Math.random()*60;return B;};}
 // dead pilots come back on their current vehicle
 {const s0=aiSpec;aiSpec=function(i){const B=AIB.L.find(b=>b.i===i);return B&&B.kind?aiSpec2(i,B.kind):s0.apply(this,arguments);};}
-// 🧠 Claude picks the vehicle and the plan for each pilot
-aiAskClaude=async function(){if(!AIB.key){if(AIB.ok!==false){AIB.ok=false;AIB.err='no API key';toast('❌ Couldn\'t connect to Claude (no API key) — the built-in AI is flying the bots',4000);}return;}
-  AIB.busy=true;try{const P=aiPlaces();const fires=FIRE.L.slice(0,6).map(F=>[Math.round(F.x),Math.round(F.z)]);
-    const bots=AIB.L.filter(B=>!B.dead).map(B=>({name:B.name.replace('🤖 ',''),vehicle:B.kind||'drone',x:Math.round(B.p.x),z:Math.round(B.p.z),height:Math.round(B.p.y-H(B.p.x,B.p.z)),doing:B.kind==='drone'||B.kind==='heli'?(B.goal?B.goal.kind:B.mode):'cruising',minutesInVehicle:Math.round((120-(B.swT||0))/60*10)/10}));
-    const me=WALK.on?'walking':vkind();
-    const prompt='You control the AI pilots in "Woods RC Sim", a kids\' RC game. Play like a fun, curious kid who loves trying everything: switch vehicles often (drone, plane, heli, boat, sub, car), explore all over the map, race, chase the player, do tricks, help fight fires, visit places, and chat. Never stay in one spot doing one thing.\n'+
-      'Player "'+(CFG.name||'Madison')+'" is '+me+' at x='+Math.round(D.pos.x)+' z='+Math.round(D.pos.z)+'.\nPlaces: '+JSON.stringify(P.map(q=>({name:q.n,x:Math.round(q.x),z:Math.round(q.z)})))+'\nFires: '+JSON.stringify(fires)+'\nTracks (drones): '+Object.keys(courses).filter(k=>!courses[k].custom).slice(0,8).join(',')+'\nPilots: '+JSON.stringify(bots)+
-      '\nBoats and subs only work on the lake; planes fly high and fast; cars drive on land.\nReply ONLY with a JSON array, one object per pilot you want to change: {"name":..., "vehicle":"drone"|"plane"|"heli"|"boat"|"sub"|"car", "do":"go"|"place"|"fire"|"chase"|"flip"|"land"|"race", "place":"place name", "x":number, "z":number, "h":number, "track":string, "say":"short friendly chat line or empty"}.';
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':AIB.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-haiku-5-5',max_tokens:700,messages:[{role:'user',content:prompt}]})});
-    if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();const txt=(j.content||[]).map(c=>c.text||'').join('');const arr=JSON.parse(txt.slice(txt.indexOf('['),txt.lastIndexOf(']')+1));
-    if(AIB.ok!==true){AIB.ok=true;toast('🧠 Connected to Claude — Claude is now deciding what the AI pilots do',3000);}
-    aiApply(arr);}
-  catch(e){AIB.err=String(e.message||e);if(AIB.ok!==false){toast('❌ Couldn\'t connect to Claude ('+AIB.err+') — the built-in AI is flying the bots',4500);}AIB.ok=false;}
-  AIB.busy=false;};
 function aiApply(arr){(Array.isArray(arr)?arr:[]).forEach(o=>{const B=AIB.L.find(b=>b.name.replace('🤖 ','').toLowerCase()===String(o.name||'').toLowerCase());if(!B||B.dead)return;
     const veh=String(o.vehicle||'').toLowerCase();if(AI_VK.includes(veh)&&veh!==B.kind)aiSwitch(B,veh,o.say?String(o.say).slice(0,80):null);else if(o.say)B.say=String(o.say).slice(0,80);
     const d=String(o.do||'go'),P=aiPlaces();let q=null;if(o.place){const nm=String(o.place).toLowerCase().replace(/^the /,'');q=P.find(p=>p.n.toLowerCase().includes(nm));}
@@ -7273,10 +7242,7 @@ function aiApply(arr){(Array.isArray(arr)?arr:[]).forEach(o=>{const B=AIB.L.find
       else if(d==='land')B.goal={x:isFinite(tx)?tx:PAD.x,z:isFinite(tz)?tz:PAD.z,h:0,kind:'land'};else if(isFinite(tx)&&isFinite(tz))B.goal={x:tx,z:tz,h:clamp(+o.h||18,4,60),kind:'go'};B.t=12;}
     else if(isFinite(tx)&&isFinite(tz)){if(B.kind==='boat'||B.kind==='sub'){if(inWater(tx,tz))B.wp={x:tx,z:tz,y:B.kind==='sub'?WATER_Y-3:WATER_Y+0.05};}else if(B.kind==='plane')B.wp={x:tx,z:tz,alt:clamp(+o.h||30,12,80)};else if(!inWater(tx,tz))B.wp={x:tx,z:tz};B.wpT=25;}
     else if(d==='chase'&&B.kind==='plane')B.wp={x:D.pos.x,z:D.pos.z,alt:20};});}
-// menu: show what each pilot is up to + a button to make them all switch
-{const i0=aiItems;aiItems=function(){const L=i0();L.splice(2,0,mInfo(()=>AIB.L.length?AIB.L.map(B=>B.name+' '+(B.dead?'💀':(AI_VIC[B.kind||'drone']||'🚁')+' '+(B.kind||'drone'))).join(' · '):'(no AI pilots yet)'),
-  mItem('🔀 Everyone switch vehicles now',()=>AIB.L.forEach(B=>{if(!B.dead)aiSwitch(B);})));
-  L[0]=mInfo('🤖 AI pilots play like you: they switch between drones, planes, helicopters, boats, subs and cars, explore the whole map, race, chase you, do tricks, fight fires and chat. With the 🧠 Claude brain connected, Claude picks their vehicles and plans.');return L;};}
+
 
 // ================================================================ v23: assist modes (aim / seeker / deadly / fly-for-me) + rapid fire, parachute, solid fallen trees, menu pause,
 // auto fix window, 15 s respawn (AI 2 min), proximity fuse, AI difficulty + less chat, your own AI server (Ollama), MEGA drones, tiny-drone turbo, a train.
@@ -7418,8 +7384,8 @@ dzBotsShoot=function(dt){if(!DZ.on||!DZ.ai||!AIB.L.length)return;const now=perfo
 // AI chat a LOT less
 {const c0=chatAdd;chatAdd=function(who,txt){if(String(who||'').startsWith('🤖')){const now=performance.now();if(!/[Cc]onnected/.test(String(txt))){if(now-(chatAdd.lastBot||0)<25000)return;chatAdd.lastBot=now;}}return c0.apply(this,arguments);};}
 {const c0=chatSys;chatSys=function(t){if(/respawned|is back at camp|Heading to|joined/.test(String(t))&&/🤖|🧑‍🚒/.test(String(t)))return;return c0.apply(this,arguments);};}
-// ---------------------------------------------------------------- 🖥️ YOUR OWN AI (Dad's computer: Ollama / LM Studio) — any AI, not just Claude
-AIB.src=LS.get('aiSrc',AIB.claude?'claude':'builtin');AIB.url=LS.get('aiUrl','');AIB.model=LS.get('aiModel','');AIB.models=[];AIB.kindApi='';
+// ---------------------------------------------------------------- 🖥️ YOUR OWN AI (Dad's computer: Ollama / LM Studio)
+AIB.src=LS.get('aiSrc','local')==='builtin'?'builtin':'local';AIB.url=LS.get('aiUrl','');AIB.model=LS.get('aiModel','');AIB.models=[];AIB.kindApi='';
 function aiUrlFix(u){u=String(u||'').trim();if(!u)return'';if(!/^https?:\/\//.test(u))u='http://'+u;u=u.replace(/\/+$/,'');if(!/:\d+$/.test(u.replace(/^https?:\/\//,'').split('/')[0]))u+=':11434';return u;}
 async function aiFetchJ(url,opt,ms){const ac=new AbortController(),t=setTimeout(()=>ac.abort(),ms||8000);try{const r=await fetch(url,Object.assign({signal:ac.signal},opt||{}));if(!r.ok)throw new Error('HTTP '+r.status);return await r.json();}finally{clearTimeout(t);}}
 async function aiListModels(){if(!AIB.url)throw new Error('no address');
@@ -7441,22 +7407,11 @@ async function aiAskLocal(){AIB.busy=true;try{if(!AIB.models.length)await aiList
     const arr=aiParse(txt);if(AIB.ok!==true){AIB.ok=true;toast('✅ Connected to AI — '+aiModelName()+' is now deciding what the AI pilots do',3500);chatSys('🧠 Connected to AI: '+aiModelName());}aiApply(arr);}
   catch(e){AIB.err=String(e.name==='AbortError'?'it took too long to answer':e.message||e);if(AIB.ok!==false){toast('❌ Couldn\'t connect to AI ('+AIB.err+') — the built-in brain is flying the pilots',5000);}AIB.ok=false;AIB.t=performance.now()+20000;}
   AIB.busy=false;}
-{const q0=aiAskClaude;aiAskClaude=function(){if(AIB.src==='local')return aiAskLocal();return q0.apply(this,arguments);};}
+
 function aiBrainSet(src){AIB.src=src;LS.set('aiSrc',src);AIB.claude=src!=='builtin';LS.set('aiClaude',AIB.claude);AIB.ok=null;AIB.t=0;AIB.models=src==='local'?AIB.models:[];if(src!=='builtin')toast('🧠 Connecting to AI…',1500);}
 aiBrainSet(AIB.src);AIB.ok=null;
 function aiModelItems(){return[mInfo('Pick which AI model on the computer flies the pilots:'),...AIB.models.map(m=>mItem(()=>(m.n===AIB.model?'✅ ':'')+m.n+(m.par?' · '+m.par:'')+(m.fam?' · '+m.fam:''),()=>{AIB.model=m.n;LS.set('aiModel',m.n);AIB.ok=null;AIB.t=0;toast('🧠 Using '+m.n,1500);})),mItem('◀ Back',()=>menuBack())];}
-aiItems=function(){return[mInfo('🤖 AI pilots play just for fun: they switch between drones, planes, helicopters, boats, subs and cars, explore everywhere, race, do tricks and help fight fires. Pick how hard they play on you below.'),
-  mItem(()=>'🤖 AI pilots: '+(AIB.n||'off')+'  ◀ ▶',()=>aiSet(AIB.n>=10?0:AIB.n+1),d=>aiSet(AIB.n+d)),
-  mInfo(()=>AIB.L.length?AIB.L.map(B=>B.name+' '+(B.dead?'💀':(AI_VIC[B.kind||'drone']||'🚁'))).join(' · '):'(no AI pilots yet)'),
-  mItem(()=>'🎚 How hard they play: '+({fun:'😊 Just for fun',medium:'😐 Medium',hard:'😈 Hard'}[AIB.diff]),()=>{const L=['fun','medium','hard'];AIB.diff=L[(L.indexOf(AIB.diff)+1)%3];LS.set('aiDiff',AIB.diff);}),
-  mItem('🔀 Everyone switch vehicles now',()=>AIB.L.forEach(B=>{if(!B.dead)aiSwitch(B);})),
-  mItem(()=>'🧠 Brain: '+({builtin:'built-in (no internet needed)',local:'🖥️ AI on a computer'+(AIB.model?' — '+AIB.model:''),claude:'Claude (API key)'}[AIB.src])+(AIB.src!=='builtin'?(AIB.ok===true?' ✅':AIB.ok===false?' ❌':' …'):'')+'  (tap to change)',()=>aiBrainSet({builtin:'local',local:'claude',claude:'builtin'}[AIB.src])),
-  mItem(()=>'🖥️ AI computer address: '+(AIB.url||'none — tap to type the IP'),()=>{const k=prompt('Type the IP address of the AI computer (like 192.168.1.50). Ollama uses port 11434 — it gets added for you.',AIB.url?AIB.url.replace(/^http:\/\//,''):'');if(k==null)return;AIB.url=aiUrlFix(k);LS.set('aiUrl',AIB.url);AIB.models=[];AIB.model='';AIB.ok=null;toast('🧠 Connecting to AI…',1500);
-    aiListModels().then(L=>{toast('✅ Found '+L.length+' AI model'+(L.length>1?'s':'')+' — using '+aiModelName(),3500);if(AIB.src!=='local')aiBrainSet('local');}).catch(e=>toast('❌ Couldn\'t connect to AI ('+(e.name==='AbortError'?'no answer':e.message)+'). Is the computer on, and is Ollama set to allow other computers?',6000));}),
-  mItem(()=>'🧩 AI model: '+(AIB.model?aiModelName():'(find models first)')+' ▸',()=>{aiListModels().then(()=>menuPush('🧩 AI models',aiModelItems())).catch(e=>toast('❌ Couldn\'t connect to AI ('+e.message+')',4000));}),
-  mItem(()=>'🔑 Claude API key: '+(AIB.key?'saved':'none'),()=>{const k=prompt('Paste an Anthropic API key (only for the Claude brain). Leave empty to remove it.',AIB.key||'');if(k==null)return;AIB.key=k.trim();LS.set('aiKey',AIB.key);AIB.ok=null;AIB.t=0;}),
-  mInfo('For Dad\'s AI computer (Ollama): it has to allow other computers — set OLLAMA_HOST=0.0.0.0 and OLLAMA_ORIGINS=* on that computer, then restart Ollama. The phone website can\'t reach it; use the game file on a computer.'),
-  mItem('◀ Back',()=>menuBack())];};
+
 // ---------------------------------------------------------------- 💪 MEGA drones (house-sized) + big drones fly smooth
 function MEGA(){return !WALK.on&&vkind()==='drone'&&(ST.rad||0)>6;}
 {const s0=stats;stats=function(sp){const st=s0.apply(this,arguments);try{if(st&&sp&&sp.parts&&st.fc&&(st.w||0)>15000){st.fc=Object.assign({},st.fc,{alpha:0,mismatch:0,topHeavy:0,head:Math.max(st.fc.head||0,0.5)});st.tau=Math.max(st.tau,0.42);if(st.rad>6){st.tough=10;st.mega=true;}}}catch(e){}return st;};}
@@ -7660,6 +7615,23 @@ function putBack(){let n=0;BOOMED.forEach(o=>{if(!OBJS.some(x=>x.id===o.id)){obj
   const t=CRATERS.length;CRATERS.length=0;LS.set('craters',[]);if(t)reloadWorld();toast('🔧 Put back '+n+' thing'+(n===1?'':'s')+(t?' + the trees and rocks grew back':''),2500);}
 {const m0=mainItems;mainItems=function(){const L=m0();const i=L.findIndex(it=>{try{return /Danger mode/.test(it.label());}catch(e){return false;}});L.splice(i+1,0,mItem(()=>'🔧 Put back everything that got blown up'+(BOOMED.length||CRATERS.length?' ('+BOOMED.length+' things, '+CRATERS.length+' blast holes)':''),()=>putBack()));return L;};}
 {const d0=dangerItems;dangerItems=function(){const L=d0();L.splice(L.length-2,0,mItem('🔧 Put back everything that got blown up',()=>putBack()),mItem('🏗 Build mode — place new things (PHOTO places, 🔁 swaps)',()=>{bmSet(true);menuToggle(false);}));return L;};}
+// ---------------------------------------------------------------- 🖥️ the AI brain is Dad's Ollama computer (mistral:7b)
+if(!LS.get('aiUrl',''))AIB.url='http://192.168.128.50:11434';
+if(!LS.get('aiModel',''))AIB.model='mistral:7b';
+if(AIB.src==='claude'||!LS.get('aiSrc',''))aiBrainSet('local');
+{const q0=aiAskClaude;aiAskClaude=function(){if(AIB.src==='local')return aiAskLocal();AIB.busy=false;};}
+{const l0=aiListModels;aiListModels=async function(){const keep=AIB.model;const r=await l0.apply(this,arguments);if(keep&&AIB.models.some(m=>m.n===keep))AIB.model=keep;else if(AIB.models.some(m=>m.n==='mistral:7b'))AIB.model='mistral:7b';LS.set('aiModel',AIB.model);return r;};}
+aiItems=function(){return[mInfo('🤖 AI pilots play just for fun: they switch between drones, planes, helicopters, boats, subs and cars, explore everywhere, race, do tricks and help fight fires.'),
+  mItem(()=>'🤖 AI pilots: '+(AIB.n||'off')+'  ◀ ▶',()=>aiSet(AIB.n>=10?0:AIB.n+1),d=>aiSet(AIB.n+d)),
+  mInfo(()=>AIB.L.length?AIB.L.map(B=>B.name+' '+(B.dead?'💀':(AI_VIC[B.kind||'drone']||'🚁'))).join(' · '):'(no AI pilots yet)'),
+  mItem(()=>'🎚 How hard they play: '+({fun:'😊 Just for fun',medium:'😐 Medium',hard:'😈 Hard'}[AIB.diff]),()=>{const L=['fun','medium','hard'];AIB.diff=L[(L.indexOf(AIB.diff)+1)%3];LS.set('aiDiff',AIB.diff);}),
+  mItem('🔀 Everyone switch vehicles now',()=>AIB.L.forEach(B=>{if(!B.dead)aiSwitch(B);})),
+  mItem(()=>'🧠 Brain: '+(AIB.src==='local'?'🖥️ Dad\'s AI computer (Ollama · '+(AIB.model||'?')+')'+(AIB.ok===true?' ✅':AIB.ok===false?' ❌ not connected':' … connecting'):'built-in (no computer needed)')+'  (tap to change)',()=>aiBrainSet(AIB.src==='local'?'builtin':'local')),
+  mItem(()=>'🖥️ AI computer address: '+(AIB.url?AIB.url.replace(/^http:\/\//,''):'none — tap to type it'),()=>{const k=prompt('AI computer address (IP), like 192.168.128.50 — port 11434 is added for you.',AIB.url?AIB.url.replace(/^http:\/\//,''):'');if(k==null)return;AIB.url=aiUrlFix(k);LS.set('aiUrl',AIB.url);AIB.models=[];AIB.ok=null;toast('🧠 Connecting to AI…',1500);
+    aiListModels().then(L=>{toast('✅ Found '+L.length+' AI model'+(L.length>1?'s':'')+' — using '+aiModelName(),3500);if(AIB.src!=='local')aiBrainSet('local');}).catch(e=>toast('❌ Couldn\'t connect to AI ('+e.message+')',6000));}),
+  mItem(()=>'🧩 AI model: '+(AIB.model||'(find models first)')+' ▸',()=>{aiListModels().then(()=>menuPush('🧩 AI models',aiModelItems())).catch(e=>toast('❌ Couldn\'t connect to AI ('+e.message+')',4000));}),
+  mInfo('Start the game with "Play Multiplayer" — the helper window passes messages to the AI computer so the browser doesn\'t block them.'),
+  mItem('◀ Back',()=>menuBack())];};
 
 // =====================================================================================
 // ===== 🌎 REAL WORLD MAP (CesiumJS): the real Earth from satellite photos + real hills, starting over the farm =====
