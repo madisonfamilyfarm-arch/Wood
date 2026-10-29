@@ -5083,7 +5083,7 @@ function tickMP(dt){
     pe.q.slerp(pe.tq,1-Math.exp(-dt*16));
     const g=pe.mesh.g;g.position.copy(pe.p);g.quaternion.copy(pe.q);g.visible=!pe.hd;
     pe.mesh.props.forEach((P,k)=>{if(P.state!=='none')P.g.rotation.y+=pe.sp*dt*(k%2?1:-1);});tickFx(pe.mesh,t);if(pe.cs)csApply(pe.mesh,pe.cs);
-    if(!pe.tag)pe.tag=label(pe.name,0,0,0,1.5,'rgba(0,0,0,0.6)');pe.tag.position.set(pe.p.x,pe.p.y+Math.max(1.1,pe.rad*1.6),pe.p.z);
+    if(!pe.tag){pe.tag=label(pe.name,0,0,0,3.4,'rgba(0,0,0,0.65)');pe.tag.userData.s0=pe.tag.scale.clone();if(pe.tag.material){pe.tag.material.depthTest=false;pe.tag.material.depthWrite=false;pe.tag.material.fog=false;pe.tag.material.needsUpdate=true;}pe.tag.renderOrder=50;}{const dd=cam.position.distanceTo(pe.p),k=Math.max(1,dd/8);pe.tag.scale.copy(pe.tag.userData.s0).multiplyScalar(k);pe.tag.position.set(pe.p.x,pe.p.y+Math.max(1.6,pe.rad*1.6)+0.6*k,pe.p.z);}
     // their pilot standing (or walking) on the ground
     const pl=pe.wk||pe.pl;if(pl){if(!pe.pilot){pe.pilot=makePilot(pe.col||'#0a84ff');scene.add(pe.pilot);}pe.pilot.visible=true;pe.pilot.position.set(pl[0],H(pl[0],pl[2]),pl[2]);pe.pilot.rotation.y=pe.wk?pe.wk[3]:Math.atan2(pe.p.x-pl[0],pe.p.z-pl[2])+Math.PI;}else if(pe.pilot)pe.pilot.visible=false;
     // bump into each other: both crash
