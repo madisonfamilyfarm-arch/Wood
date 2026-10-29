@@ -5382,7 +5382,7 @@ function tickWalk(dt){
   if(kb){fwd=(k.KeyW||k.ArrowUp?1:0)-(k.KeyS||k.ArrowDown?1:0);side=(k.KeyD?1:0)-(k.KeyA?1:0);turn=(k.ArrowRight?1:0)-(k.ArrowLeft?1:0);look=(k.KeyE?1:0)-(k.KeyQ?1:0);}
   else{fwd=inp.ly;side=0;turn=inp.lx+inp.rx;look=-inp.ry;} // left stick = walk + turn · right stick = look (up/down inverted, like a plane)
   WALK.yaw-=turn*2.0*dt;WALK.pitch=clamp(WALK.pitch+look*1.4*dt,-1.35,1.35);
-  const run=k.ShiftLeft||k.ShiftRight||Math.abs(fwd)>0.92?8.5:4.3,fx=-Math.sin(WALK.yaw),fz=-Math.cos(WALK.yaw);
+  const run=k.ShiftLeft||k.ShiftRight||Math.abs(fwd)>0.92?12:6.5,fx=-Math.sin(WALK.yaw),fz=-Math.cos(WALK.yaw);
   _wv.set(fx*fwd+(-fz)*side,0,fz*fwd+fx*side);if(_wv.lengthSq()>1)_wv.normalize();
   const nx=WALK.pos.x+_wv.x*run*dt,nz=WALK.pos.z+_wv.z*run*dt;_p.set(nx,WALK.pos.y+1.0,nz);
   if(!hitTest(_p,0.3)&&!(inWater(nx,nz)&&H(nx,nz)<WATER_Y-0.6)){WALK.pos.x=nx;WALK.pos.z=nz;}else{const st=surfY(nx,nz,WALK.pos.y+1.3);if(st>WALK.pos.y+0.05&&st<WALK.pos.y+1.3){WALK.pos.x=nx;WALK.pos.z=nz;WALK.pos.y=st;WALK.vy=0;}}
@@ -7588,6 +7588,49 @@ const MEGA_SPEC={"name":"MEGA Smasher","size":0.12,"motor":4,"rotors":4,"mah":80
 
 {const u0=updateCam;updateCam=function(){const r=u0.apply(this,arguments);try{if(ST.giga&&!WALK.on&&camName()==='CHASE'){const p=D.pos;cam.position.y=Math.max(cam.position.y,p.y+ST.rad*0.45);cam.lookAt(p);}}catch(e){}return r;};}
 
+// ================================================================ 🏗 BUILD MODE: walk (or fly) around, PHOTO = place, 🔁 swap = change what you place, tap the big map to add train track
+const BM={on:false,i:0,marks:[]};
+function bmTypes(){return['track',...Object.keys(OTYPES),'remove'];}
+function bmName(t){return t==='track'?'🛤 Train track point':t==='remove'?'🗑 Remove nearest thing':OTYPES[t].ic+' '+OTYPES[t].n;}
+function bmCur(){const T=bmTypes();return T[((BM.i%T.length)+T.length)%T.length];}
+function bmSet(on){BM.on=on==null?!BM.on:!!on;bmBanner();bmMarks();if(BM.on)toast('🏗 BUILD MODE — PHOTO = place '+bmName(bmCur())+' · 🔁 swap = change it · open the map to tap track points · Menu to stop',4500);else toast('🏗 Build mode off',1200);}
+function bmPlace(){const t=bmCur();
+  if(t==='track'){trainAddPt();bmMarks();return;}
+  if(t==='remove'){if(TRAIN.mine.length&&(()=>{const h=trainHere();const p=TRAIN.mine[TRAIN.mine.length-1];return Math.hypot(p[0]-h[0],p[1]-h[1])<6;})()){trainUndo();bmMarks();return;}const o=objNearest();if(o){objDel(o.id);toast('🗑 Removed '+OTYPES[o.type].n,1000);}else toast('Nothing to remove nearby',1000);return;}
+  placeObj(t);beep(800,0.06,0.04);}
+function bmSwap(d){BM.i+=d||1;bmBanner();toast('🏗 Now placing: '+bmName(bmCur()),1300);}
+function bmBanner(){let el=$('bmBan');if(!el){el=document.createElement('div');el.id='bmBan';el.style.cssText='position:fixed;left:50%;top:calc(52px + env(safe-area-inset-top));transform:translateX(-50%);z-index:22;background:rgba(255,159,10,0.85);color:#111;border-radius:10px;padding:4px 12px;font:800 13px system-ui;white-space:nowrap;display:none;pointer-events:auto;cursor:pointer';el.onclick=()=>bmSet(false);document.body.appendChild(el);}
+  el.style.display=BM.on?'block':'none';el.textContent='🏗 BUILD: '+bmName(bmCur())+' — PHOTO = place · 🔁 = swap · tap here to stop';const b=$('bShot');if(b&&BM.on)b.textContent='🏗 PLACE';}
+// little posts where your track points are
+function bmMarks(){BM.marks.forEach(m=>scene.remove(m));BM.marks=[];if(!BM.on)return;TRAIN.mine.forEach((p,i)=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(0.15,0.15,2.4,8),new THREE.MeshBasicMaterial({color:i===TRAIN.mine.length-1?0xff3b30:0xffd60a}));m.position.set(p[0],H(p[0],p[1])+1.2,p[1]);scene.add(m);BM.marks.push(m);});}
+// PHOTO places, 🔁 swaps (keyboard, buttons and the DJI remote all go through these)
+{const s0=shutter;shutter=function(down){if(BM.on){if(down)bmPlace();return;}return s0.apply(this,arguments);};}
+{const c0=cycleShot;cycleShot=function(){if(BM.on){bmSwap(1);return;}return c0.apply(this,arguments);};}
+setTimeout(()=>{const b=$('bShot');if(b)b.addEventListener('click',e=>{if(BM.on){e.stopImmediatePropagation();e.preventDefault();bmPlace();}},true);},600);
+{const u0=updBadge;updBadge=function(){const r=u0.apply(this,arguments);if(BM.on)bmBanner();return r;};}
+// tap the BIG map to put a track point there
+setTimeout(()=>{const c=$('mini');if(!c)return;let dn=null;c.addEventListener('pointerdown',e=>{dn={x:e.clientX,y:e.clientY,big:MAP.mode!=='corner'};},true);
+  c.addEventListener('pointerup',e=>{if(!BM.on||!dn||!dn.big||bmCur()!=='track'||(typeof MED!=='undefined'&&MED.on))return;if(Math.hypot(e.clientX-dn.x,e.clientY-dn.y)>6)return;const w=mapToWorld(e.clientX,e.clientY);
+    TRAIN.mine.push([+w.x.toFixed(1),+w.z.toFixed(1)]);LS.set('trainPts',TRAIN.mine);if(TRAIN.mine.length>=3)trainBuild();bmMarks();toast('🛤 Track point '+TRAIN.mine.length+(TRAIN.mine.length<3?' — add '+(3-TRAIN.mine.length)+' more':''),1200);e.stopImmediatePropagation();},true);},600);
+// the train track is drawn on the map (+ your track points while building)
+{const d0=drawMini;drawMini=function(){const r=d0.apply(this,arguments);try{if(!MAP.T||!TRAIN_PTS.length)return r;const c=$('mini'),x=c.getContext('2d'),W=c.width,Hh=c.height,big=MAP.mode!=='corner';
+  x.save();x.setTransform(1,0,0,1,0,0);x.beginPath();if(big)x.rect(0,0,W,Hh);else x.arc(W/2,Hh/2,Math.min(W,Hh)/2-2,0,7);x.clip();x.setTransform(MAP.T);
+  x.strokeStyle='#8e5a2b';x.lineWidth=2.2/MAP.s*MAP.dpr;x.setLineDash([3/MAP.s*MAP.dpr,2/MAP.s*MAP.dpr]);x.beginPath();TRAIN_PTS.forEach((p,i)=>{if(i%2)return;if(!i)x.moveTo(p.x,p.z);else x.lineTo(p.x,p.z);});if(TRAIN.closed)x.closePath();x.stroke();x.setLineDash([]);
+  const g=TRAIN.cars[0].position;x.fillStyle='#d7263d';x.beginPath();x.arc(g.x,g.z,4/MAP.s*MAP.dpr,0,7);x.fill();
+  if(BM.on){x.fillStyle='#ffd60a';TRAIN.mine.forEach(p=>{x.beginPath();x.arc(p[0],p[1],3.5/MAP.s*MAP.dpr,0,7);x.fill();});}x.restore();}catch(e){}return r;};}
+// menu: build mode everywhere it makes sense
+{const m0=mainItems;mainItems=function(){const L=m0();L.splice(1,0,mItem(()=>BM.on?'🏗 Build mode is ON — tap to stop':'🏗 Build mode (walk around + PHOTO places things)',()=>{bmSet();menuToggle(false);}));return L;};}
+{const t0=trainItems;trainItems=function(){const L=t0();L.splice(1,0,mItem(()=>BM.on&&bmCur()==='track'?'🏗 Building track: ON — tap to stop':'🏗 Build track: walk around + press PHOTO for each point (or tap the big map)',()=>{if(BM.on&&bmCur()==='track')bmSet(false);else{BM.i=0;if(!BM.on)bmSet(true);else bmBanner();}menuToggle(false);}));return L;};}
+{const p0=placeItems;placeItems=function(){const L=p0();L.splice(1,0,mItem(()=>BM.on?'🏗 Build mode ON — tap to stop':'🏗 Build mode: PHOTO places, 🔁 swaps what you place',()=>{bmSet();menuToggle(false);}));return L;};}
+// ---------------------------------------------------------------- 💥 proximity fuse that never misses: checks the rocket's whole path each frame (not just where it is)
+function fuseTargets(){const L=[];for(const id in mp.peers){const pe=mp.peers[id];if(pe.hd||!pe.p)continue;L.push(pe.wk?new V3(pe.wk[0],pe.wk[1]+0.9,pe.wk[2]):pe.p);}
+  if(typeof CAMPERS!=='undefined')for(const C of CAMPERS.L)if(!C.dead&&C.g.visible)L.push(new V3(C.x,H(C.x,C.z)+0.9,C.z));return L;}
+const _fa=new V3(),_fb=new V3(),_fc=new V3();
+{const t0=tickShots;tickShots=function(dt){try{if(!SIM.pause){const R=clamp(WPN.blast*0.75,3,6),T=fuseTargets();if(T.length)for(const s of shots){if(!s.own||s.w!=='rocket'||s.life<=0)continue;
+      const P=s.m.position;_fb.copy(P).addScaledVector(s.v,dt*1.15);_fa.subVectors(_fb,P);const L2=_fa.lengthSq()||1e-9;let best=null,bd=1e9;
+      for(const q of T){const t=clamp(_fc.subVectors(q,P).dot(_fa)/L2,0,1);const cx=P.x+_fa.x*t,cy=P.y+_fa.y*t,cz=P.z+_fa.z*t,d=Math.hypot(q.x-cx,q.y-cy,q.z-cz);if(d<R&&d<bd){bd=d;best=[cx,cy,cz];}}
+      if(best){P.set(best[0],best[1],best[2]);s.v.setLength(0.001);s.life=0;s.prev&&s.prev.copy(P);}}}}catch(e){}return t0.apply(this,arguments);};}
+
 // =====================================================================================
 // ===== 🌎 REAL WORLD MAP (CesiumJS): the real Earth from satellite photos + real hills, starting over the farm =====
 // The game itself (physics, multiplayer, weapons, workshop…) is the same — Cesium just draws the world underneath.
@@ -7826,7 +7869,7 @@ requestAnimationFrame(frame);if(curMap()==='earth')cesLoad();
 $('cBat').style.cursor='pointer';$('cBat').title='tap to swap the battery';$('cBat').onclick=()=>{if(D.state==='landed'||D.state==='down'||(vkind()==='car'||vkind()==='boat')&&Math.hypot(D.vel.x,D.vel.z)<0.5){D.batt=100;D.lowWarn=false;D.autoLand=false;beep(900,0.1,0.05);toast('🔋 Fresh battery!',1200);}else toast('🔋 Land (or stop) first, then tap here to swap the battery',1800);};
 if(!CFG.mini)$('mapBox').style.display='none';if(!CFG.hud)$('osd').style.display='none';
 updBadge();$('camName').textContent=CAMS[camI];$('bRC').style.display=CAMS[camI]==='PILOT'?'':'none';$('cSpd').textContent=D.speed;
-window.__wds={step:(inp,sec)=>{for(let t=0;t<sec;t+=1/60)tickDrone(1/60,Object.assign({lx:0,ly:0,rx:0,ry:0},inp));placeDrone();},D,get DR(){return DR;},get ST(){return ST;},get SPEC(){return SPEC;},dji,djiFeed,courses,get course(){return course;},get cpI(){return cpI;},startCourse,nextCam,menu,menuToggle,menuPush,vr,toggleVR,shutter,gallery,takeoff,getCam:()=>CAMS[camI],respawn,chunks,deer,balloons,repair,openRepair,jobAct,curJob,repairJobs,openBuilder,builder,useSpec,PRESETS,stats,mp,mpConnect,impact,setCam:n=>{camI=CAMS.indexOf(n);$('camName').textContent=n;},toggleRC,cycleShot,get shotMode(){return shotMode;},rthPress,get count(){return count;},hitTest,quickFix,armMotors,setRaw:a=>{rawIn=a;},get rcView(){return rcView;},WX,repairJobs,get cpI(){return cpI;},VPRESETS,vkind,kindStart,MAP,MED,medOpen,medUp,medDown,mapMode,buildMyCourses,applyTOD,debris,connectedParts,propStrikes,AP,droneAPI,openProg,runProg,progTab,PROG,BL,PY,apStop,blocksToJs,doFlip,armFlip,fnTap,CFG,rcSetup,rcw,get RCMAP(){return RCMAP;},ECO,DMG,award,CB,comboTick,acroToggle,UW,SEA,seaEnter,seaExit,seaH,XT,xtAdd,aptDice,FIRE,fireStart,fireAdd,ISL,truckGoto,TRUCK,CAMPERS,AIB,aiSet,campAdd,aiHear,CONS,HURT,heal,DZ,dzSet,ASSIST,asSet,asRapid,CHUTE,chuteToggle,LOGS,logHit,TRAIN,trainToggle,MEGA,aiListModels,aiUrlFix,aiSwitch,aiApply,aiPlaces,dzDie,dzBotDie,XTRA,TROPHY,hikerStart,pkgStart,fireworks,shopItems,dmgAdd,ecoRestock,MB,mbPreset,mbIn,FLD,FU,fldBuild,aptPick,fldStart,LOOK,LKT,LKN,lkSky,lkClouds,lkEnvUpdate,RADIO,SIM,LES,LESSONS,lesStart,lesStop,csApply,flapSet,cutSet,smokeToggle,pauseToggle,slowCycle,rescue,SMK,WS,openWorkshop,wsTool,wsSpec,closeWorkshop,partsInfo};
+window.__wds={step:(inp,sec)=>{for(let t=0;t<sec;t+=1/60)tickDrone(1/60,Object.assign({lx:0,ly:0,rx:0,ry:0},inp));placeDrone();},D,get DR(){return DR;},get ST(){return ST;},get SPEC(){return SPEC;},dji,djiFeed,courses,get course(){return course;},get cpI(){return cpI;},startCourse,nextCam,menu,menuToggle,menuPush,vr,toggleVR,shutter,gallery,takeoff,getCam:()=>CAMS[camI],respawn,chunks,deer,balloons,repair,openRepair,jobAct,curJob,repairJobs,openBuilder,builder,useSpec,PRESETS,stats,mp,mpConnect,impact,setCam:n=>{camI=CAMS.indexOf(n);$('camName').textContent=n;},toggleRC,cycleShot,get shotMode(){return shotMode;},rthPress,get count(){return count;},hitTest,quickFix,armMotors,setRaw:a=>{rawIn=a;},get rcView(){return rcView;},WX,repairJobs,get cpI(){return cpI;},VPRESETS,vkind,kindStart,MAP,MED,medOpen,medUp,medDown,mapMode,buildMyCourses,applyTOD,debris,connectedParts,propStrikes,AP,droneAPI,openProg,runProg,progTab,PROG,BL,PY,apStop,blocksToJs,doFlip,armFlip,fnTap,CFG,rcSetup,rcw,get RCMAP(){return RCMAP;},ECO,DMG,award,CB,comboTick,acroToggle,UW,SEA,seaEnter,seaExit,seaH,XT,xtAdd,aptDice,FIRE,fireStart,fireAdd,ISL,truckGoto,TRUCK,CAMPERS,AIB,aiSet,campAdd,aiHear,CONS,HURT,heal,DZ,dzSet,BM,bmSet,bmPlace,bmSwap,ASSIST,asSet,asRapid,CHUTE,chuteToggle,LOGS,logHit,TRAIN,trainToggle,MEGA,aiListModels,aiUrlFix,aiSwitch,aiApply,aiPlaces,dzDie,dzBotDie,XTRA,TROPHY,hikerStart,pkgStart,fireworks,shopItems,dmgAdd,ecoRestock,MB,mbPreset,mbIn,FLD,FU,fldBuild,aptPick,fldStart,LOOK,LKT,LKN,lkSky,lkClouds,lkEnvUpdate,RADIO,SIM,LES,LESSONS,lesStart,lesStop,csApply,flapSet,cutSet,smokeToggle,pauseToggle,slowCycle,rescue,SMK,WS,openWorkshop,wsTool,wsSpec,closeWorkshop,partsInfo};
 </script>
 </body>
 </html>
