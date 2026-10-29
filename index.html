@@ -7583,7 +7583,7 @@ function fuseTargets(){const L=[];for(const id in mp.peers){const pe=mp.peers[id
 const _fa=new V3(),_fb=new V3(),_fc=new V3();
 {const t0=tickShots;tickShots=function(dt){try{if(!SIM.pause){const R=clamp(WPN.blast*0.75,3,6),T=fuseTargets();if(T.length)for(const s of shots){if(!s.own||s.w!=='rocket'||s.life<=0)continue;
       const P=s.m.position;_fb.copy(P).addScaledVector(s.v,dt*1.15);_fa.subVectors(_fb,P);const L2=_fa.lengthSq()||1e-9;let best=null,bd=1e9;
-      for(const q of T){const t=clamp(_fc.subVectors(q,P).dot(_fa)/L2,0,1);const cx=P.x+_fa.x*t,cy=P.y+_fa.y*t,cz=P.z+_fa.z*t,d=Math.hypot(q.x-cx,q.y-cy,q.z-cz);if(d<R&&d<bd){bd=d;best=[cx,cy,cz];}}
+      for(const q of T){const t=clamp(_fc.subVectors(q,P).dot(_fa)/L2,0,1);const cx=P.x+_fa.x*t,cy=P.y+_fa.y*t,cz=P.z+_fa.z*t,d=Math.hypot(q.x-cx,q.y-cy,q.z-cz);if(d<R+(q.fr||0)&&d<bd){bd=d;best=[cx,cy,cz];}}
       if(best){P.set(best[0],best[1],best[2]);s.v.setLength(0.001);s.life=0;s.prev&&s.prev.copy(P);}}}}catch(e){}return t0.apply(this,arguments);};}
 // ---------------------------------------------------------------- 😠 REVENGE button (on screen + main menu): shoots back at whoever shoots at you — even if they miss
 function revSet(on){ASSIST.revenge=on==null?!ASSIST.revenge:!!on;LS.set('asRev',ASSIST.revenge);if(!ASSIST.revenge)ASSIST.revId=null;toast(ASSIST.revenge?'😠 REVENGE ON — anyone who shoots at you gets shot back automatically':'Revenge off',2500);asBtn();}
@@ -7632,6 +7632,28 @@ aiItems=function(){return[mInfo('🤖 AI pilots play just for fun: they switch b
   mItem(()=>'🧩 AI model: '+(AIB.model||'(find models first)')+' ▸',()=>{aiListModels().then(()=>menuPush('🧩 AI models',aiModelItems())).catch(e=>toast('❌ Couldn\'t connect to AI ('+e.message+')',4000));}),
   mInfo('Start the game with "Play Multiplayer" — the helper window passes messages to the AI computer so the browser doesn\'t block them.'),
   mItem('◀ Back',()=>menuBack())];};
+// ---------------------------------------------------------------- 💥 blow up the TRAIN, BIRDS, HOT-AIR BALLOONS and the UFO too (🔧 Put back brings them back)
+const GONE={train:false,ufo:false,birds:[],balloons:[]};
+function blowables(){const L=[];if(!GONE.train&&TRAIN.cars.length)TRAIN.cars.forEach(g=>L.push({k:'train',p:g.position.clone().add(new V3(0,1.7,0)),r:3.8}));
+  if(typeof XTRA!=='undefined'){XTRA.birds.forEach(f=>{if(!f.dead)L.push({k:'bird',o:f,p:f.g.position,r:3});});XTRA.balloons.forEach(b=>{if(!b.dead)L.push({k:'balloon',o:b,p:b.g.position.clone().add(new V3(0,4,0)),r:6.5});});
+    if(XTRA.ufo&&XTRA.ufo.visible&&!GONE.ufo)L.push({k:'ufo',p:XTRA.ufo.position,r:7});}return L;}
+function blowUp(t,by){const p=t.p.clone();
+  if(t.k==='train'){GONE.train=true;TRAIN.cars.forEach(g=>{scene.remove(g);for(let k=0;k<4;k++)puff(g.position.clone().add(new V3((Math.random()-0.5)*4,1+Math.random()*3,(Math.random()-0.5)*6)),0x333333,1.2,2.2);});if(TRAIN.ride)trainToggle();chatSys('💥 '+(by||'Someone')+' blew up the train! 🚂');}
+  else if(t.k==='bird'){t.o.dead=true;scene.remove(t.o.g);for(let k=0;k<10;k++)puff(p.clone().add(new V3((Math.random()-0.5)*3,(Math.random()-0.5)*2,(Math.random()-0.5)*3)),0xffffff,0.15,1.5);GONE.birds.push(t.o);}
+  else if(t.k==='balloon'){t.o.dead=true;scene.remove(t.o.g);GONE.balloons.push(t.o);chatSys('💥 '+(by||'Someone')+' popped a hot-air balloon! 🎈');}
+  else if(t.k==='ufo'){GONE.ufo=true;scene.remove(XTRA.ufo);chatSys('💥 '+(by||'Someone')+' shot down the UFO! 🛸');try{award&&award(50,'🛸 UFO down!');}catch(e){}}}
+// rockets go off when they get near any of these…
+{const f0=fuseTargets;fuseTargets=function(){const L=f0();blowables().forEach(t=>{const q=t.p.clone();q.fr=t.r*0.6;L.push(q);});return L;};}
+// …and the blast destroys whatever is inside it
+{const e0=explode;explode=function(p,r,dr,own,byName,byId){const res=e0.apply(this,arguments);try{const R=Math.max(r||4,3);for(const t of blowables())if(t.p.distanceTo(p)<R+t.r)blowUp(t,DZ.bn||byName);}catch(e){}return res;};}
+// a blown-up train stops running
+{const t0=trainTick;trainTick=function(dt){if(GONE.train)return;return t0.apply(this,arguments);};}
+{const n0=trainNear;trainNear=function(){if(GONE.train)return false;return n0.apply(this,arguments);};}
+// 🔧 Put back also brings these back
+{const p0=putBack;putBack=function(){const n=(GONE.train?1:0)+(GONE.ufo?1:0)+GONE.birds.length+GONE.balloons.length;
+  if(GONE.train){GONE.train=false;TRAIN.cars.forEach(g=>scene.add(g));}if(GONE.ufo&&XTRA.ufo){GONE.ufo=false;scene.add(XTRA.ufo);}
+  GONE.birds.forEach(f=>{f.dead=false;scene.add(f.g);});GONE.birds=[];GONE.balloons.forEach(b=>{b.dead=false;scene.add(b.g);});GONE.balloons=[];
+  p0.apply(this,arguments);if(n)setTimeout(()=>toast('🔧 The train, birds, balloons and UFO are back too',2000),2600);};}
 
 // =====================================================================================
 // ===== 🌎 REAL WORLD MAP (CesiumJS): the real Earth from satellite photos + real hills, starting over the farm =====
