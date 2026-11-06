@@ -4182,7 +4182,7 @@ function mapLabel(x,t,wx,wz,col){const p=MAP.T.transformPoint(new DOMPoint(wx,wz
 function drawMini(){
   const c=$('mini'),box=$('mapBox'),dpr=Math.min(2,devicePixelRatio||1),cw=Math.max(40,box.clientWidth),ch=Math.max(40,box.clientHeight);MAP.dpr=dpr;
   if(c.width!==Math.round(cw*dpr)||c.height!==Math.round(ch*dpr)){c.width=Math.round(cw*dpr);c.height=Math.round(ch*dpr);}
-  const x=c.getContext('2d'),W=c.width,Hh=c.height,big=MAP.mode!=='corner',view=MAP.view*(big?1.8:1),s=Math.min(W,Hh)/2/view,cx=D.pos.x+MAP.px,cz=D.pos.z+MAP.pz,rot=MAP.rot?D.yaw:0;
+  const x=c.getContext('2d'),W=c.width,Hh=c.height,big=MAP.mode!=='corner',view=MAP.view*(big?1.8:1),s=Math.min(W,Hh)/2/view,cx=(MAP.anc?MAP.anc.x:D.pos.x)+MAP.px,cz=(MAP.anc?MAP.anc.z:D.pos.z)+MAP.pz,rot=MAP.rot?D.yaw:0;
   x.save();x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,W,Hh);x.beginPath();if(big)x.rect(0,0,W,Hh);else x.arc(W/2,Hh/2,Math.min(W,Hh)/2-2,0,7);x.clip();x.fillStyle='#2c4a24';x.fillRect(0,0,W,Hh);
   x.translate(W/2,Hh/2);x.rotate(rot);x.scale(s,s);x.translate(-cx,-cz);MAP.T=x.getTransform();MAP.s=s;
   const R=view*1.5,near=(px,pz,m)=>Math.abs(px-cx)<R+m&&Math.abs(pz-cz)<R+m;
@@ -4216,13 +4216,13 @@ function drawMini(){
 function teleport(x,z){if(WALK.on){WALK.pos.set(x,H(x,z),z);toast('🌀 Walked there in a blink',1200);return;}
   if(D.state==='flying'||D.state==='takeoff'){const a=D.pos.y-groundY(D.pos.x,D.pos.z);D.pos.x=x;D.pos.z=z;D.pos.y=groundY(x,z)+Math.max(3,a);D.holdP=null;}else resetDrone({x,z,yaw:D.yaw});chunkTick(true);toast('🌀 Teleported',1200);mpSendNow();}
 function mapToWorld(clientX,clientY){const c=$('mini'),r=c.getBoundingClientRect(),dpr=MAP.dpr||1;const p=MAP.T.inverse().transformPoint(new DOMPoint((clientX-r.left)*dpr,(clientY-r.top)*dpr));return{x:p.x,z:p.y};}
-function mapMode(m){MAP.mode=MAP.mode===m?'corner':m;if(MAP.mode==='corner'){MAP.px=MAP.pz=0;if(MED.on)medClose();}mapApply();}
+function mapMode(m){MAP.mode=MAP.mode===m?'corner':m;if(MAP.mode==='corner'){MAP.px=MAP.pz=0;MAP.anc=null;if(MED.on)medClose();}mapApply();}
 (function(){
   const c=$('mini'),pts=new Map();let drag=null,pinch=0;
   $('mapBtns').addEventListener('pointerdown',e=>e.stopPropagation());
   $('mapBtns').onclick=e=>{const a=e.target.dataset&&e.target.dataset.a;if(!a)return;e.stopPropagation();
     if(a==='in')MAP.view=Math.max(8,MAP.view/1.35);else if(a==='out')MAP.view=Math.min(600,MAP.view*1.35);else if(a==='big')mapMode('big');else if(a==='swap')mapMode('swap');
-    else if(a==='rot'){MAP.rot=!MAP.rot;toast(MAP.rot?'🧭 Map turns with you':'🧭 North is up',1200);}else if(a==='center'){MAP.px=MAP.pz=0;}mapSave();mapApply();};
+    else if(a==='rot'){MAP.rot=!MAP.rot;toast(MAP.rot?'🧭 Map turns with you':'🧭 North is up',1200);}else if(a==='center'){MAP.px=MAP.pz=0;MAP.anc=null;}mapSave();mapApply();};
   c.addEventListener('wheel',e=>{e.preventDefault();MAP.view=clamp(MAP.view*Math.pow(1.0015,e.deltaY),8,600);mapSave();},{passive:false});
   c.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();c.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);
     if(pts.size===2){const a=[...pts.values()];pinch=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1]);drag=null;return;}
@@ -4231,7 +4231,7 @@ function mapMode(m){MAP.mode=MAP.mode===m?'corner':m;if(MAP.mode==='corner'){MAP
     if(pts.size===2&&pinch){const a=[...pts.values()],d=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1]);MAP.view=clamp(MAP.view*pinch/d,8,600);pinch=d;return;}
     if(!drag)return;if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>5)drag.moved=true;if(!drag.moved)return;
     if(MED.on&&MED.dragI>=0){const w=mapToWorld(e.clientX,e.clientY);medMove(w);return;}
-    const w=mapToWorld(e.clientX,e.clientY);MAP.px-=w.x-drag.w.x;MAP.pz-=w.z-drag.w.z;mapApply();});
+    const ddx=(e.clientX-(drag.lx!=null?drag.lx:drag.x))*(MAP.dpr||1),ddy=(e.clientY-(drag.ly!=null?drag.ly:drag.y))*(MAP.dpr||1);drag.lx=e.clientX;drag.ly=e.clientY;mapPanScreen(ddx,ddy);});
   const up=e=>{pts.delete(e.pointerId);if(pts.size<2)pinch=0;if(pts.size||!drag)return;const d=drag;drag=null;
     if(MED.on){medUp(d.moved?mapToWorld(e.clientX,e.clientY):d.w,d.moved);return;}
     if(!d.moved&&MAP.mode==='corner'){mapMode('big');}
@@ -7879,6 +7879,44 @@ const ON_WEB=/github\.io$/.test(location.hostname);
   else L.splice(1,0,mItem('📱 Play on my phone (QR code)',()=>{menuToggle(false);phoneShow();}));return L;};}
 // the AI brain on the website can't reach the home computer — say how to fix it instead of a confusing error
 {const l0=aiListModels;aiListModels=async function(){if(ON_WEB&&AIB.url&&/^http:/.test(AIB.url))throw new Error('the phone website can\'t reach Dad\'s AI — Menu → 🏠 Play through the home computer');return l0.apply(this,arguments);};}
+// on the phone website the home AI can't be reached → quietly use the built-in brain (no error pop-ups)
+if(ON_WEB&&AIB.src==='local'){AIB.src='builtin';AIB.claude=false;}
+{const b0=aiBrainSet;aiBrainSet=function(src){if(ON_WEB&&src==='local'){toast('🏠 Dad\'s AI only works through the home computer (Menu → 🏠 Play through the home computer). Using the built-in brain.',4500);src='builtin';}return b0.call(this,src);};}
+
+// ================================================================ 🗺 MAP: smooth pan (drag / ▲▼◀▶ / keys), it stays where you put it, and a 2D ⇄ 3D switch (3D = tilted bird's-eye view of the real world)
+MAP.d3=LS.get('map3d',false);MAP.y3=0;
+// keep the map where you panned it (doesn't slide along with your drone)
+function mapPanBy(dx,dz){if(!MAP.anc)MAP.anc={x:D.pos.x,z:D.pos.z};MAP.px+=dx;MAP.pz+=dz;mapApply();}
+function mapPanScreen(sx,sy){const rr=MAP.d3&&MAP.mode!=='corner'?MAP.y3:(MAP.rot?D.yaw:0),co=Math.cos(rr),si=Math.sin(rr),ss=MAP.s||1;mapPanBy(-(co*sx+si*sy)/ss,-(-si*sx+co*sy)/ss);}
+function map3dOn(){return MAP.d3&&MAP.mode!=='corner';}
+// ▲▼◀▶ + 2D/3D + rotate buttons on the big map
+setTimeout(()=>{const box=$('mapBox');if(!box)return;const pad=document.createElement('div');pad.id='mapPad';pad.style.cssText='position:absolute;left:10px;bottom:62px;z-index:5;display:none;grid-template-columns:repeat(3,38px);grid-template-rows:repeat(3,38px);gap:3px';
+  const mk=(t,c,r,fn,hold)=>{const b=document.createElement('button');b.textContent=t;b.style.cssText='grid-column:'+c+';grid-row:'+r+';font:800 16px system-ui;border-radius:9px;border:1px solid rgba(255,255,255,0.5);background:rgba(0,0,0,0.6);color:#fff;touch-action:none;cursor:pointer';
+    let iv=null;b.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();fn();if(hold){clearInterval(iv);iv=setInterval(fn,60);}});const stop=()=>{clearInterval(iv);iv=null;};b.addEventListener('pointerup',stop);b.addEventListener('pointerleave',stop);b.addEventListener('click',e=>e.stopPropagation());pad.appendChild(b);return b;};
+  const step=()=>(MAP.s?40/MAP.s*(MAP.dpr||1):6);
+  mk('▲',2,1,()=>mapPanScreen(0,-40*(MAP.dpr||1)),1);mk('◀',1,2,()=>mapPanScreen(-40*(MAP.dpr||1),0),1);mk('▶',3,2,()=>mapPanScreen(40*(MAP.dpr||1),0),1);mk('▼',2,3,()=>mapPanScreen(0,40*(MAP.dpr||1)),1);
+  mk('🎯',2,2,()=>{MAP.px=MAP.pz=0;MAP.anc=null;mapApply();});
+  const t=document.createElement('div');t.id='mapTop';t.style.cssText='position:absolute;right:10px;bottom:10px;z-index:5;display:none;gap:5px';
+  const mk2=(txt,fn)=>{const b=document.createElement('button');b.style.cssText='font:800 14px system-ui;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.5);background:rgba(0,0,0,0.65);color:#fff;cursor:pointer';b.textContent=txt;b.addEventListener('pointerdown',e=>e.stopPropagation());b.onclick=e=>{e.stopPropagation();fn(b);};t.appendChild(b);return b;};
+  const d=mk2(MAP.d3?'🗺 2D':'⛰ 3D',b=>{MAP.d3=!MAP.d3;LS.set('map3d',MAP.d3);b.textContent=MAP.d3?'🗺 2D':'⛰ 3D';toast(MAP.d3?'⛰ 3D map — drag to move, scroll/pinch to zoom, ⟲ ⟳ to turn':'🗺 2D map',2000);});
+  mk2('⟲',()=>{MAP.y3+=Math.PI/4;});mk2('⟳',()=>{MAP.y3-=Math.PI/4;});
+  box.appendChild(pad);box.appendChild(t);
+  setInterval(()=>{const big=MAP.mode!=='corner';pad.style.display=big?'grid':'none';t.style.display=big?'flex':'none';[...t.children].slice(1).forEach(b=>b.style.display=map3dOn()?'':'none');const c=$('mini');if(c)c.style.opacity=map3dOn()?'0':'1';box.style.background=map3dOn()?'transparent':'';},250);},800);
+// arrow keys pan the big map (while it's open)
+addEventListener('keydown',e=>{if(MAP.mode==='corner'||menu.open)return;const k={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]}[e.code];if(!k)return;e.preventDefault();e.stopImmediatePropagation();mapPanScreen(k[0]*50*(MAP.dpr||1),k[1]*50*(MAP.dpr||1));},true);
+// ---------------------------------------------------------------- ⛰ the 3D map: an extra camera high above, drawn into the big-map box
+const MAP3C=new THREE.PerspectiveCamera(50,1,1,5000);
+const MAPBEAC=(()=>{const g=new THREE.Group();const m=new THREE.Mesh(new THREE.ConeGeometry(1,3,12),new THREE.MeshBasicMaterial({color:0xff3b30}));m.rotation.x=Math.PI;g.add(m);g.visible=false;scene.add(g);return g;})();
+function map3dCenter(){const a=MAP.anc||D.pos;return new V3(a.x+MAP.px,0,a.z+MAP.pz);}
+{const r0=renderer.render.bind(renderer);renderer.render=function(sc,camera){r0(sc,camera);if(camera!==cam||!map3dOn()||!started)return;try{
+  const box=$('mapBox'),R=box.getBoundingClientRect();if(R.width<20)return;const c=map3dCenter(),view=MAP.view*1.8;c.y=H(c.x,c.z);
+  const dist=view*1.6;MAP3C.aspect=R.width/R.height;MAP3C.position.set(c.x+Math.sin(MAP.y3)*dist*0.75,c.y+dist*0.85,c.z+Math.cos(MAP.y3)*dist*0.75);MAP3C.lookAt(c);MAP3C.far=dist*6;MAP3C.updateProjectionMatrix();
+  const me=WALK.on?WALK.pos:D.pos;MAPBEAC.position.set(me.x,me.y+view*0.06+2,me.z);MAPBEAC.scale.setScalar(Math.max(1,view/25));MAPBEAC.visible=true;
+  const fog=sc.fog;sc.fog=null;const y=innerHeight-R.bottom;renderer.setScissorTest(true);renderer.setViewport(R.left,y,R.width,R.height);renderer.setScissor(R.left,y,R.width,R.height);renderer.clearDepth();r0(sc,MAP3C);
+  renderer.setScissorTest(false);renderer.setViewport(0,0,innerWidth,innerHeight);sc.fog=fog;MAPBEAC.visible=false;}catch(e){renderer.setScissorTest(false);renderer.setViewport(0,0,innerWidth,innerHeight);}};}
+// taps on the 3D map land on the real ground (track points, build mode, teleport all keep working)
+{const m0=mapToWorld;mapToWorld=function(cx,cy){if(!map3dOn())return m0.apply(this,arguments);const R=$('mapBox').getBoundingClientRect();const nd=new THREE.Vector2((cx-R.left)/R.width*2-1,-((cy-R.top)/R.height)*2+1);
+  const ray=new THREE.Raycaster();ray.setFromCamera(nd,MAP3C);const o=ray.ray.origin.clone(),d=ray.ray.direction;for(let t=0;t<6000;t+=2){const p=o.clone().addScaledVector(d,t);if(p.y<=H(p.x,p.z))return{x:p.x,z:p.z};}const p=o.clone().addScaledVector(d,(o.y-0)/Math.max(0.01,-d.y));return{x:p.x,z:p.z};};}
 
 // =====================================================================================
 // ===== 🌎 REAL WORLD MAP (CesiumJS): the real Earth from satellite photos + real hills, starting over the farm =====
@@ -8118,7 +8156,7 @@ requestAnimationFrame(frame);if(curMap()==='earth')cesLoad();
 $('cBat').style.cursor='pointer';$('cBat').title='tap to swap the battery';$('cBat').onclick=()=>{if(D.state==='landed'||D.state==='down'||(vkind()==='car'||vkind()==='boat')&&Math.hypot(D.vel.x,D.vel.z)<0.5){D.batt=100;D.lowWarn=false;D.autoLand=false;beep(900,0.1,0.05);toast('🔋 Fresh battery!',1200);}else toast('🔋 Land (or stop) first, then tap here to swap the battery',1800);};
 if(!CFG.mini)$('mapBox').style.display='none';if(!CFG.hud)$('osd').style.display='none';
 updBadge();$('camName').textContent=CAMS[camI];$('bRC').style.display=CAMS[camI]==='PILOT'?'':'none';$('cSpd').textContent=D.speed;
-window.__wds={step:(inp,sec)=>{for(let t=0;t<sec;t+=1/60)tickDrone(1/60,Object.assign({lx:0,ly:0,rx:0,ry:0},inp));placeDrone();},D,get DR(){return DR;},get ST(){return ST;},get SPEC(){return SPEC;},dji,djiFeed,courses,get course(){return course;},get cpI(){return cpI;},startCourse,nextCam,menu,menuToggle,menuPush,vr,toggleVR,shutter,gallery,takeoff,getCam:()=>CAMS[camI],respawn,chunks,deer,balloons,repair,openRepair,jobAct,curJob,repairJobs,openBuilder,builder,useSpec,PRESETS,stats,mp,mpConnect,impact,setCam:n=>{camI=CAMS.indexOf(n);$('camName').textContent=n;},toggleRC,cycleShot,get shotMode(){return shotMode;},rthPress,get count(){return count;},hitTest,quickFix,armMotors,setRaw:a=>{rawIn=a;},get rcView(){return rcView;},WX,repairJobs,get cpI(){return cpI;},VPRESETS,vkind,kindStart,MAP,MED,medOpen,medUp,medDown,mapMode,buildMyCourses,applyTOD,debris,connectedParts,propStrikes,AP,droneAPI,openProg,runProg,progTab,PROG,BL,PY,apStop,blocksToJs,doFlip,armFlip,fnTap,CFG,rcSetup,rcw,get RCMAP(){return RCMAP;},ECO,DMG,award,CB,comboTick,acroToggle,UW,SEA,seaEnter,seaExit,seaH,XT,xtAdd,aptDice,FIRE,fireStart,fireAdd,ISL,truckGoto,TRUCK,CAMPERS,AIB,aiSet,campAdd,aiHear,CONS,HURT,heal,DZ,dzSet,phoneShow,phoneUrl,trainDerail,trainRerail,putBackItems,TED,tedOpen,tedDone,boomStatic,GONE,AIX,aiChat,campApply,BM,bmSet,bmPlace,bmSwap,ASSIST,asSet,asRapid,CHUTE,chuteToggle,LOGS,logHit,TRAIN,trainToggle,MEGA,aiListModels,aiUrlFix,aiSwitch,aiApply,aiPlaces,dzDie,dzBotDie,XTRA,TROPHY,hikerStart,pkgStart,fireworks,shopItems,dmgAdd,ecoRestock,MB,mbPreset,mbIn,FLD,FU,fldBuild,aptPick,fldStart,LOOK,LKT,LKN,lkSky,lkClouds,lkEnvUpdate,RADIO,SIM,LES,LESSONS,lesStart,lesStop,csApply,flapSet,cutSet,smokeToggle,pauseToggle,slowCycle,rescue,SMK,WS,openWorkshop,wsTool,wsSpec,closeWorkshop,partsInfo};
+window.__wds={step:(inp,sec)=>{for(let t=0;t<sec;t+=1/60)tickDrone(1/60,Object.assign({lx:0,ly:0,rx:0,ry:0},inp));placeDrone();},D,get DR(){return DR;},get ST(){return ST;},get SPEC(){return SPEC;},dji,djiFeed,courses,get course(){return course;},get cpI(){return cpI;},startCourse,nextCam,menu,menuToggle,menuPush,vr,toggleVR,shutter,gallery,takeoff,getCam:()=>CAMS[camI],respawn,chunks,deer,balloons,repair,openRepair,jobAct,curJob,repairJobs,openBuilder,builder,useSpec,PRESETS,stats,mp,mpConnect,impact,setCam:n=>{camI=CAMS.indexOf(n);$('camName').textContent=n;},toggleRC,cycleShot,get shotMode(){return shotMode;},rthPress,get count(){return count;},hitTest,quickFix,armMotors,setRaw:a=>{rawIn=a;},get rcView(){return rcView;},WX,repairJobs,get cpI(){return cpI;},VPRESETS,vkind,kindStart,MAP,MED,medOpen,medUp,medDown,mapMode,buildMyCourses,applyTOD,debris,connectedParts,propStrikes,AP,droneAPI,openProg,runProg,progTab,PROG,BL,PY,apStop,blocksToJs,doFlip,armFlip,fnTap,CFG,rcSetup,rcw,get RCMAP(){return RCMAP;},ECO,DMG,award,CB,comboTick,acroToggle,UW,SEA,seaEnter,seaExit,seaH,XT,xtAdd,aptDice,FIRE,fireStart,fireAdd,ISL,truckGoto,TRUCK,CAMPERS,AIB,aiSet,campAdd,aiHear,CONS,HURT,heal,DZ,dzSet,mapPanScreen,map3dOn,MAP3C,phoneShow,phoneUrl,trainDerail,trainRerail,putBackItems,TED,tedOpen,tedDone,boomStatic,GONE,AIX,aiChat,campApply,BM,bmSet,bmPlace,bmSwap,ASSIST,asSet,asRapid,CHUTE,chuteToggle,LOGS,logHit,TRAIN,trainToggle,MEGA,aiListModels,aiUrlFix,aiSwitch,aiApply,aiPlaces,dzDie,dzBotDie,XTRA,TROPHY,hikerStart,pkgStart,fireworks,shopItems,dmgAdd,ecoRestock,MB,mbPreset,mbIn,FLD,FU,fldBuild,aptPick,fldStart,LOOK,LKT,LKN,lkSky,lkClouds,lkEnvUpdate,RADIO,SIM,LES,LESSONS,lesStart,lesStop,csApply,flapSet,cutSet,smokeToggle,pauseToggle,slowCycle,rescue,SMK,WS,openWorkshop,wsTool,wsSpec,closeWorkshop,partsInfo};
 </script>
 </body>
 </html>
