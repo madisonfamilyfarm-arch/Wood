@@ -5150,7 +5150,7 @@ function chatClose(){const b=$('chatBar');if(b)b.style.display='none';try{$('cha
 function chatSend(txt){txt=(txt||'').trim();if(!txt)return;if(!mpOpen()){toast('💬 Chat works when you\'re in a multiplayer game',2000);return;}mpSend({t:'chat',txt:txt.slice(0,140)});chatAdd(CFG.name+' (you)',txt.slice(0,140),'#ffd60a');}
 function chatAdd(who,txt,col){CHAT.push({who,txt,col,t:performance.now()});if(CHAT.length>40)CHAT.shift();chatDraw();beep(1050,0.05,0.03);vrMsg(who+': '+txt,4000);}
 function chatSys(txt){CHAT.push({who:'',txt,col:'#9fd3ff',t:performance.now()});if(CHAT.length>40)CHAT.shift();chatDraw();}
-function chatDraw(all){const L=chatEl(),now=performance.now(),open=$('chatBar').style.display==='flex';const show=CHAT.filter(c=>open||all||now-c.t<14000).slice(open?-12:-6);
+function chatDraw(all){const L=chatEl(),now=performance.now(),open=$('chatBar').style.display==='flex';const show=CHAT.filter(c=>open||all||now-c.t<30000).slice(open?-12:-5);
   L.innerHTML=show.map(c=>'<div>'+(c.who?'<b style="color:'+(c.col||'#fff')+'">'+esc(c.who)+':</b> ':'')+'<span'+(c.who?'':' style="color:'+c.col+'"')+'>'+esc(c.txt)+'</span></div>').join('');L.style.display=show.length?'block':'none';}
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 setInterval(()=>{if(CHAT.length)chatDraw();},2000);
@@ -7918,7 +7918,8 @@ function map3dCenter(){const a=MAP.anc||D.pos;return new V3(a.x+MAP.px,0,a.z+MAP
 {const m0=mapToWorld;mapToWorld=function(cx,cy){if(!map3dOn())return m0.apply(this,arguments);const R=$('mapBox').getBoundingClientRect();const nd=new THREE.Vector2((cx-R.left)/R.width*2-1,-((cy-R.top)/R.height)*2+1);
   const ray=new THREE.Raycaster();ray.setFromCamera(nd,MAP3C);const o=ray.ray.origin.clone(),d=ray.ray.direction;for(let t=0;t<6000;t+=2){const p=o.clone().addScaledVector(d,t);if(p.y<=H(p.x,p.z))return{x:p.x,z:p.z};}const p=o.clone().addScaledVector(d,(o.y-0)/Math.max(0.01,-d.y));return{x:p.x,z:p.z};};}
 // ---------------------------------------------------------------- 📱 phone layout: the tool buttons fold into one 🎛 button (they covered the right stick)
-const PHONE=matchMedia('(pointer:coarse)').matches||Math.min(innerWidth,innerHeight)<500;
+function devIsPhone(){const m=LS.get('devMode','auto');if(m==='phone')return true;if(m==='computer'||m==='vr')return false;return matchMedia('(hover: none)').matches||Math.min(innerWidth,innerHeight)<500;}
+let PHONE=devIsPhone();
 {const b0=asBtn;asBtn=function(){b0.apply(this,arguments);const box=$('asBox');if(!box||!PHONE)return;let t=$('asFold');
   if(!t){t=document.createElement('button');t.id='asFold';t.className='btn';t.style.cssText=$('asBtn').style.cssText+';font-size:15px;padding:6px 11px';t.onclick=()=>{asBtn.open=!asBtn.open;asBtn();};box.insertBefore(t,box.firstChild);
     box.addEventListener('click',e=>{if(e.target!==t&&asBtn.open){setTimeout(()=>{asBtn.open=false;asBtn();},700);}});}
@@ -7949,8 +7950,8 @@ function cbEl(){let P=$('cbBox');if(P)return P;P=document.createElement('div');P
   document.body.appendChild(P);const i=$('cbIn');['keydown','keyup','keypress'].forEach(ev=>i.addEventListener(ev,e=>{e.stopPropagation();if(ev==='keydown'&&e.key==='Escape'){cbClose();}}));
   $('cbForm').onsubmit=e=>{e.preventDefault();const v=i.value.trim();if(v){chatSend(v);i.value='';}i.focus();};$('cbX').onclick=()=>cbClose();P.addEventListener('pointerdown',e=>e.stopPropagation());return P;}
 function cbDraw(){const L=$('cbLog');if(!L||$('cbBox').style.display==='none')return;L.innerHTML=CHAT.slice(-14).map(c=>'<div><b style="color:'+(c.col||'#9fd3ff')+'">'+esc(c.who||'')+(c.who?':':'')+'</b> '+esc(c.txt)+'</div>').join('')||'<div style="opacity:0.6">No messages yet — say hi!</div>';L.scrollTop=L.scrollHeight;}
-function cbOpen(){const P=cbEl();P.style.display='flex';const lg=$('chatLog');if(lg)lg.style.visibility='hidden';cbDraw();setTimeout(()=>{try{$('cbIn').focus();}catch(e){}},50);}
-function cbClose(){const P=$('cbBox');if(P)P.style.display='none';const lg=$('chatLog');if(lg)lg.style.visibility='';try{$('cbIn').blur();}catch(e){}}
+function cbOpen(){const P=cbEl();P.style.display='flex';document.body.classList.add('cbopen');cbDraw();setTimeout(()=>{try{$('cbIn').focus();}catch(e){}},50);}
+function cbClose(){const P=$('cbBox');if(P)P.style.display='none';document.body.classList.remove('cbopen');try{$('cbIn').blur();}catch(e){}}
 chatOpen=function(){cbOpen();};{const c0=chatClose;chatClose=function(){const r=c0.apply(this,arguments);return r;};}
 {const a0=chatAdd;chatAdd=function(){const r=a0.apply(this,arguments);setTimeout(cbDraw,0);return r;};}
 {const s0=chatSys;chatSys=function(){const r=s0.apply(this,arguments);setTimeout(cbDraw,0);return r;};}
@@ -8006,6 +8007,20 @@ function smartHear(txt){const s=' '+String(txt||'').toLowerCase().replace(/[!?.,
 {const s0=chatSend;chatSend=function(txt){const t=String(txt||'').trim();if(!t)return;const big=aiLocalOn()&&AIB.ok===true&&AIX.answer;
   if(!big){const was=aiHear;aiHear=function(){return true;};let r;try{r=s0.apply(this,arguments);}finally{aiHear=was;}try{smartHear(t);}catch(e){console.warn('smart',e);}return r;}
   return s0.apply(this,arguments);};}
+// ---------------------------------------------------------------- 🐢 chat you can actually READ: AI messages come one at a time (≥2.5 s apart) and stay on screen longer
+const SAYQ=[];
+{const s0=aiSayAs;aiSayAs=function(name,text){SAYQ.push([name,text]);if(SAYQ.length>6)SAYQ.splice(0,SAYQ.length-6);};setInterval(()=>{const m=SAYQ.shift();if(m)s0(m[0],m[1]);},2600);}
+// ---------------------------------------------------------------- 📱💻🥽 Settings: what are you playing on?
+function devSet(m){LS.set('devMode',m);PHONE=devIsPhone();const sticks=document.querySelectorAll('.stick');sticks.forEach(s=>s.style.display=(m==='computer')?'none':'');
+  if(m==='vr'&&!(typeof vr!=='undefined'&&vr.on))try{toggleVR();}catch(e){}if(m!=='vr'&&typeof vr!=='undefined'&&vr.on)try{toggleVR();}catch(e){}
+  const box=$('asBox');if(box){if(!PHONE){[...box.children].forEach(c=>{if(c.id==='asFold')c.style.display='none';else c.style.display=c.dataset.hide?'none':'';});box.style.top='calc(96px + env(safe-area-inset-top))';box.style.maxHeight='';}}asBtn.open=false;asBtn();
+  const bar=$('chatBar');if(bar&&!PHONE){bar.dataset.fixed='';}
+  toast({phone:'📱 Phone mode — touch sticks + the 🎛 Tools button',computer:'💻 Computer mode — keyboard/mouse/controller, no touch sticks',vr:'🥽 VR mode',auto:'🔄 Auto — the game picks'}[m],2500);}
+function devName(){return{auto:'🔄 Auto',phone:'📱 Phone',computer:'💻 Computer',vr:'🥽 VR'}[LS.get('devMode','auto')];}
+{const m0=mainItems;mainItems=function(){const L=m0();L.splice(1,0,mItem(()=>'⚙️ Playing on: '+devName()+'  (tap to change)',()=>{const o=['auto','phone','computer','vr'];const m=o[(o.indexOf(LS.get('devMode','auto'))+1)%4];devSet(m);}));return L;};}
+setTimeout(()=>{const m=LS.get('devMode','auto');if(m==='computer')document.querySelectorAll('.stick').forEach(s=>s.style.display='none');},800);
+
+{const st=document.createElement('style');st.textContent='body.cbopen #chatLog{display:none!important}';document.head.appendChild(st);}
 
 // =====================================================================================
 // ===== 🌎 REAL WORLD MAP (CesiumJS): the real Earth from satellite photos + real hills, starting over the farm =====
