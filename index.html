@@ -7917,6 +7917,21 @@ function map3dCenter(){const a=MAP.anc||D.pos;return new V3(a.x+MAP.px,0,a.z+MAP
 // taps on the 3D map land on the real ground (track points, build mode, teleport all keep working)
 {const m0=mapToWorld;mapToWorld=function(cx,cy){if(!map3dOn())return m0.apply(this,arguments);const R=$('mapBox').getBoundingClientRect();const nd=new THREE.Vector2((cx-R.left)/R.width*2-1,-((cy-R.top)/R.height)*2+1);
   const ray=new THREE.Raycaster();ray.setFromCamera(nd,MAP3C);const o=ray.ray.origin.clone(),d=ray.ray.direction;for(let t=0;t<6000;t+=2){const p=o.clone().addScaledVector(d,t);if(p.y<=H(p.x,p.z))return{x:p.x,z:p.z};}const p=o.clone().addScaledVector(d,(o.y-0)/Math.max(0.01,-d.y));return{x:p.x,z:p.z};};}
+// ---------------------------------------------------------------- 📱 phone layout: the tool buttons fold into one 🎛 button (they covered the right stick)
+const PHONE=matchMedia('(pointer:coarse)').matches||Math.min(innerWidth,innerHeight)<500;
+{const b0=asBtn;asBtn=function(){b0.apply(this,arguments);const box=$('asBox');if(!box||!PHONE)return;let t=$('asFold');
+  if(!t){t=document.createElement('button');t.id='asFold';t.className='btn';t.style.cssText=$('asBtn').style.cssText+';font-size:15px;padding:6px 11px';t.onclick=()=>{asBtn.open=!asBtn.open;asBtn();};box.insertBefore(t,box.firstChild);
+    box.addEventListener('click',e=>{if(e.target!==t&&asBtn.open){setTimeout(()=>{asBtn.open=false;asBtn();},700);}});}
+  t.textContent=asBtn.open?'✕ Close':'🎛 Tools';[...box.children].forEach(c=>{if(c!==t)c.style.display=asBtn.open?(c.dataset.hide?'none':''):'none';});
+  box.style.top='calc(84px + env(safe-area-inset-top))';box.style.maxHeight='calc(100vh - 100px)';box.style.overflowY='auto';};}
+// remember which buttons the normal code hides (so opening the fold doesn't show them)
+{const b1=asBtn;asBtn=function(){b1.apply(this,arguments);if(!PHONE)return;const sb=$('safeBtn'),cb=$('chuteBtn');if(sb){const k=vkind();sb.dataset.hide=((k==='drone'||k==='heli')&&!WALK.on)?'':'1';}if(cb)cb.dataset.hide=(chuteCan()||CHUTE.on)?'':'1';};}
+// 🚂 the default track keeps away from the launch pad and the campsite (it was running campers over)
+{const d0=trainDefaultPts;trainDefaultPts=function(){const P=d0.apply(this,arguments);const avoid=[[PAD.x,PAD.z,24],[16,-14,26],[TRUCK.x,TRUCK.z,14]];
+  return P.map(p=>{let [x,z]=p;for(const [ax,az,r] of avoid){const dx=x-ax,dz=z-az,d=Math.hypot(dx,dz);if(d<r){const k=(r/(d||1));x=ax+dx*k;z=az+dz*k;}}return[x,z];});};}
+if(!TRAIN.mine.length)trainBuild();
+// campers hear the horn and jump out of the way instead of getting squashed
+{const c0=dzCampDie;dzCampDie=function(C,txt){if(/train/i.test(String(txt))){if(!C.dodgeT||performance.now()>C.dodgeT){C.dodgeT=performance.now()+3000;C.x+=(Math.random()<0.5?-1:1)*5;C.z+=(Math.random()<0.5?-1:1)*5;C.g.position.set(C.x,H(C.x,C.z),C.z);beep(330,0.25,0.05);}return;}return c0.apply(this,arguments);};}
 
 // =====================================================================================
 // ===== 🌎 REAL WORLD MAP (CesiumJS): the real Earth from satellite photos + real hills, starting over the farm =====
