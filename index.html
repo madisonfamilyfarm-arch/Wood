@@ -7932,6 +7932,15 @@ const PHONE=matchMedia('(pointer:coarse)').matches||Math.min(innerWidth,innerHei
 if(!TRAIN.mine.length)trainBuild();
 // campers hear the horn and jump out of the way instead of getting squashed
 {const c0=dzCampDie;dzCampDie=function(C,txt){if(/train/i.test(String(txt))){if(!C.dodgeT||performance.now()>C.dodgeT){C.dodgeT=performance.now()+3000;C.x+=(Math.random()<0.5?-1:1)*5;C.z+=(Math.random()<0.5?-1:1)*5;C.g.position.set(C.x,H(C.x,C.z),C.z);beep(330,0.25,0.05);}return;}return c0.apply(this,arguments);};}
+// ---------------------------------------------------------------- 💬 chat on the phone: the bar moves to the TOP (the keyboard was covering it + the Send button), big Send, keyboard "send" key works
+{const o0=chatOpen;chatOpen=function(){chatEl();const bar=$('chatBar'),i=$('chatIn'),go=$('chatGo');
+  if(!bar.dataset.fixed){bar.dataset.fixed=1;i.setAttribute('enterkeyhint','send');i.setAttribute('autocapitalize','sentences');
+    const f=document.createElement('form');f.style.cssText='display:flex;flex:1;gap:6px;margin:0';f.onsubmit=e=>{e.preventDefault();const v=i.value;if(v.trim()){chatSend(v);i.value='';}chatClose();};bar.insertBefore(f,i);f.appendChild(i);f.appendChild(go);go.type='submit';go.onclick=null;
+    go.textContent='Send ➤';go.style.cssText+=';font:800 16px system-ui;padding:8px 16px;min-width:84px';i.placeholder=PHONE?'Type a message, then tap Send ➤':i.placeholder;
+    if(PHONE){bar.style.cssText+=';position:fixed;top:calc(6px + env(safe-area-inset-top));bottom:auto;left:8px;right:8px;width:auto;max-width:none;transform:none;z-index:90;background:rgba(0,0,0,0.88);padding:6px;border-radius:12px;box-sizing:border-box';i.style.cssText+=';flex:1;min-width:0;font-size:16px;background:#fff;color:#111;padding:10px 12px;border-radius:10px;border:0;outline:none';}}
+  return o0.apply(this,arguments);};}
+// a 💬 button opens it on the phone (no Enter key needed)
+setTimeout(()=>{const b=[...document.querySelectorAll('button')].find(x=>x.textContent.trim()==='💬');if(b&&!b.dataset.hooked){b.dataset.hooked=1;b.addEventListener('click',()=>setTimeout(()=>{const bar=$('chatBar');if(!bar||bar.style.display==='none')chatOpen();},50));}},1500);
 
 // =====================================================================================
 // ===== 🌎 REAL WORLD MAP (CesiumJS): the real Earth from satellite photos + real hills, starting over the farm =====
