@@ -8135,6 +8135,11 @@ if(ON_WEB&&/^https:/i.test(AIB.url||'')&&LS.get('aiSrc','')==='local'){AIB.src='
       aiListModels().then(L2=>{toast('✅ Found Dad\'s AI — '+L2.length+' models, using '+AIB.model,3500);aiBrainSet('local');}).catch(e=>toast('❌ '+e.message,7000));}),
     mItem(()=>'🏠 Use the home address ('+'192.168.128.50'+')',()=>{AIB.url=aiUrlFix('192.168.128.50');LS.set('aiUrl',AIB.url);AIB.models=[];AIB.ok=null;toast('🏠 Using the home address',1500);}),
     mItem(()=>'🔑 AI key (only if Dad\'s remote setup needs one): '+(AIB.key2?'saved':'none'),()=>{const v=prompt('Key for Dad\'s AI (leave empty for none)',AIB.key2||'');if(v==null)return;AIB.key2=v.trim();LS.set('aiKey2',AIB.key2);AIB.ok=null;}));return L;};}
+// Open WebUI support (https web page Dad may use remotely): models at /api/models, chat at /api/chat/completions, needs its API key
+{const l0=aiListModels;aiListModels=async function(){try{AIB.owui=false;return await l0.apply(this,arguments);}catch(e){if(!AIB.url)throw e;
+  try{const j=await aiFetchJ(AIB.url+'/api/models',{},10000);const L=(j.data||j.models||[]).map(m=>({n:m.id||m.name,size:0,fam:'',par:''})).filter(m=>m.n);if(!L.length)throw e;AIB.owui=true;AIB.kindApi='openai';AIB.models=L;
+    if(!AIB.model||!L.some(m=>m.n===AIB.model)){const m=L.find(m=>/^mistral/.test(m.n))||L[0];AIB.model=m.n;}LS.set('aiModel',AIB.model);return L;}catch(e2){throw e;}}};}
+{const f0=aiFetchJ;aiFetchJ=function(url,opt,ms){if(AIB.owui&&AIB.url&&String(url).startsWith(AIB.url+'/v1/chat/completions'))url=AIB.url+'/api/chat/completions';return f0.call(this,url,opt,ms);};}
 
 // =====================================================================================
 // ===== 🌎 REAL WORLD MAP (CesiumJS): the real Earth from satellite photos + real hills, starting over the farm =====
