@@ -8022,6 +8022,73 @@ setTimeout(()=>{const m=LS.get('devMode','auto');if(m==='computer')document.quer
 
 {const st=document.createElement('style');st.textContent='body.cbopen #chatLog{display:none!important}';document.head.appendChild(st);}
 
+// ================================================================ 🌐 ONLINE ROOMS: multiplayer phone-to-phone over the internet (no computer needed). One player creates a room → gets a code → friends type the code.
+// Uses PeerJS (MIT) + its free public broker; the room creator's phone passes everyone's messages on.
+const ONL={on:false,peer:null,host:false,conns:[],hc:null,code:''};
+function onlCode(){const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<4;i++)s+=A[Math.floor(Math.random()*A.length)];return s;}
+function onlLoad(cb){if(window.Peer)return cb();toast('🌐 Getting online play ready…',1500);const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js';s.onload=cb;s.onerror=()=>toast('❌ Couldn\'t load online play — is the phone on the internet?',4000);document.head.appendChild(s);}
+// a pretend WebSocket so all the normal multiplayer code works unchanged
+const PWS={readyState:0,send(str){if(ONL.host){ONL.conns.forEach(c=>{if(c.open)try{c.send(str);}catch(e){}});}else if(ONL.hc&&ONL.hc.open){try{ONL.hc.send(str);}catch(e){}}},close(){onlLeave();}};
+function onlAttach(){if(mp.ws&&mp.ws!==PWS){const o=mp.ws;mp.ws=null;try{o.onclose=null;o.close();}catch(e){}}mp.ws=PWS;PWS.readyState=1;mp.want=true;try{mpHello();}catch(e){}}
+function onlRecv(str,from){let m;try{m=typeof str==='string'?JSON.parse(str):str;}catch(e){return;}if(ONL.host){const s=typeof str==='string'?str:JSON.stringify(str);ONL.conns.forEach(c=>{if(c!==from&&c.open)try{c.send(s);}catch(e){}});}try{mpRecv(m);}catch(e){console.warn('onl',e);}}
+function onlHost(tries){onlLoad(()=>{onlLeave(true);const code=onlCode();let p;try{p=new Peer('woodsrc-'+code);}catch(e){toast('❌ Online play didn\'t start: '+e.message,4000);return;}ONL.peer=p;ONL.host=true;ONL.code=code;
+  p.on('open',()=>{ONL.on=true;onlAttach();onlShowCode();chatSys('🌐 Room '+code+' is open — friends: Menu → 🌐 Online rooms → Join, and type '+code);});
+  p.on('connection',c=>{ONL.conns.push(c);c.on('open',()=>{chatSys('👋 Someone joined room '+code+'!');setTimeout(()=>{try{mpHello();}catch(e){}},300);});c.on('data',d=>onlRecv(d,c));c.on('close',()=>{ONL.conns=ONL.conns.filter(x=>x!==c);chatSys('👋 Someone left the room');});});
+  p.on('disconnected',()=>{try{p.reconnect();}catch(e){}});
+  p.on('error',e=>{if(e.type==='unavailable-id'&&(tries||0)<4){onlHost((tries||0)+1);return;}toast('❌ Online play: '+(e.type==='network'||e.type==='server-error'?'can\'t reach the internet room server':e.type),4000);});});}
+function onlJoin(code){code=String(code||'').trim().toUpperCase().replace(/[^A-Z0-9]/g,'');if(code.length<3){toast('Type the 4-letter room code',1600);return;}
+  onlLoad(()=>{onlLeave(true);let p;try{p=new Peer();}catch(e){toast('❌ '+e.message,3000);return;}ONL.peer=p;ONL.host=false;ONL.code=code;toast('🌐 Joining room '+code+'…',2000);
+    p.on('open',()=>{const c=p.connect('woodsrc-'+code,{reliable:true});ONL.hc=c;const t=setTimeout(()=>{if(!ONL.on){toast('❌ Couldn\'t join room '+code+' — check the code, and that the room creator is still playing',5000);onlLeave(true);}},15000);
+      c.on('open',()=>{clearTimeout(t);ONL.on=true;onlAttach();toast('🌐 You joined room '+code+'! 🎉',3000);chatSys('🌐 Joined room '+code);});c.on('data',d=>onlRecv(d,null));c.on('close',()=>{if(ONL.on){toast('🌐 The room closed',3000);onlLeave();}});});
+    p.on('error',e=>toast(e.type==='peer-unavailable'?'❌ No room called '+code+' — check the code':'❌ Online play: '+e.type,4000));});}
+function onlLeave(quiet){const was=ONL.on;if(ONL.peer)try{ONL.peer.destroy();}catch(e){}ONL.peer=null;ONL.conns=[];ONL.hc=null;ONL.on=false;
+  if(mp.ws===PWS){mp.ws=null;PWS.readyState=0;Object.keys(mp.peers).forEach(id=>{if(!/^(bot|tg|tst)/.test(id))mpDrop(id);});}if(was&&!quiet)toast('🚪 Left the online room',1500);onlShowCode(true);}
+// the normal (computer) connection must not kick the room out
+{const c0=mpConnect;mpConnect=function(){if(ONL.on||ONL.peer)return;return c0.apply(this,arguments);};}
+// room code badge (tap to copy / share)
+function onlShowCode(hide){let b=$('onlBadge');if(!b){b=document.createElement('div');b.id='onlBadge';b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);top:calc(56px + env(safe-area-inset-top));z-index:22;background:rgba(10,132,255,0.9);color:#fff;font:800 14px system-ui;padding:5px 12px;border-radius:12px;cursor:pointer;display:none';
+    b.onclick=()=>{const t='Join my Woods RC Sim room: '+ONL.code+'  https://madisonfamilyfarm-arch.github.io/Wood/';if(navigator.share)navigator.share({text:t}).catch(()=>{});else if(navigator.clipboard)navigator.clipboard.writeText(t).then(()=>toast('📋 Copied!',1200));};document.body.appendChild(b);}
+  if(hide||!ONL.on){b.style.display='none';return;}b.style.display='block';b.textContent='🌐 Room '+ONL.code+(ONL.host?' · '+(ONL.conns.filter(c=>c.open).length+1)+' players · tap to share':' · online');}
+setInterval(()=>{if(ONL.on)onlShowCode();},2000);
+function onlItems(){return[mInfo('🌐 Play with friends on their phones (or computers) anywhere — no home computer needed. One person creates a room, everyone else joins with the code.'),
+  mInfo(()=>ONL.on?'You are in room '+ONL.code+(ONL.host?' (you made it — keep the game open!)':''):'Not in a room'),
+  mItem('➕ Create a room',()=>{onlHost();menuToggle(false);}),
+  mItem('🔑 Join a room (type the code)',()=>{const c=prompt('Type the room code your friend sees (like K7QX):','');if(c){onlJoin(c);menuToggle(false);}}),
+  mItem(()=>ONL.on?'📤 Share the room code':'📤 Share (make a room first)',()=>{if(ONL.on)$('onlBadge').click();}),
+  mItem('🚪 Leave the room',()=>onlLeave()),mItem('◀ Back',()=>menuBack())];}
+{const m0=mainItems;mainItems=function(){const L=m0();L.splice(1,0,mItem(()=>'🌐 Online rooms — multiplayer on phones'+(ONL.on?' (in room '+ONL.code+')':'')+' ▸',()=>menuPush('🌐 Online rooms',onlItems())));return L;};}
+// the AI on the phone = the smart built-in brain (it lives in the game, works anywhere)
+
+// ================================================================ 🔄 FLIP button (phones have no F key) · AI pilots really flip when asked · your AI pilots show up for everyone in multiplayer / online rooms
+// ---------------------------------------------------------------- 🔄 flip button
+setTimeout(()=>{const b=document.createElement('button');b.id='flipBtn';b.textContent='🔄 FLIP';b.style.cssText='position:fixed;right:calc(150px + env(safe-area-inset-right));bottom:calc(150px + env(safe-area-inset-bottom));z-index:21;font:800 14px system-ui;padding:9px 12px;border-radius:14px;border:2px solid rgba(255,255,255,0.7);background:rgba(191,90,242,0.85);color:#fff;touch-action:none;display:none;cursor:pointer';
+  let dn=null;b.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();dn={x:e.clientX,y:e.clientY};});
+  b.addEventListener('pointerup',e=>{e.stopPropagation();if(!dn)return;const dx=e.clientX-dn.x,dy=e.clientY-dn.y;dn=null;let way;if(Math.max(Math.abs(dx),Math.abs(dy))>25)way=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'back':'front');try{doFlip(way);}catch(err){}});
+  b.title='Tap = flip · swipe on it = flip that way';document.body.appendChild(b);
+  setInterval(()=>{const k=vkind();b.style.display=started&&!WALK.on&&!menu.open&&D.state==='flying'&&(k==='drone'||k==='heli'||k==='plane')&&(PHONE||LS.get('devMode','auto')==='phone')?'':'none';},300);},1500);
+// in the Tools list too (any device)
+{const b0=asBtn;asBtn=function(){b0.apply(this,arguments);const box=$('asBox');if(!box)return;let v=$('flipTool');if(!v){v=document.createElement('button');v.id='flipTool';v.className='btn';v.style.cssText=$('asBtn').style.cssText;v.textContent='🔄 Flip (F)';v.onclick=()=>{try{doFlip();}catch(e){}};box.appendChild(v);}
+  const k=vkind();v.dataset.hide=(D.state==='flying'&&!WALK.on&&(k==='drone'||k==='heli'||k==='plane'))?'':'1';if(!PHONE||asBtn.open)v.style.display=v.dataset.hide?'none':'';};}
+// ---------------------------------------------------------------- 🤖 AI flips that always happen (a pilot on the ground hops up first)
+{const a0=aiTick;aiTick=function(dt){for(const B of AIB.L){if(B.dead||!(B.flipT>0))continue;B.flipT-=dt;if(B.kind==='drone'||B.kind==='heli'){if(B.p.y-H(B.p.x,B.p.z)<3)B.p.y+=dt*8;}if(B.flipT<=0){B.flipT=0;B.flip=0;}}
+  const r=a0.apply(this,arguments);for(const B of AIB.L){if(B.dead||!(B.flipT>0)||!(B.kind==='drone'||B.kind==='heli'))continue;const k=1-B.flipT/1.8;_ae2.set(k*6.2832*2,B.yaw||0,0,'YXZ');B.q.setFromEuler(_ae2);
+    mpRecv({id:B.id,n:B.name,t:'s',p:[B.p.x,B.p.y,B.p.z],r:[B.q.x,B.q.y,B.q.z,B.q.w],v:[0,0,0],st:'flying',a:1,sp:60});}return r;};}
+function aiFlip(B){if(!B||B.dead)return;if(B.kind==='plane'){B.loop=2.5;return;}if(B.kind==='drone'||B.kind==='heli'){B.flipT=1.8;if(B.mode!=='fly')B.mode='fly';return;}}
+{const s0=smartHear;smartHear=function(txt){const s=' '+String(txt||'').toLowerCase()+' ';if(/\b(flip|flips|trick|loop|stunt|roll|backflip|frontflip)\b/.test(s)){let W=sbWho(s.replace(/[!?.,]/g,' '));if(!W){const me=dzMe()||D.pos;const n=AIB.L.filter(B=>!B.dead).sort((a,b)=>a.p.distanceTo(me)-b.p.distanceTo(me))[0];W=n?[{B:n}]:[];}
+    W.forEach((w,i)=>{if(w.B){aiFlip(w.B);sbSay(w,['Watch this! 🤸','Wheee!','Ta-da! ✨','Flip time! 🔄'][i%4],300+i*500);}else if(w.C){w.C.dance=performance.now()+4000;sbSay(w,'I can\'t flip, but I can dance! 💃',300+i*500);}});return true;}return s0.apply(this,arguments);};}
+{const p0=aiApply;aiApply=function(arr){(Array.isArray(arr)?arr:[]).forEach(o=>{if(o&&/flip|trick|loop/.test(String(o.do||''))){const B=AIB.L.find(b=>b.name.replace('🤖 ','').toLowerCase()===String(o.name||'').toLowerCase());if(B)aiFlip(B);}});return p0.apply(this,arguments);};}
+// ---------------------------------------------------------------- 🌐 share your AI pilots with everyone in the game (they show up as "Ace (Madison's AI)")
+const BOTNET={sp:{},last:{}};
+function botNetSend(m){if(!mpOpen()||!mp.ws)return;const o=Object.assign({},m,{id:mp.id+'~'+m.id,q:++mp.seq,n:(m.n||'')+' ('+(CFG.name||'')+'\'s AI)',botnet:1});try{mp.ws.send(JSON.stringify(o));}catch(e){}}
+{const r0=mpRecv;mpRecv=function(m){const r=r0.apply(this,arguments);try{if(m&&!m.botnet&&typeof m.id==='string'&&/^bot\d+$/.test(m.id)&&mp.peers[m.id]){
+    if(m.t==='sp'){BOTNET.sp[m.id]=m;botNetSend(m);}
+    else if(m.t==='s'){const now=performance.now();if(now-(BOTNET.last[m.id]||0)>120){BOTNET.last[m.id]=now;if(BOTNET.sp[m.id]&&now-(BOTNET.sp[m.id].sentT||0)>8000){BOTNET.sp[m.id].sentT=now;botNetSend(BOTNET.sp[m.id]);}botNetSend(m);}}}}catch(e){}return r;};}
+// a pilot that switches / gets blown up disappears for everyone too
+{const d0=mpDrop;mpDrop=function(id){const r=d0.apply(this,arguments);try{if(typeof id==='string'&&/^bot\d+$/.test(id)&&mpOpen()){delete BOTNET.sp[id];try{mp.ws.send(JSON.stringify({t:'bye',id:mp.id+'~'+id,q:++mp.seq}));}catch(e){}}}catch(e){}return r;};}
+{const h0=mpHello;mpHello=function(){const r=h0.apply(this,arguments);try{for(const k in BOTNET.sp)botNetSend(BOTNET.sp[k]);}catch(e){}return r;};}
+// when a real player leaves, their AI pilots leave with them
+setInterval(()=>{try{for(const id in mp.peers){const i=id.indexOf('~');if(i>0){const owner=id.slice(0,i);const pe=mp.peers[id];if(!mp.peers[owner]&&performance.now()-(pe.t||pe.lastT||0)>8000)mpDrop(id);}}}catch(e){}},4000);
+
 // =====================================================================================
 // ===== 🌎 REAL WORLD MAP (CesiumJS): the real Earth from satellite photos + real hills, starting over the farm =====
 // The game itself (physics, multiplayer, weapons, workshop…) is the same — Cesium just draws the world underneath.
@@ -8260,7 +8327,7 @@ requestAnimationFrame(frame);if(curMap()==='earth')cesLoad();
 $('cBat').style.cursor='pointer';$('cBat').title='tap to swap the battery';$('cBat').onclick=()=>{if(D.state==='landed'||D.state==='down'||(vkind()==='car'||vkind()==='boat')&&Math.hypot(D.vel.x,D.vel.z)<0.5){D.batt=100;D.lowWarn=false;D.autoLand=false;beep(900,0.1,0.05);toast('🔋 Fresh battery!',1200);}else toast('🔋 Land (or stop) first, then tap here to swap the battery',1800);};
 if(!CFG.mini)$('mapBox').style.display='none';if(!CFG.hud)$('osd').style.display='none';
 updBadge();$('camName').textContent=CAMS[camI];$('bRC').style.display=CAMS[camI]==='PILOT'?'':'none';$('cSpd').textContent=D.speed;
-window.__wds={step:(inp,sec)=>{for(let t=0;t<sec;t+=1/60)tickDrone(1/60,Object.assign({lx:0,ly:0,rx:0,ry:0},inp));placeDrone();},D,get DR(){return DR;},get ST(){return ST;},get SPEC(){return SPEC;},dji,djiFeed,courses,get course(){return course;},get cpI(){return cpI;},startCourse,nextCam,menu,menuToggle,menuPush,vr,toggleVR,shutter,gallery,takeoff,getCam:()=>CAMS[camI],respawn,chunks,deer,balloons,repair,openRepair,jobAct,curJob,repairJobs,openBuilder,builder,useSpec,PRESETS,stats,mp,mpConnect,impact,setCam:n=>{camI=CAMS.indexOf(n);$('camName').textContent=n;},toggleRC,cycleShot,get shotMode(){return shotMode;},rthPress,get count(){return count;},hitTest,quickFix,armMotors,setRaw:a=>{rawIn=a;},get rcView(){return rcView;},WX,repairJobs,get cpI(){return cpI;},VPRESETS,vkind,kindStart,MAP,MED,medOpen,medUp,medDown,mapMode,buildMyCourses,applyTOD,debris,connectedParts,propStrikes,AP,droneAPI,openProg,runProg,progTab,PROG,BL,PY,apStop,blocksToJs,doFlip,armFlip,fnTap,CFG,rcSetup,rcw,get RCMAP(){return RCMAP;},ECO,DMG,award,CB,comboTick,acroToggle,UW,SEA,seaEnter,seaExit,seaH,XT,xtAdd,aptDice,FIRE,fireStart,fireAdd,ISL,truckGoto,TRUCK,CAMPERS,AIB,aiSet,campAdd,aiHear,CONS,HURT,heal,DZ,dzSet,smartHear,cbOpen,cbClose,mapPanScreen,map3dOn,MAP3C,phoneShow,phoneUrl,trainDerail,trainRerail,putBackItems,TED,tedOpen,tedDone,boomStatic,GONE,AIX,aiChat,campApply,BM,bmSet,bmPlace,bmSwap,ASSIST,asSet,asRapid,CHUTE,chuteToggle,LOGS,logHit,TRAIN,trainToggle,MEGA,aiListModels,aiUrlFix,aiSwitch,aiApply,aiPlaces,dzDie,dzBotDie,XTRA,TROPHY,hikerStart,pkgStart,fireworks,shopItems,dmgAdd,ecoRestock,MB,mbPreset,mbIn,FLD,FU,fldBuild,aptPick,fldStart,LOOK,LKT,LKN,lkSky,lkClouds,lkEnvUpdate,RADIO,SIM,LES,LESSONS,lesStart,lesStop,csApply,flapSet,cutSet,smokeToggle,pauseToggle,slowCycle,rescue,SMK,WS,openWorkshop,wsTool,wsSpec,closeWorkshop,partsInfo};
+window.__wds={step:(inp,sec)=>{for(let t=0;t<sec;t+=1/60)tickDrone(1/60,Object.assign({lx:0,ly:0,rx:0,ry:0},inp));placeDrone();},D,get DR(){return DR;},get ST(){return ST;},get SPEC(){return SPEC;},dji,djiFeed,courses,get course(){return course;},get cpI(){return cpI;},startCourse,nextCam,menu,menuToggle,menuPush,vr,toggleVR,shutter,gallery,takeoff,getCam:()=>CAMS[camI],respawn,chunks,deer,balloons,repair,openRepair,jobAct,curJob,repairJobs,openBuilder,builder,useSpec,PRESETS,stats,mp,mpConnect,impact,setCam:n=>{camI=CAMS.indexOf(n);$('camName').textContent=n;},toggleRC,cycleShot,get shotMode(){return shotMode;},rthPress,get count(){return count;},hitTest,quickFix,armMotors,setRaw:a=>{rawIn=a;},get rcView(){return rcView;},WX,repairJobs,get cpI(){return cpI;},VPRESETS,vkind,kindStart,MAP,MED,medOpen,medUp,medDown,mapMode,buildMyCourses,applyTOD,debris,connectedParts,propStrikes,AP,droneAPI,openProg,runProg,progTab,PROG,BL,PY,apStop,blocksToJs,doFlip,armFlip,fnTap,CFG,rcSetup,rcw,get RCMAP(){return RCMAP;},ECO,DMG,award,CB,comboTick,acroToggle,UW,SEA,seaEnter,seaExit,seaH,XT,xtAdd,aptDice,FIRE,fireStart,fireAdd,ISL,truckGoto,TRUCK,CAMPERS,AIB,aiSet,campAdd,aiHear,CONS,HURT,heal,DZ,dzSet,aiFlip,BOTNET,ONL,onlHost,onlJoin,onlLeave,smartHear,cbOpen,cbClose,mapPanScreen,map3dOn,MAP3C,phoneShow,phoneUrl,trainDerail,trainRerail,putBackItems,TED,tedOpen,tedDone,boomStatic,GONE,AIX,aiChat,campApply,BM,bmSet,bmPlace,bmSwap,ASSIST,asSet,asRapid,CHUTE,chuteToggle,LOGS,logHit,TRAIN,trainToggle,MEGA,aiListModels,aiUrlFix,aiSwitch,aiApply,aiPlaces,dzDie,dzBotDie,XTRA,TROPHY,hikerStart,pkgStart,fireworks,shopItems,dmgAdd,ecoRestock,MB,mbPreset,mbIn,FLD,FU,fldBuild,aptPick,fldStart,LOOK,LKT,LKN,lkSky,lkClouds,lkEnvUpdate,RADIO,SIM,LES,LESSONS,lesStart,lesStop,csApply,flapSet,cutSet,smokeToggle,pauseToggle,slowCycle,rescue,SMK,WS,openWorkshop,wsTool,wsSpec,closeWorkshop,partsInfo};
 </script>
 </body>
 </html>
