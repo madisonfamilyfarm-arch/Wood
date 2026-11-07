@@ -1,0 +1,3 @@
+const H=require('./harness');const fs=require('fs');const J=JSON.parse(fs.readFileSync(process.argv[2]));
+H(async({mk})=>{const A=await mk('A','http://127.0.0.1:8765/woods-rc-sim.html');await A.waitForTimeout(2500);
+  console.log(await A.evaluate(j=>{const sp=sanitize(j.spec);const I=partsInfo(sp),st=stats(sp);const f=I.fc;const o={};for(const k in f)if(typeof f[k]!=='object')o[k]=typeof f[k]==='number'?+f[k].toFixed(3):f[k];return JSON.stringify(o)+' tw '+st.tw.toFixed(2)+' tough '+st.tough+' top '+st.top.toFixed(1)+' mins '+st.mins.toFixed(1)+' W '+I.W.toFixed(0)+' rad '+st.rad.toFixed(1)+' n '+I.n+' guards '+I.guards+' struck '+JSON.stringify(I.struck)+' why '+st.why;},J));});

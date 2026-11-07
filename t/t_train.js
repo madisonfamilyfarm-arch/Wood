@@ -1,0 +1,13 @@
+const H=require('./harness');
+H(async({mk})=>{const A=await mk('A','http://127.0.0.1:8765/woods-rc-sim.html');await A.waitForTimeout(2500);const ev=(f,x)=>A.evaluate(f,x);
+  await ev(()=>startGame('free'));await A.waitForTimeout(1500);
+  console.log(await ev(()=>{let m=0;for(const [k,ch] of chunks)for(const t of ch.trees)if(trainDist(t.x,t.z)<4)m++;return 'len '+TRAIN.len.toFixed(0)+' pts '+TRAIN_PTS.length+' trees on rail '+m+' closed '+TRAIN.closed;}));
+  await ev(()=>{trainGoto();const g=TRAIN.cars[1].position;WALK.pos.set(g.x+2,H(g.x,g.z),g.z);trainToggle();});
+  const u0=await ev(()=>TRAIN.u);await ev(()=>{TRAIN.hold=1;});await A.waitForTimeout(3000);console.log('fwd',await ev(u=>'v '+TRAIN.v.toFixed(1)+' du '+(TRAIN.u-u).toFixed(4)+' btns '+$('trBtns').style.display,u0));
+  await ev(()=>{TRAIN.hold=-1;});await A.waitForTimeout(4000);console.log('back',await ev(()=>'v '+TRAIN.v.toFixed(1)));await ev(()=>{TRAIN.hold=0;});
+  await A.screenshot({path:'train2.png'});
+  console.log(await ev(()=>{trainToggle();const pts=[[10,30],[60,40],[70,-20],[20,-40]];pts.forEach(p=>{WALK.pos.set(p[0],H(p[0],p[1]),p[1]);trainAddPt();});return 'mine '+TRAIN.mine.length+' len '+TRAIN.len.toFixed(0);}));
+  console.log('walk speed',await ev(()=>{WALK.pos.set(0,H(0,0),0);keys.KeyW=true;return 1;}));await A.waitForTimeout(2000);console.log(await ev(()=>{keys.KeyW=false;return 'moved '+Math.hypot(WALK.pos.x,WALK.pos.z).toFixed(1);}));
+  await ev(()=>{trainReset();__wds.setCam('CHASE');walkToggle(false);D.pos.set(30,H(30,30)+40,60);D.yaw=Math.PI;});await A.waitForTimeout(1500);await A.screenshot({path:'train3.png'});
+  console.log('items',await ev(()=>trainItems().length));
+});

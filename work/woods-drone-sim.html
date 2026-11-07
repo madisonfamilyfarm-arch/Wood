@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Woods Drone">
+<title>Woods Drone Sim</title>
+<style>
+html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#000;position:fixed;inset:0;touch-action:none;-webkit-user-select:none;user-select:none;font-family:-apple-system,system-ui,Segoe UI,Roboto,sans-serif;color:#fff;}
+#gl{position:fixed;inset:0;width:100%;height:100%;display:block;}
+.btn{background:rgba(10,14,20,0.62);border:1px solid rgba(255,255,255,0.28);color:#fff;border-radius:10px;padding:7px 10px;font:600 12px system-ui,sans-serif;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;}
+.btn:active{background:rgba(60,80,110,0.8);}
+#top{position:fixed;left:0;right:0;top:0;padding:calc(6px + env(safe-area-inset-top)) calc(8px + env(safe-area-inset-right)) 6px calc(8px + env(safe-area-inset-left));display:flex;gap:5px;align-items:center;background:linear-gradient(rgba(0,0,0,0.55),rgba(0,0,0,0));z-index:20;flex-wrap:wrap;}
+#top .sp{flex:1;}
+.chip{background:rgba(0,0,0,0.5);border-radius:8px;padding:4px 7px;font:700 12px ui-monospace,Menlo,monospace;cursor:pointer;}
+#course{position:fixed;left:50%;top:calc(50px + env(safe-area-inset-top));transform:translateX(-50%);z-index:19;background:rgba(0,0,0,0.55);border-radius:12px;padding:5px 8px 5px 14px;font:700 13px ui-monospace,Menlo,monospace;display:none;align-items:center;gap:8px;white-space:nowrap;}
+#course .x{background:rgba(255,255,255,0.15);border:none;color:#fff;border-radius:8px;padding:3px 8px;font:700 12px system-ui;cursor:pointer;}
+#arrow{position:fixed;left:50%;top:calc(86px + env(safe-area-inset-top));width:46px;height:46px;margin-left:-23px;z-index:19;display:none;pointer-events:none;}
+#osd{position:fixed;left:50%;bottom:calc(8px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:19;background:rgba(0,0,0,0.5);border-radius:10px;padding:5px 12px;font:600 12px ui-monospace,Menlo,monospace;white-space:nowrap;}
+#mini{position:fixed;left:calc(8px + env(safe-area-inset-left));top:calc(50px + env(safe-area-inset-top));width:118px;height:118px;z-index:18;border-radius:50%;}
+#badge{position:fixed;right:calc(10px + env(safe-area-inset-right));top:calc(50px + env(safe-area-inset-top));z-index:19;background:rgba(0,0,0,0.6);border:2px solid #4ade80;border-radius:14px;padding:4px 10px;font:700 12px system-ui;}
+#xh{position:fixed;left:50%;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;border:2px solid rgba(255,255,255,0.75);border-radius:50%;z-index:15;pointer-events:none;}
+#warn{position:fixed;left:50%;top:38%;transform:translateX(-50%);z-index:21;background:rgba(200,30,20,0.85);border-radius:10px;padding:5px 14px;font:800 15px system-ui;display:none;pointer-events:none;}
+#count{position:fixed;left:50%;top:42%;transform:translate(-50%,-50%);z-index:30;font:900 90px system-ui;text-shadow:0 0 18px #000,0 0 4px #000;display:none;pointer-events:none;}
+.stick{position:fixed;bottom:calc(34px + env(safe-area-inset-bottom));width:124px;height:124px;border-radius:50%;background:rgba(0,0,0,0.28);border:2px solid rgba(255,255,255,0.3);z-index:17;touch-action:none;}
+.stick .k{position:absolute;left:50%;top:50%;width:50px;height:50px;margin:-25px 0 0 -25px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#777,#222 70%);border:2px solid #999;pointer-events:none;}
+.stick .t{position:absolute;left:-20px;right:-20px;top:-18px;text-align:center;font:600 10px system-ui;opacity:0.7;}
+#stL{left:calc(16px + env(safe-area-inset-left));}#stR{right:calc(16px + env(safe-area-inset-right));}
+#gimbal{position:fixed;right:calc(152px + env(safe-area-inset-right));bottom:calc(46px + env(safe-area-inset-bottom));z-index:17;height:110px;writing-mode:vertical-lr;direction:rtl;width:26px;}
+#bFire{position:fixed;left:50%;bottom:calc(40px + env(safe-area-inset-bottom));margin-left:-40px;width:80px;height:80px;border-radius:50%;background:rgba(220,40,30,0.85);border:3px solid #ffb080;color:#fff;font:800 14px system-ui;z-index:18;display:none;touch-action:none;}
+#rc{position:fixed;left:50%;bottom:0;transform:translateX(-50%);z-index:16;display:none;pointer-events:none;}
+#toast{position:fixed;left:50%;top:68%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.78);border-radius:12px;padding:10px 16px;font:700 15px system-ui;z-index:60;opacity:0;transition:opacity 0.3s;pointer-events:none;text-align:center;max-width:80vw;}
+#menu{position:fixed;inset:0;z-index:50;background:rgba(4,8,6,0.86);display:none;align-items:center;justify-content:center;}
+#menu .box{width:min(460px,92vw);max-height:86vh;overflow-y:auto;background:#101a14;border:1px solid #2f4a37;border-radius:16px;padding:12px;}
+#menu.side{background:transparent;justify-content:flex-end;pointer-events:none;}
+#menu.side .box{pointer-events:auto;width:min(400px,50vw);margin-right:calc(10px + env(safe-area-inset-right));max-height:92vh;background:rgba(16,26,20,0.93);}
+#menu h2{margin:2px 4px 10px;font:800 18px system-ui;}
+.mi{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;margin:4px 0;border-radius:10px;background:#18261d;font:600 14px system-ui;cursor:pointer;flex-wrap:wrap;}
+.mi.sel{background:#ffd60a;color:#000;}
+.mi input[type=range]{width:100%;margin:4px 0 0;}
+.mi .sw{display:inline-block;width:16px;height:16px;border-radius:4px;border:1px solid #fff;vertical-align:middle;margin-left:6px;}
+.mi.info{background:#0c140f;cursor:default;font-weight:500;font-size:13px;}
+#gal{position:fixed;inset:0;z-index:55;background:rgba(0,0,0,0.92);display:none;overflow-y:auto;padding:14px;}
+#gal .grid{display:flex;flex-wrap:wrap;gap:8px;}
+#gal .grid a{display:block;width:150px;}
+#gal img,#gal video{width:150px;border-radius:8px;display:block;}
+#repair{position:fixed;inset:0;z-index:45;display:none;align-items:center;justify-content:center;pointer-events:none;}
+#repair .rbox{pointer-events:auto;background:rgba(12,18,14,0.9);border:1px solid #3a5;border-radius:16px;padding:8px;width:min(660px,96vw,calc((100vh - 96px)*1.6));}
+#repair .rh{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;font:800 15px system-ui;}
+#rcv{width:100%;height:auto;display:block;touch-action:none;border-radius:10px;background:#0b120d;}
+#repair .rb{display:flex;gap:8px;justify-content:center;margin-top:5px;flex-wrap:wrap;}
+#vrUI{position:fixed;inset:0;z-index:40;display:none;pointer-events:none;}
+#vrUI .btn{pointer-events:auto;position:absolute;}
+#djiStat{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:58;background:#0e1510;border:1px solid #3a5;border-radius:14px;padding:16px;width:min(440px,90vw);display:none;font:13px ui-monospace,Menlo,monospace;white-space:pre-wrap;}
+body.vr #toast,body.vr #top,body.vr #course,body.vr #arrow,body.vr #osd,body.vr #mini,body.vr #badge,body.vr #xh,body.vr .stick,body.vr #gimbal,body.vr #warn,body.vr #count,body.vr #bFire,body.vr #rc,body.vr #repair{display:none!important;}
+body.vr #vrUI{display:block;}
+body.remote .stick,body.remote #gimbal{display:none;}
+body.rcview .stick,body.rcview #gimbal{display:none;}
+#start{position:fixed;inset:0;z-index:70;background:radial-gradient(ellipse at 50% 30%,#1d3a26,#050a06 75%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:20px;overflow-y:auto;}
+#start h1{margin:0;font:900 30px system-ui;letter-spacing:2px;}
+#start p{margin:0;opacity:0.75;font:14px system-ui;max-width:560px;}
+#start .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+#start .big{font-size:15px;padding:11px 16px;border-radius:12px;}
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+
+<div id="top">
+  <button class="btn" id="bMenu">☰</button>
+  <button class="btn" id="bCam">🎥 <span id="camName">GIMBAL</span></button>
+  <button class="btn" id="bRC" style="display:none">🎮 RC</button>
+  <button class="btn" id="bShot">📷 PHOTO</button>
+  <button class="btn" id="bMode">🔁</button>
+  <button class="btn" id="bTake">🛫 TAKE OFF</button>
+  <button class="btn" id="bRTH" title="tap = fly home · double-tap = land here">🏠</button>
+  <button class="btn" id="bFlip">🔄</button>
+  <span class="sp"></span>
+  <span class="chip" id="cMP" style="display:none"></span>
+  <span class="chip" id="cSpd">NORMAL</span><span class="chip" id="cBat">🔋100%</span>
+  <button class="btn" id="bDJI">🎮 DJI</button>
+  <button class="btn" id="bVR">🥽 VR</button>
+  <button class="btn" id="bFS">⛶</button>
+</div>
+<div id="course"><span id="courseTxt"></span><button class="x" id="courseX">✕ end</button></div>
+<canvas id="arrow" width="92" height="92"></canvas>
+<canvas id="mini" width="236" height="236"></canvas>
+<div id="badge">📷 PHOTO</div>
+<div id="xh"></div>
+<div id="warn">⚠ OBSTACLE — BRAKING</div>
+<div id="count"></div>
+<div id="osd">—</div>
+<div class="stick" id="stL"><div class="t">▲▼ up/down · ◀▶ turn</div><div class="k"></div></div>
+<div class="stick" id="stR"><div class="t">▲▼ fwd/back · ◀▶ sideways</div><div class="k"></div></div>
+<input type="range" id="gimbal" min="-90" max="90" value="-10" title="camera tilt">
+<button id="bFire">🎯<br>FIRE</button>
+<canvas id="rc"></canvas>
+<div id="toast"></div>
+
+<div id="menu"><div class="box"><h2 id="menuTitle">Menu</h2><div id="menuList"></div></div></div>
+<div id="repair"><div class="rbox"><div class="rh"><span>🔧 Fix your drone</span><button class="btn" id="rClose">✕ later</button></div><canvas id="rcv" width="640" height="400"></canvas>
+  <div class="rb"><button class="btn" id="rQuick">⚡ Quick fix</button><button class="btn" id="rPad">🚶 Carry it back to the pad</button></div></div></div>
+<div id="gal"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><b style="font-size:18px;">📸 Photos & videos</b><button class="btn" onclick="galClose()">✕ Close</button></div><div style="font-size:12px;opacity:0.7;margin-bottom:10px;">Tap one to save it (iPhone: tap, then long-press → Save to Photos).</div><div class="grid" id="galGrid"></div></div>
+<div id="vrUI"><button class="btn" style="right:12px;top:12px;" onclick="toggleVR()">✕ Exit VR</button></div>
+<div id="djiStat"></div>
+
+<div id="start">
+  <h1>🌲 WOODS DRONE SIM</h1>
+  <p>Endless woods, hoops, slalom gates, a twisty forest trail and a race arena with light tunnels. Build your own drone, race your ghost, pop balloons, fix crashes, fly with friends. Works with your DJI remote (USB or the Phone Link), a controller, keyboard or touch — and in VR goggles.</p>
+  <div class="row">
+    <button class="btn big" onclick="startGame('free')">🌲 Free fly</button>
+    <button class="btn big" onclick="startGame('hoops')">⭕ Hoop Run</button>
+    <button class="btn big" onclick="startGame('slalom')">🚩 Slalom</button>
+    <button class="btn big" onclick="startGame('trail')">🛤️ Forest Trail</button>
+    <button class="btn big" onclick="startGame('arena')">🏟️ Race Arena</button>
+    <button class="btn big" onclick="startGame('balloons')">🎈 Balloon Pop</button>
+  </div>
+  <div class="row"><button class="btn" onclick="connectDJI()">🎮 Connect DJI remote</button><button class="btn" onclick="startGame('free');setTimeout(openBuilder,200)">🛠 Build a drone</button><button class="btn" onclick="startGame('free');setTimeout(toggleVR,300)">🥽 Start in VR</button></div>
+  <p style="font-size:12px;">Start like a real DJI: pull BOTH sticks down and in (or down and out) → motors start → push the left stick up. · Right stick = fly · wheel = camera tilt (hold Fn + wheel = zoom) · PHOTO = photo / record / fire · PHOTO-VIDEO switch = photo → video → paintball · Fn tap = next camera · Fn hold = menu · ⏮ tap = fly home, double-tap = land · C/N/S = speed</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+'use strict';
+// =====================================================================================
+// WOODS DRONE SIM v2 — one file
+//  helpers · settings · world (endless streaming chunks) · central scenery · arena · courses
+//  drones (presets, builder, damage) · physics · repair · cameras · input (touch/keys/pad/DJI)
+//  shots (photo/video/paintball) · HUD/minimap/RC view · VR · menu · multiplayer · loop
+// =====================================================================================
+const $=id=>document.getElementById(id);
+const clamp=(v,a,b)=>v<a?a:v>b?b:v, lerp=(a,b,t)=>a+(b-a)*t;
+function smooth(a,b,x){const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t);}
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function hash2(i,j,s){let h=Math.imul(i|0,374761393)+Math.imul(j|0,668265263)+Math.imul(s|0,1442695041);h=Math.imul(h^(h>>>13),1274126177);h^=h>>>16;return(h>>>0)/4294967296;}
+const LS={get(k,d){try{const v=localStorage.getItem('wds_'+k);return v===null?d:JSON.parse(v);}catch(e){return d;}},set(k,v){try{localStorage.setItem('wds_'+k,JSON.stringify(v));}catch(e){}}};
+const V3=THREE.Vector3;
+function toast(m,ms){const t=$('toast');t.textContent=m;t.style.opacity=1;clearTimeout(toast._t);toast._t=setTimeout(()=>t.style.opacity=0,ms||2200);vrMsg(m,ms);}
+function beep(f,d,v){try{const A=beep.a||(beep.a=new (window.AudioContext||window.webkitAudioContext)());const o=A.createOscillator(),g=A.createGain();o.frequency.value=f;g.gain.value=v||0.05;o.connect(g);g.connect(A.destination);o.start();g.gain.exponentialRampToValueAtTime(0.0001,A.currentTime+(d||0.1));o.stop(A.currentTime+(d||0.1)+0.02);}catch(e){}}
+function roundRect(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+
+// ---------------------------------------------------------------- settings
+const CFG=Object.assign({speedPct:100,resp:100,tilt:100,fpvUp:-1,expo:60,avoid:true,landProt:true,wind:0,quality:'normal',name:'Pilot-'+Math.floor(100+Math.random()*900),autoZoom:true},LS.get('cfg',{}));
+function saveCfg(){LS.set('cfg',CFG);}
+const QUALS={low:{r:1,trees:22,seg:10,fogN:30,fogF:95,pr:1},normal:{r:2,trees:34,seg:14,fogN:55,fogF:150,pr:1.25},high:{r:3,trees:44,seg:18,fogN:80,fogF:205,pr:2}};
+let Q=QUALS[CFG.quality]||QUALS.normal;
+
+// ---------------------------------------------------------------- renderer
+const canvas=$('gl');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:false,powerPreference:'high-performance'});
+function setPR(){renderer.setPixelRatio(Math.min(devicePixelRatio||1,Q.pr));renderer.setSize(innerWidth,innerHeight,false);}
+setPR();
+const scene=new THREE.Scene();
+const SKY_HOR=new THREE.Color(0xcfe6f2);
+scene.background=SKY_HOR.clone();
+scene.fog=new THREE.Fog(0xcfe6f2,Q.fogN,Q.fogF);
+const cam=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,0.05,260);
+const camG=new THREE.PerspectiveCamera(72,16/9,0.05,260); // the drone's own camera (for the RC screen)
+scene.add(new THREE.HemisphereLight(0xdfefff,0x3a4a22,0.85));
+const sun=new THREE.DirectionalLight(0xfff2d8,0.9);sun.position.set(60,100,40);scene.add(sun);
+(function(){
+  const m=new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,depthTest:false,fog:false,
+    uniforms:{top:{value:new THREE.Color(0x3d7fd6)},hor:{value:SKY_HOR},sd:{value:sun.position.clone().normalize()}},
+    vertexShader:'varying vec3 v;void main(){v=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
+    fragmentShader:'uniform vec3 top;uniform vec3 hor;uniform vec3 sd;varying vec3 v;void main(){vec3 d=normalize(v);float h=clamp(d.y,0.0,1.0);vec3 c=mix(hor,top,pow(h,0.6));float s=max(dot(d,sd),0.0);c+=vec3(1.0,0.9,0.7)*(pow(s,40.0)*0.5+pow(s,600.0)*2.0);if(d.y<0.0)c=hor;gl_FragColor=vec4(c,1.0);}'});
+  const sky=new THREE.Mesh(new THREE.SphereGeometry(200,24,12),m);sky.renderOrder=-10;sky.frustumCulled=false;
+  sky.onBeforeRender=function(r,s,c){this.position.copy(c.position);this.updateMatrixWorld(true);};scene.add(sky);
+})();
+
+// ---------------------------------------------------------------- terrain height
+const CH=64; // streaming chunk size (m)
+const PAD={x:0,z:0},ARENA={x0:-55,x1:55,z0:150,z1:250},MEADOW={x0:26,x1:118,z0:-18,z1:18};
+const APAD={x:0,z:158}; // arena start pad
+const PONDC={x:62,z:-62,r:9,central:true};
+const WATER_Y=-0.35;
+const POWER={z:60,x0:-175,x1:-40};
+function rectD(x,z,R){const mx=Math.max(R.x0-x,x-R.x1,0),mz=Math.max(R.z0-z,z-R.z1,0);return Math.hypot(mx,mz);}
+const pondCache=new Map();
+function cellPond(i,j){const k=i+','+j;if(pondCache.has(k))return pondCache.get(k);
+  const cx=(i+0.5)*CH,cz=(j+0.5)*CH;let p=null;
+  if(Math.hypot(cx,cz)>200&&rectD(cx,cz,ARENA)>70&&hash2(i,j,7)<0.14){const r=6+hash2(i,j,8)*6,sp=CH-2*r-20;p={x:cx+(hash2(i,j,9)-0.5)*sp,z:cz+(hash2(i,j,10)-0.5)*sp,r};}
+  pondCache.set(k,p);return p;}
+function pondOf(x,z){if(Math.hypot(x-PONDC.x,z-PONDC.z)<PONDC.r+8)return PONDC;return cellPond(Math.floor(x/CH),Math.floor(z/CH));}
+function inWater(x,z){const p=pondOf(x,z);return p&&Math.hypot(x-p.x,z-p.z)<p.r?p:null;}
+function rawH(x,z){return 1.6*Math.sin(x*0.021)*Math.cos(z*0.026)+0.9*Math.sin(x*0.052+z*0.041)+0.5*Math.cos(z*0.09-x*0.03)+2.4*Math.sin(x*0.0071+1)*Math.sin(z*0.0063);}
+function H(x,z){
+  let h=rawH(x,z);
+  h*=smooth(14,34,Math.hypot(x-PAD.x,z-PAD.z));h*=smooth(0,14,rectD(x,z,MEADOW));h*=smooth(0,18,rectD(x,z,ARENA));
+  const p=pondOf(x,z);if(p){const d=Math.hypot(x-p.x,z-p.z);h=lerp(h,-1.3,smooth(p.r+6,p.r*0.7,d));}
+  return h;
+}
+
+// ---------------------------------------------------------------- trail + hoop route (centre)
+let R=rng(20261026);
+const trailPts=[];(function(){const n=14;for(let i=0;i<n;i++){const a=i/n*Math.PI*2,r=105+(R()-0.5)*50;trailPts.push(new V3(Math.cos(a)*r,0,Math.sin(a)*r-10));}})();
+trailPts[0].set(-20,0,-6);
+const trail=new THREE.CatmullRomCurve3(trailPts,true,'catmullrom',0.5);
+const TS=trail.getSpacedPoints(700);TS.pop();
+const tGrid={};const TC=8;TS.forEach((p,i)=>{const k=Math.floor(p.x/TC)+','+Math.floor(p.z/TC);(tGrid[k]=tGrid[k]||[]).push(i);});
+function trailDist(x,z){let best=1e9;const cx=Math.floor(x/TC),cz=Math.floor(z/TC);for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const L=tGrid[(cx+a)+','+(cz+b)];if(L)for(const i of L){const p=TS[i];const d=(p.x-x)*(p.x-x)+(p.z-z)*(p.z-z);if(d<best)best=d;}}return Math.sqrt(best);}
+const hoopRoute=new THREE.CatmullRomCurve3([[8,6],[30,-30],[10,-70],[-30,-90],[-70,-60],[-80,-20],[-60,25],[-25,55],[5,70],[30,45],[22,20]].map(p=>new V3(p[0],0,p[1])),true,'catmullrom',0.5);
+const HR=hoopRoute.getSpacedPoints(400);HR.pop();
+function routeDist(x,z){let b=1e9;for(let i=0;i<HR.length;i+=2){const p=HR[i];const d=(p.x-x)*(p.x-x)+(p.z-z)*(p.z-z);if(d<b)b=d;}return Math.sqrt(b);}
+const FEAT=[{x:-14,z:12,r:9},{x:-40,z:-40,r:7},{x:16,z:-14,r:8},{x:-22,z:-18,r:4},{x:8,z:24,r:4}];
+function blocked(x,z){
+  if(Math.hypot(x-PAD.x,z-PAD.z)<20)return true;
+  if(rectD(x,z,MEADOW)<3)return true;if(rectD(x,z,ARENA)<7)return true;if(Math.abs(x)<5&&z>14&&z<152)return true;
+  const p=pondOf(x,z);if(p&&Math.hypot(x-p.x,z-p.z)<p.r+3)return true;
+  if(Math.abs(z-POWER.z)<4.5&&x>POWER.x0-4&&x<POWER.x1+4)return true;
+  if(Math.hypot(x,z+10)<175){if(trailDist(x,z)<3.4)return true;if(routeDist(x,z)<4.4)return true;}
+  for(const f of FEAT)if(Math.hypot(x-f.x,z-f.z)<f.r)return true;
+  return false;
+}
+
+// ---------------------------------------------------------------- collision world (grid, removable)
+const CG=new Map(),CGS=8;let COLLECT=null;
+function gridAdd(o,x,z,r){o.keys=[];const x0=Math.floor((x-r)/CGS),x1=Math.floor((x+r)/CGS),z0=Math.floor((z-r)/CGS),z1=Math.floor((z+r)/CGS);
+  for(let a=x0;a<=x1;a++)for(let b=z0;b<=z1;b++){const k=a+','+b;let L=CG.get(k);if(!L){L=[];CG.set(k,L);}L.push(o);o.keys.push(k);}if(COLLECT)COLLECT.push(o);return o;}
+function gridRemove(o){for(const k of o.keys){const L=CG.get(k);if(L){const i=L.indexOf(o);if(i>=0)L.splice(i,1);}}}
+function addVCyl(x,z,r,y0,y1){return gridAdd({t:'v',x,z,r,y0,y1},x,z,r);}
+function addCone(x,z,r,y0,y1){return gridAdd({t:'c',x,z,r,y0,y1},x,z,r);}
+function addSph(x,y,z,r){return gridAdd({t:'s',x,y,z,r},x,z,r);}
+function addBox(x0,y0,z0,x1,y1,z1){return gridAdd({t:'b',x0,y0,z0,x1,y1,z1},(x0+x1)/2,(z0+z1)/2,Math.max(x1-x0,z1-z0)/2+1);}
+function addHCyl(a,b,r){const o={t:'h',a:a.clone(),b:b.clone(),r};return gridAdd(o,(a.x+b.x)/2,(a.z+b.z)/2,Math.hypot(b.x-a.x,b.z-a.z)/2+r);}
+function addTorus(c,n,Rr,tube){return gridAdd({t:'t',c:c.clone(),n:n.clone(),R:Rr,tube},c.x,c.z,Rr+tube);}
+const _v=new V3(),_w=new V3(),_p=new V3();
+function hitTest(p,rad){
+  const L=CG.get(Math.floor(p.x/CGS)+','+Math.floor(p.z/CGS));if(!L)return false;
+  for(const o of L){
+    if(o.t==='v'){if(p.y>o.y0-rad&&p.y<o.y1+rad&&Math.hypot(p.x-o.x,p.z-o.z)<o.r+rad)return o;}
+    else if(o.t==='c'){if(p.y>o.y0&&p.y<o.y1){const rr=o.r*(o.y1-p.y)/(o.y1-o.y0);if(Math.hypot(p.x-o.x,p.z-o.z)<rr*0.8+rad*0.6)return o;}}
+    else if(o.t==='s'){if(Math.hypot(p.x-o.x,p.y-o.y,p.z-o.z)<o.r*0.82+rad*0.6)return o;}
+    else if(o.t==='b'){if(p.x>o.x0-rad&&p.x<o.x1+rad&&p.y>o.y0-rad&&p.y<o.y1+rad&&p.z>o.z0-rad&&p.z<o.z1+rad)return o;}
+    else if(o.t==='h'){_v.subVectors(o.b,o.a);const t=clamp(_w.subVectors(p,o.a).dot(_v)/_v.lengthSq(),0,1);_w.copy(o.a).addScaledVector(_v,t);if(_w.distanceTo(p)<o.r+rad)return o;}
+    else if(o.t==='t'){_v.subVectors(p,o.c);const h=_v.dot(o.n);_w.copy(_v).addScaledVector(o.n,-h);const d=Math.hypot(_w.length()-o.R,h);if(d<o.tube+rad*0.8)return o;}
+  }
+  return false;
+}
+
+// ---------------------------------------------------------------- shared geometry / materials
+const GEO={trunk:new THREE.CylinderGeometry(0.7,1,1,6).translate(0,0.5,0),cone:new THREE.ConeGeometry(1,1,7).translate(0,0.5,0),ball:new THREE.IcosahedronGeometry(1,0),rock:new THREE.DodecahedronGeometry(1,0),box:new THREE.BoxGeometry(1,1,1)};
+const MAT={trunk:new THREE.MeshLambertMaterial({color:0x5b3d22}),leaf:new THREE.MeshLambertMaterial({color:0xffffff}),rock:new THREE.MeshLambertMaterial({color:0xffffff}),ground:new THREE.MeshLambertMaterial({vertexColors:true}),
+  water:new THREE.MeshLambertMaterial({color:0x3c7fb4,transparent:true,opacity:0.85}),wood:new THREE.MeshLambertMaterial({color:0x8b6a45}),roof:new THREE.MeshLambertMaterial({color:0x5a2e22}),metal:new THREE.MeshLambertMaterial({color:0x8a8f94}),dark:new THREE.MeshLambertMaterial({color:0x222222}),
+  deer:new THREE.MeshLambertMaterial({color:0x8a5a33}),deerL:new THREE.MeshLambertMaterial({color:0xd9c3a0}),
+  next:new THREE.MeshBasicMaterial({color:0x33ff66}),done:new THREE.MeshBasicMaterial({color:0xff3b30}),todo:new THREE.MeshLambertMaterial({color:0xf2f2f2})};
+function label(text,x,y,z,w,bg){const c=document.createElement('canvas');c.width=512;c.height=96;const g=c.getContext('2d');g.fillStyle=bg||'rgba(20,30,20,0.85)';roundRect(g,4,4,504,88,22);g.fill();g.fillStyle='#fff';g.font='bold 46px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(text,256,52);
+  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),fog:true}));s.scale.set(w||6,(w||6)*96/512,1);s.position.set(x,y,z);scene.add(s);return s;}
+
+// ---------------------------------------------------------------- ground colour
+const _c2=new THREE.Color(),C_DIRT=new THREE.Color(0x7a5c3a),C_MEAD=new THREE.Color(0x6f9a3c),C_PAD=new THREE.Color(0x56603f),C_SAND=new THREE.Color(0xb59c6b),C_BED=new THREE.Color(0x3b4a3a),C_AR=new THREE.Color(0x3a3f48);
+function groundColor(x,z,c){
+  const n=0.5+0.5*Math.sin(x*0.31+Math.cos(z*0.27)*2.0)*Math.cos(z*0.23),n2=0.5+0.5*Math.sin(x*0.07-z*0.05);
+  c.setRGB(0.22+n*0.08+n2*0.04,0.34+n*0.1-n2*0.03,0.14+n*0.04);
+  if(Math.hypot(x,z+10)<175){const td=trailDist(x,z);if(td<2.6)c.lerp(C_DIRT,smooth(2.6,1.0,td));}
+  if(Math.abs(x)<3&&z>16&&z<152)c.lerp(C_DIRT,smooth(3,1.5,Math.abs(x)));
+  if(rectD(x,z,MEADOW)<0.01)c.lerp(C_MEAD,0.6);
+  if(rectD(x,z,ARENA)<14)c.lerp(C_AR,smooth(14,2,rectD(x,z,ARENA))*0.8);
+  const dp=Math.hypot(x-PAD.x,z-PAD.z);if(dp<12)c.lerp(C_PAD,smooth(12,6,dp)*0.6);
+  const p=pondOf(x,z);if(p){const d=Math.hypot(x-p.x,z-p.z);if(d<p.r+3)c.lerp(d<p.r?C_BED:C_SAND,0.8);}
+  return c;
+}
+
+// ---------------------------------------------------------------- deer
+const deer=[];
+function makeDeer(x,z,chunk){
+  const g=new THREE.Group(),b=new THREE.Mesh(GEO.box,MAT.deer);b.scale.set(0.45,0.5,1.15);b.position.y=0.95;g.add(b);
+  const neck=new THREE.Mesh(GEO.box,MAT.deer);neck.scale.set(0.2,0.55,0.22);neck.position.set(0,1.3,-0.55);neck.rotation.x=-0.5;g.add(neck);
+  const head=new THREE.Group();head.position.set(0,1.55,-0.72);g.add(head);const hm=new THREE.Mesh(GEO.box,MAT.deer);hm.scale.set(0.22,0.24,0.42);hm.position.z=-0.12;head.add(hm);
+  if(Math.random()<0.5){[-1,1].forEach(s=>{const a=new THREE.Mesh(GEO.box,MAT.deerL);a.scale.set(0.04,0.4,0.04);a.position.set(s*0.12,0.3,0);a.rotation.z=s*0.4;head.add(a);});}
+  const tail=new THREE.Mesh(GEO.box,MAT.deerL);tail.scale.set(0.12,0.18,0.1);tail.position.set(0,1.08,0.6);g.add(tail);
+  const legs=[];[[-0.15,-0.42],[0.15,-0.42],[-0.15,0.42],[0.15,0.42]].forEach(o=>{const lg=new THREE.Group();lg.position.set(o[0],0.72,o[1]);const m=new THREE.Mesh(GEO.box,MAT.deer);m.scale.set(0.09,0.72,0.09);m.position.y=-0.36;lg.add(m);g.add(lg);legs.push(lg);});
+  g.position.set(x,H(x,z),z);scene.add(g);
+  const d={g,head,legs,x,z,dir:Math.random()*6.28,spd:0,state:'graze',t:Math.random()*4,chunk};deer.push(d);return d;
+}
+function tickDeer(dt){
+  for(const d of deer){
+    const dx=d.x-D.pos.x,dz=d.z-D.pos.z,dist=Math.hypot(dx,dz);if(dist>130)continue;
+    const low=D.pos.y-H(D.pos.x,D.pos.z)<7&&(D.state==='flying'||D.state==='takeoff');
+    d.t-=dt;
+    if(dist<10&&low&&d.state!=='flee'){d.state='flee';d.t=3+Math.random()*2;d.dir=Math.atan2(dx,dz)+(Math.random()-0.5)*0.6;}
+    if(d.t<=0){if(d.state==='graze'){d.state='walk';d.t=2+Math.random()*4;d.dir+=(Math.random()-0.5)*2;}else{d.state='graze';d.t=3+Math.random()*6;}}
+    const sp=d.state==='flee'?7:d.state==='walk'?1.1:0;d.spd=lerp(d.spd,sp,0.1);
+    const nx=d.x+Math.sin(d.dir)*d.spd*dt,nz=d.z+Math.cos(d.dir)*d.spd*dt;
+    if(inWater(nx,nz)||rectD(nx,nz,ARENA)<3){d.dir+=Math.PI*0.7;}else{d.x=nx;d.z=nz;}
+    d.g.position.set(d.x,H(d.x,d.z),d.z);d.g.rotation.y=d.dir+Math.PI;
+    const sw=d.spd>0.2?Math.sin(performance.now()*0.001*(d.spd*4+3))*Math.min(0.7,d.spd*0.15+0.2):0;
+    d.legs[0].rotation.x=sw;d.legs[3].rotation.x=sw;d.legs[1].rotation.x=-sw;d.legs[2].rotation.x=-sw;
+    d.head.rotation.x=d.state==='graze'?0.9:0;
+  }
+}
+
+// ---------------------------------------------------------------- streaming chunks (scenery loads as you fly, far parts are thrown away)
+const chunks=new Map(),blinkers=[];
+const UP=new V3(0,1,0);
+function buildChunk(i,j){
+  const ch={i,j,objs:[],cols:[],trees:[],rocks:[],pond:null};
+  const r=rng(Math.floor(hash2(i,j,3)*1e9)+7);const x0=i*CH,z0=j*CH,cx=x0+CH/2,cz=z0+CH/2;
+  COLLECT=ch.cols;
+  const N=Q.seg,g=new THREE.PlaneGeometry(CH,CH,N,N);g.rotateX(-Math.PI/2);g.translate(cx,0,cz);
+  const pos=g.attributes.position,nor=g.attributes.normal,col=new Float32Array(pos.count*3);
+  for(let k=0;k<pos.count;k++){const x=pos.getX(k),z=pos.getZ(k);pos.setY(k,H(x,z));const e=0.8,nx=H(x-e,z)-H(x+e,z),nz=H(x,z-e)-H(x,z+e),l=Math.hypot(nx,2*e,nz);nor.setXYZ(k,nx/l,2*e/l,nz/l);groundColor(x,z,_c2);col[k*3]=_c2.r;col[k*3+1]=_c2.g;col[k*3+2]=_c2.b;}
+  g.setAttribute('color',new THREE.BufferAttribute(col,3));
+  const gm=new THREE.Mesh(g,MAT.ground);scene.add(gm);ch.objs.push(gm);
+  const p=cellPond(i,j);if(p){ch.pond=p;const w=new THREE.Mesh(new THREE.CircleGeometry(p.r+0.6,24),MAT.water);w.rotation.x=-Math.PI/2;w.position.set(p.x,WATER_Y,p.z);scene.add(w);ch.objs.push(w);}
+  const central=Math.hypot(cx,cz+10)<185||rectD(cx,cz,ARENA)<70;
+  const kind=central?'park':(hash2(i,j,11)<0.16?'clearing':'forest');
+  const want=Math.round(Q.trees*(kind==='clearing'?0.15:1)*(central?0.95:1.05));
+  for(let tries=0;ch.trees.length<want&&tries<want*4;tries++){
+    const x=x0+r()*CH,z=z0+r()*CH;if(blocked(x,z))continue;
+    let ok=true;for(const t of ch.trees)if((t.x-x)*(t.x-x)+(t.z-z)*(t.z-z)<5.5){ok=false;break;}if(!ok)continue;
+    const pine=r()<(central?0.62:0.72),h=7+r()*11,tr=0.16+r()*0.22,cr=pine?1.7+r()*1.2:2.3+r()*1.2;
+    ch.trees.push({x,z,y:H(x,z),pine,h,tr,cr,shade:r()});
+  }
+  const nP=ch.trees.filter(t=>t.pine).length,nB=ch.trees.length-nP;
+  const trunks=new THREE.InstancedMesh(GEO.trunk,MAT.trunk,Math.max(1,ch.trees.length)),cones=new THREE.InstancedMesh(GEO.cone,MAT.leaf,Math.max(1,nP*2)),balls=new THREE.InstancedMesh(GEO.ball,MAT.leaf,Math.max(1,nB*2));
+  const m=new THREE.Matrix4(),q=new THREE.Quaternion(),s=new V3(),pp=new V3(),c=new THREE.Color();let ic=0,ib=0;
+  ch.trees.forEach((t,k)=>{
+    const th=t.pine?t.h*0.45:t.h*0.6;m.compose(pp.set(t.x,t.y-0.3,t.z),q.identity(),s.set(t.tr,th+0.3,t.tr));trunks.setMatrixAt(k,m);addVCyl(t.x,t.z,t.tr,t.y-1,t.y+th);
+    if(t.pine){const y0=t.y+t.h*0.22;c.setHSL(0.31+t.shade*0.04,0.45,0.17+t.shade*0.08);
+      m.compose(pp.set(t.x,y0,t.z),q.setFromAxisAngle(UP,t.shade*6),s.set(t.cr,t.h*0.55,t.cr));cones.setMatrixAt(ic,m);cones.setColorAt(ic++,c);
+      m.compose(pp.set(t.x,y0+t.h*0.36,t.z),q,s.set(t.cr*0.7,t.h*0.42,t.cr*0.7));cones.setMatrixAt(ic,m);cones.setColorAt(ic++,c.offsetHSL(0,0,0.04));addCone(t.x,t.z,t.cr,y0,t.y+t.h);}
+    else{const yc=t.y+t.h*0.72;c.setHSL(0.2+t.shade*0.1,0.5,0.22+t.shade*0.1);
+      m.compose(pp.set(t.x,yc,t.z),q.setFromAxisAngle(UP,t.shade*6),s.set(t.cr,t.cr*0.85,t.cr));balls.setMatrixAt(ib,m);balls.setColorAt(ib++,c);
+      m.compose(pp.set(t.x+0.8,yc+t.cr*0.5,t.z-0.5),q,s.set(t.cr*0.65,t.cr*0.6,t.cr*0.65));balls.setMatrixAt(ib,m);balls.setColorAt(ib++,c.offsetHSL(0,0,0.05));addSph(t.x,yc,t.z,t.cr);}
+  });
+  trunks.count=ch.trees.length;cones.count=ic;balls.count=ib;
+  [trunks,cones,balls].forEach(o=>{if(o.count){scene.add(o);ch.objs.push(o);}});
+  const nr=2+Math.floor(r()*4)+(kind==='clearing'?3:0),nbush=kind==='forest'?8:4,tot=nr+nbush;
+  const rk=new THREE.InstancedMesh(GEO.rock,MAT.rock,tot);let ri=0;
+  for(let k=0;k<tot;k++){const x=x0+r()*CH,z=z0+r()*CH;if(blocked(x,z))continue;const bush=k>=nr;const rr=bush?0.5+r()*0.6:0.4+r()*1.3,y=H(x,z)+rr*(bush?0.3:0.4);
+    m.compose(pp.set(x,y,z),q.setFromEuler(new THREE.Euler(r()*3,r()*3,r()*3)),s.set(rr,rr*(bush?0.7:0.8),rr));rk.setMatrixAt(ri,m);
+    rk.setColorAt(ri++,bush?c.setHSL(0.27,0.45,0.2+r()*0.08):c.setHSL(0.1,0.04,0.42+r()*0.15));addSph(x,y,z,rr);ch.rocks.push({x,z,r:rr,bush});}
+  rk.count=ri;if(ri){scene.add(rk);ch.objs.push(rk);}
+  if(!central){const f=hash2(i,j,12),fx=cx+(hash2(i,j,13)-0.5)*20,fz=cz+(hash2(i,j,14)-0.5)*20;
+    if(!blocked(fx,fz)){if(f<0.05)radioTower(ch,fx,fz);else if(f<0.1)oldShed(ch,fx,fz);else if(f<0.14)hayBales(ch,fx,fz);}}
+  if(kind==='clearing'){const n=2+Math.floor(r()*2);for(let k=0;k<n;k++)makeDeer(cx+(r()-0.5)*30,cz+(r()-0.5)*30,ch);}
+  COLLECT=null;return ch;
+}
+function radioTower(ch,x,z){const y=H(x,z),hh=26;
+  [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(o=>{const l=new THREE.Mesh(GEO.box,MAT.metal);l.scale.set(0.15,hh,0.15);l.position.set(x+o[0]*0.9,y+hh/2,z+o[1]*0.9);scene.add(l);ch.objs.push(l);});
+  for(let k=1;k<9;k++){const b=new THREE.Mesh(GEO.box,MAT.metal);b.scale.set(2,0.08,2);b.position.set(x,y+k*3,z);scene.add(b);ch.objs.push(b);}
+  const lt=new THREE.Mesh(new THREE.SphereGeometry(0.35,8,6),new THREE.MeshBasicMaterial({color:0xff2020}));lt.position.set(x,y+hh+0.4,z);scene.add(lt);ch.objs.push(lt);blinkers.push(lt);
+  addBox(x-1.1,y,z-1.1,x+1.1,y+hh+0.6,z+1.1);
+  [[1,0],[-1,0],[0,1]].forEach(o=>{const a=new V3(x,y+hh*0.75,z),b=new V3(x+o[0]*14,H(x+o[0]*14,z+o[1]*14),z+o[1]*14);const w=new THREE.Mesh(new THREE.CylinderGeometry(0.02,0.02,a.distanceTo(b),4),MAT.dark);w.position.copy(a).add(b).multiplyScalar(0.5);w.quaternion.setFromUnitVectors(UP,b.clone().sub(a).normalize());scene.add(w);ch.objs.push(w);addHCyl(a,b,0.05);});
+}
+function oldShed(ch,x,z){const y=H(x,z);const b=new THREE.Mesh(GEO.box,MAT.wood);b.scale.set(5,3,4);b.position.set(x,y+1.5,z);b.rotation.y=0.3;scene.add(b);ch.objs.push(b);
+  const rf=new THREE.Mesh(new THREE.ConeGeometry(3.9,1.6,4),MAT.roof);rf.position.set(x,y+3.8,z);rf.rotation.y=Math.PI/4+0.3;rf.scale.set(1,1,0.8);scene.add(rf);ch.objs.push(rf);addBox(x-2.6,y,z-2.6,x+2.6,y+4.6,z+2.6);}
+function hayBales(ch,x,z){for(let k=0;k<5;k++){const bx=x+(k%3)*1.9-1.9,bz=z+Math.floor(k/3)*2,by=H(bx,bz)+0.6;const h=new THREE.Mesh(new THREE.CylinderGeometry(0.65,0.65,1.2,12),new THREE.MeshLambertMaterial({color:0xd8b860}));h.rotation.z=Math.PI/2;h.position.set(bx,by,bz);scene.add(h);ch.objs.push(h);addSph(bx,by,bz,0.75);}}
+const SHARED_GEO=new Set(Object.values(GEO));
+function unloadChunk(ch){
+  ch.objs.forEach(o=>{scene.remove(o);if(o.isInstancedMesh){if(o.dispose)o.dispose();}else if(o.geometry&&!SHARED_GEO.has(o.geometry))o.geometry.dispose();const bi=blinkers.indexOf(o);if(bi>=0)blinkers.splice(bi,1);});
+  ch.cols.forEach(gridRemove);
+  for(let k=deer.length-1;k>=0;k--)if(deer[k].chunk===ch){scene.remove(deer[k].g);deer.splice(k,1);}
+}
+function chunkTick(all){
+  const R=Q.r,ci=Math.floor(D.pos.x/CH),cj=Math.floor(D.pos.z/CH),pi=Math.floor(cam.position.x/CH),pj=Math.floor(cam.position.z/CH);
+  const want=new Set();for(let a=-R;a<=R;a++)for(let b=-R;b<=R;b++)want.add((ci+a)+','+(cj+b));
+  for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++)want.add((pi+a)+','+(pj+b));
+  for(const [k,ch] of chunks)if(!want.has(k)&&(Math.abs(ch.i-ci)>R+1||Math.abs(ch.j-cj)>R+1)&&(Math.abs(ch.i-pi)>2||Math.abs(ch.j-pj)>2)){unloadChunk(ch);chunks.delete(k);}
+  const need=[];for(const k of want)if(!chunks.has(k)){const ab=k.split(',').map(Number);need.push([ab[0],ab[1],Math.hypot(ab[0]-ci,ab[1]-cj)]);}
+  need.sort((x,y)=>x[2]-y[2]);
+  need.slice(0,all?999:1).forEach(n=>chunks.set(n[0]+','+n[1],buildChunk(n[0],n[1])));
+}
+function reloadWorld(){for(const ch of chunks.values())unloadChunk(ch);chunks.clear();chunkTick(true);}
+
+// ---------------------------------------------------------------- the middle of the map (always there)
+const smoke=[],flames=[];
+(function(){
+  const pad=new THREE.Mesh(new THREE.CylinderGeometry(1.6,1.6,0.06,28),new THREE.MeshLambertMaterial({color:0x333a40}));pad.position.set(PAD.x,0.03,PAD.z);scene.add(pad);
+  const mk=(col)=>{const hc=document.createElement('canvas');hc.width=hc.height=128;const x=hc.getContext('2d');x.fillStyle='#2b3238';x.fillRect(0,0,128,128);x.strokeStyle=col;x.lineWidth=6;x.beginPath();x.arc(64,64,54,0,7);x.stroke();x.fillStyle='#fff';x.font='bold 70px sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText('H',64,68);return new THREE.CanvasTexture(hc);};
+  const top=new THREE.Mesh(new THREE.CircleGeometry(1.55,28),new THREE.MeshBasicMaterial({map:mk('#ffd60a')}));top.rotation.x=-Math.PI/2;top.position.set(PAD.x,0.065,PAD.z);scene.add(top);
+  const ap=new THREE.Mesh(new THREE.CylinderGeometry(1.6,1.6,0.06,28),new THREE.MeshLambertMaterial({color:0x222233}));ap.position.set(APAD.x,0.05,APAD.z);scene.add(ap);
+  const at=new THREE.Mesh(new THREE.CircleGeometry(1.55,28),new THREE.MeshBasicMaterial({map:mk('#33ccff')}));at.rotation.x=-Math.PI/2;at.position.set(APAD.x,0.085,APAD.z);scene.add(at);
+  const cx=-14,cz=12,cy=H(cx,cz);const cab=new THREE.Mesh(GEO.box,MAT.wood);cab.scale.set(7,3.2,5);cab.position.set(cx,cy+1.6,cz);scene.add(cab);
+  const roof=new THREE.Mesh(new THREE.ConeGeometry(5.4,2.2,4),MAT.roof);roof.rotation.y=Math.PI/4;roof.scale.set(1,1,0.75);roof.position.set(cx,cy+4.3,cz);scene.add(roof);
+  const chim=new THREE.Mesh(GEO.box,MAT.metal);chim.scale.set(0.7,2,0.7);chim.position.set(cx+2,cy+5,cz);scene.add(chim);
+  addBox(cx-3.5,cy,cz-2.5,cx+3.5,cy+3.2,cz+2.5);addCone(cx,cz,4.6,cy+3.2,cy+5.4);addBox(cx+1.6,cy,cz-0.4,cx+2.4,cy+6,cz+0.4);
+  label('🏠 Cabin',cx,cy+7,cz,4);
+  const fx=-40,fz=-40,fy=H(fx,fz);
+  [[-1.6,-1.6],[1.6,-1.6],[-1.6,1.6],[1.6,1.6]].forEach(o=>{const l=new THREE.Mesh(GEO.box,MAT.metal);l.scale.set(0.2,18,0.2);l.position.set(fx+o[0],fy+9,fz+o[1]);scene.add(l);addVCyl(fx+o[0],fz+o[1],0.15,fy,fy+18);});
+  for(let k=1;k<6;k++){const b=new THREE.Mesh(GEO.box,MAT.metal);b.scale.set(3.4,0.1,0.1);b.position.set(fx,fy+k*3,fz-1.6);scene.add(b);const b2=b.clone();b2.position.z=fz+1.6;scene.add(b2);}
+  const cabT=new THREE.Mesh(GEO.box,MAT.wood);cabT.scale.set(4,2.4,4);cabT.position.set(fx,fy+19.2,fz);scene.add(cabT);addBox(fx-2,fy+18,fz-2,fx+2,fy+20.4,fz+2);
+  const rT=new THREE.Mesh(new THREE.ConeGeometry(3.4,1.6,4),MAT.roof);rT.rotation.y=Math.PI/4;rT.position.set(fx,fy+21.2,fz);scene.add(rT);addCone(fx,fz,3.4,fy+20.4,fy+22);
+  label('🔥 Fire lookout tower',fx,fy+24,fz,7);
+  const tx=16,tz=-14,ty=H(tx,tz);const tent=new THREE.Mesh(new THREE.ConeGeometry(2,2.2,4),new THREE.MeshLambertMaterial({color:0xe07a20}));tent.position.set(tx-2.5,ty+1.1,tz);tent.rotation.y=Math.PI/4;scene.add(tent);addCone(tx-2.5,tz,2,ty,ty+2.2);
+  for(let k=0;k<5;k++){const lg=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.08,0.9,6),MAT.trunk);lg.position.set(tx+1,ty+0.12,tz);lg.rotation.set(Math.PI/2.3,k*1.25,0);scene.add(lg);}
+  for(let k=0;k<3;k++){const f=new THREE.Mesh(new THREE.ConeGeometry(0.25-k*0.05,0.7+k*0.2,6),new THREE.MeshBasicMaterial({color:[0xff5a10,0xff9a20,0xffe060][k]}));f.position.set(tx+1,ty+0.4,tz);scene.add(f);flames.push(f);}
+  const sc=document.createElement('canvas');sc.width=sc.height=64;const sg=sc.getContext('2d');const gr=sg.createRadialGradient(32,32,2,32,32,30);gr.addColorStop(0,'rgba(200,200,200,0.7)');gr.addColorStop(1,'rgba(200,200,200,0)');sg.fillStyle=gr;sg.fillRect(0,0,64,64);
+  const smT=new THREE.CanvasTexture(sc);for(let k=0;k<10;k++){const s=new THREE.Sprite(new THREE.SpriteMaterial({map:smT,transparent:true,depthWrite:false}));s.userData.t=k/10;scene.add(s);smoke.push(s);}
+  smoke.base=new V3(tx+1,ty+0.6,tz);
+  addVCyl(tx+1,tz,0.5,ty,ty+1.2);label('🏕️ Campsite',tx,ty+4.5,tz,4.5);
+  const w=new THREE.Mesh(new THREE.CircleGeometry(PONDC.r+0.6,32),MAT.water);w.rotation.x=-Math.PI/2;w.position.set(PONDC.x,WATER_Y,PONDC.z);scene.add(w);
+  const dock=new THREE.Mesh(GEO.box,MAT.wood);dock.scale.set(1.6,0.15,6);dock.position.set(PONDC.x,0.05,PONDC.z-PONDC.r+1.5);scene.add(dock);
+  label('🛤️ Forest Trail →',-14,2.6,-4,4.5);label('🏟️ Race Arena ↑',3,2.6,20,4.5);label('🚩 Slalom field →',22,2.6,6,4.5);
+  for(let k=0;k<9;k++){const i=Math.floor((k+0.5)/9*TS.length),p=TS[i],nx=TS[(i+1)%TS.length];const ddx=nx.x-p.x,ddz=nx.z-p.z,L=Math.hypot(ddx,ddz);const px=-ddz/L,pz=ddx/L;
+    const y=H(p.x,p.z)+0.35+((k*7)%3)*0.25,len=6;const a=new V3(p.x-px*len/2,y,p.z-pz*len/2),b=new V3(p.x+px*len/2,y,p.z+pz*len/2);
+    const lm=new THREE.Mesh(new THREE.CylinderGeometry(0.32,0.38,len,8),MAT.trunk);lm.position.copy(a).add(b).multiplyScalar(0.5);lm.quaternion.setFromUnitVectors(UP,b.clone().sub(a).normalize());scene.add(lm);addHCyl(a,b,0.36);}
+  const poles=[];for(let x=POWER.x0;x<=POWER.x1+0.1;x+=27)poles.push(x);
+  poles.forEach(x=>{const y=H(x,POWER.z);const pl=new THREE.Mesh(new THREE.CylinderGeometry(0.15,0.2,11,8),MAT.trunk);pl.position.set(x,y+5.5,POWER.z);scene.add(pl);addVCyl(x,POWER.z,0.2,y,y+11);
+    const arm=new THREE.Mesh(GEO.box,MAT.trunk);arm.scale.set(0.15,0.15,3);arm.position.set(x,y+10.3,POWER.z);scene.add(arm);addBox(x-0.1,y+10.2,POWER.z-1.5,x+0.1,y+10.4,POWER.z+1.5);});
+  const wireM=new THREE.MeshLambertMaterial({color:0x1a1a1a}),ballM=new THREE.MeshLambertMaterial({color:0xff7a00});
+  for(let k=0;k<poles.length-1;k++){const xa=poles[k],xb=poles[k+1];[-1.3,0,1.3].forEach((off,wi)=>{
+    const ya=H(xa,POWER.z)+(wi===1?11:10.5),yb=H(xb,POWER.z)+(wi===1?11:10.5);const pts=[];for(let s=0;s<=8;s++){const t=s/8;pts.push(new V3(lerp(xa,xb,t),lerp(ya,yb,t)-Math.sin(t*Math.PI)*1.6,POWER.z+off));}
+    scene.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),16,0.03,4,false),wireM));
+    for(let s=0;s<8;s+=2)addHCyl(pts[s],pts[s+2],0.06);
+    if(wi===1){const bm=new THREE.Mesh(new THREE.SphereGeometry(0.35,10,8),ballM);bm.position.copy(pts[4]);scene.add(bm);}});}
+  label('⚡ Power line — don\'t touch the wires',POWER.x1-6,13,POWER.z+3,7);
+  for(let k=0;k<6;k++)makeDeer(MEADOW.x0+10+k*14,MEADOW.z1+8+(k%2)*6,null);
+})();
+
+// ---------------------------------------------------------------- race arena with flashing tunnels
+const arenaLights=[];
+function neonMat(ph,kind){const m=new THREE.MeshBasicMaterial({color:0x00ffff});arenaLights.push({m,ph,kind:kind||'rainbow'});return m;}
+(function(){
+  const A=ARENA;
+  const fc=document.createElement('canvas');fc.width=fc.height=512;const f=fc.getContext('2d');f.fillStyle='#1b1f27';f.fillRect(0,0,512,512);f.strokeStyle='rgba(80,200,255,0.35)';f.lineWidth=3;for(let k=0;k<=512;k+=64){f.beginPath();f.moveTo(k,0);f.lineTo(k,512);f.stroke();f.beginPath();f.moveTo(0,k);f.lineTo(512,k);f.stroke();}
+  const ft=new THREE.CanvasTexture(fc);ft.wrapS=ft.wrapT=THREE.RepeatWrapping;ft.repeat.set(7,6);
+  const floor=new THREE.Mesh(new THREE.PlaneGeometry(A.x1-A.x0,A.z1-A.z0),new THREE.MeshLambertMaterial({map:ft}));floor.rotation.x=-Math.PI/2;floor.position.set((A.x0+A.x1)/2,0.02,(A.z0+A.z1)/2);scene.add(floor);
+  const net=new THREE.MeshLambertMaterial({color:0x223355,transparent:true,opacity:0.35,side:THREE.DoubleSide});
+  const wall=(x0,z0,x1,z1)=>{const m=new THREE.Mesh(GEO.box,net);m.scale.set(Math.max(0.2,x1-x0),6,Math.max(0.2,z1-z0));m.position.set((x0+x1)/2,3,(z0+z1)/2);scene.add(m);addBox(Math.min(x0,x1)-0.1,0,Math.min(z0,z1)-0.1,Math.max(x0,x1)+0.1,6,Math.max(z0,z1)+0.1);};
+  wall(A.x0,A.z1,A.x1,A.z1);wall(A.x0,A.z0,A.x0,A.z1);wall(A.x1,A.z0,A.x1,A.z1);wall(A.x0,A.z0,-8,A.z0);wall(8,A.z0,A.x1,A.z0);
+  for(let k=0;k<24;k++){const t=k/24,x=lerp(A.x0,A.x1,t);const mat=neonMat(t,'chase');const b=new THREE.Mesh(GEO.box,mat);b.scale.set(3,0.25,0.25);b.position.set(x+2,6.1,A.z1);scene.add(b);
+    const b2=new THREE.Mesh(GEO.box,mat);b2.scale.set(0.25,0.25,3);b2.position.set(A.x0,6.1,lerp(A.z0,A.z1,t)+2);scene.add(b2);const b3=b2.clone();b3.position.x=A.x1;scene.add(b3);}
+  [A.x0-6,A.x1+6].forEach(x=>{for(let s=0;s<4;s++){const b=new THREE.Mesh(GEO.box,MAT.metal);b.scale.set(2,0.5,60);b.position.set(x+(x<0?-s*2:s*2),0.25+s*1,(A.z0+A.z1)/2);scene.add(b);}addBox(x-8,0,A.z0+20,x+8,4,A.z1-20);});
+  label('🏟️ WOODS RACE ARENA',0,9,A.z0,14,'rgba(10,30,60,0.9)');
+})();
+function tickArena(t){for(const L of arenaLights){if(L.kind==='chase'){const v=(Math.sin((t*2-L.ph*12)*Math.PI)+1)/2;L.m.color.setHSL(0.55,1,0.2+v*0.5);}else L.m.color.setHSL((t*0.25+L.ph)%1,1,0.5+0.15*Math.sin(t*9+L.ph*30));}}
+
+// ---------------------------------------------------------------- course pieces
+function numberSprite(){const c=document.createElement('canvas');c.width=c.height=64;const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),fog:true}));s.scale.set(0.9,0.9,1);s.visible=false;scene.add(s);return s;}
+function makeHoop(c,dir,Rr,neon){
+  const n=dir.clone().setY(0).normalize(),g=new THREE.Group();
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(Rr,0.09,8,32),MAT.todo);g.add(ring);
+  if(neon){g.add(new THREE.Mesh(new THREE.TorusGeometry(Rr+0.18,0.05,6,32),neonMat(Math.random())));}
+  g.position.copy(c);g.lookAt(c.clone().add(n));scene.add(g);
+  const gy=H(c.x,c.z);if(c.y-Rr-gy>0.3){const post=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,c.y-Rr-gy,5),MAT.todo);post.position.set(c.x,(c.y-Rr+gy)/2,c.z);scene.add(post);addVCyl(c.x,c.z,0.05,gy,c.y-Rr);}
+  addTorus(c,n,Rr,0.09);const sp=numberSprite();sp.position.set(c.x,c.y+Rr+0.7,c.z);
+  return{kind:'hoop',c:c.clone(),n,R:Rr-0.1,mesh:[ring],label:sp};
+}
+function makeGate(c,dir,w,h,style){
+  const n=dir.clone().setY(0).normalize(),side=new V3(-n.z,0,n.x),gy=H(c.x,c.z),meshes=[];
+  [-1,1].forEach(sg=>{const px=c.x+side.x*w/2*sg,pz=c.z+side.z*w/2*sg,py=H(px,pz);
+    const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.08,h,6),MAT.todo);pole.position.set(px,py+h/2,pz);scene.add(pole);meshes.push(pole);addVCyl(px,pz,0.09,py,py+h);
+    if(typeof style==='number'){const fl=new THREE.Mesh(new THREE.PlaneGeometry(0.8,0.5),new THREE.MeshLambertMaterial({color:style,side:THREE.DoubleSide}));fl.position.set(px+n.x*0.4,py+h-0.3,pz+n.z*0.4);fl.lookAt(fl.position.clone().add(side));scene.add(fl);}
+    if(style==='neon'){const s2=new THREE.Mesh(GEO.box,neonMat(Math.random()));s2.scale.set(0.12,h,0.12);s2.position.set(px-n.x*0.15,py+h/2,pz-n.z*0.15);scene.add(s2);}});
+  if(style==='arch'||style==='neon'){const a=new V3(c.x-side.x*w/2,gy+h,c.z-side.z*w/2),b=new V3(c.x+side.x*w/2,gy+h,c.z+side.z*w/2);
+    const beam=new THREE.Mesh(GEO.box,MAT.todo);beam.position.copy(a).add(b).multiplyScalar(0.5);beam.lookAt(beam.position.clone().add(n));beam.scale.set(w,0.25,0.25);scene.add(beam);meshes.push(beam);addHCyl(a,b,0.16);
+    if(style==='neon'){const nb=new THREE.Mesh(GEO.box,neonMat(Math.random()));nb.position.copy(beam.position);nb.position.y-=0.22;nb.quaternion.copy(beam.quaternion);nb.scale.set(w,0.12,0.12);scene.add(nb);}}
+  const sp=numberSprite();sp.position.set(c.x,gy+h+0.8,c.z);
+  return{kind:'gate',c:new V3(c.x,gy+h/2,c.z),n,w:w/2-0.1,h,gy,mesh:meshes,label:sp};
+}
+function makeTunnel(x,z0,z1,w,h){ // straight tunnel along z with chasing rainbow light rings; returns [entry, exit]
+  const dir=Math.sign(z1-z0),len=Math.abs(z1-z0),zc=(z0+z1)/2;
+  const shell=new THREE.MeshLambertMaterial({color:0x111522,transparent:true,opacity:0.55,side:THREE.DoubleSide});
+  const part=(sx,sy,sz,px,py)=>{const m=new THREE.Mesh(GEO.box,shell);m.scale.set(sx,sy,sz);m.position.set(px,py,zc);scene.add(m);};
+  part(0.2,h,len,x-w/2-0.1,h/2);part(0.2,h,len,x+w/2+0.1,h/2);part(w+0.4,0.2,len,x,h+0.1);
+  addBox(x-w/2-0.2,0,Math.min(z0,z1),x-w/2,h,Math.max(z0,z1));addBox(x+w/2,0,Math.min(z0,z1),x+w/2+0.2,h,Math.max(z0,z1));addBox(x-w/2-0.2,h,Math.min(z0,z1),x+w/2+0.2,h+0.2,Math.max(z0,z1));
+  const rings=Math.floor(len/2);for(let k=0;k<=rings;k++){const z=z0+dir*k*2,mat=neonMat(k/rings*0.7,'rainbow');
+    [[w+0.3,0.12,x,h+0.02],[w+0.3,0.12,x,0.06]].forEach(b=>{const m=new THREE.Mesh(GEO.box,mat);m.scale.set(b[0],b[1],0.12);m.position.set(b[2],b[3],z);scene.add(m);});
+    [x-w/2-0.02,x+w/2+0.02].forEach(px=>{const m=new THREE.Mesh(GEO.box,mat);m.scale.set(0.12,h,0.12);m.position.set(px,h/2,z);scene.add(m);});}
+  const n=new V3(0,0,dir);
+  const cp=(z)=>({kind:'gate',c:new V3(x,h/2,z),n:n.clone(),w:w/2-0.15,h:h-0.1,gy:0,mesh:[],label:(()=>{const s=numberSprite();s.position.set(x,h+0.9,z);return s;})()});
+  return[cp(z0),cp(z1)];
+}
+
+// ---------------------------------------------------------------- courses
+const courses={};
+(function(){
+  const pad={x:PAD.x,z:PAD.z,yaw:0};
+  const hs=[];for(let i=0;i<14;i++){const t=(i+0.5)/14,p=hoopRoute.getPointAt(t),d=hoopRoute.getTangentAt(t);hs.push(makeHoop(new V3(p.x,H(p.x,p.z)+2.2+((i*37)%5)*1.1,p.z),d,1.45));}
+  courses.hoops={key:'hoops',name:'⭕ Hoop Run',cps:hs,start:pad};
+  const gs=[];for(let i=0;i<12;i++){gs.push(makeGate(new V3(MEADOW.x0+6+i*7,0,(i%2?1:-1)*5.5),new V3(1,0,0),4.2,5,i%2?0x3399ff:0xff3333));}
+  gs.push(makeHoop(new V3(MEADOW.x1-4,H(MEADOW.x1-4,0)+5,0),new V3(1,0,0),1.6));
+  courses.slalom={key:'slalom',name:'🚩 Slalom',cps:gs,start:{x:PAD.x,z:PAD.z,yaw:-Math.PI/2}};
+  const as=[];for(let k=0;k<16;k++){const i=Math.floor((k+0.3)/16*TS.length),p=TS[i],q=TS[(i+3)%TS.length];as.push(makeGate(new V3(p.x,0,p.z),q.clone().sub(p),4.4,3.6,'arch'));}
+  courses.trail={key:'trail',name:'🛤️ Forest Trail',cps:as,start:pad};
+  const ar=[];
+  ar.push(makeGate(new V3(0,0,170),new V3(0,0,1),5,4,'neon'));
+  ar.push(makeHoop(new V3(22,3.5,186),new V3(1,0,1),1.6,true));
+  makeTunnel(38,192,218,3.2,3.2).forEach(c=>ar.push(c));
+  ar.push(makeGate(new V3(28,0,236),new V3(-1,0,0.4),5,6,'neon'));
+  ar.push(makeHoop(new V3(6,7,240),new V3(-1,0,0),1.6,true));
+  ar.push(makeHoop(new V3(-14,2.2,236),new V3(-1,0,-0.3),1.5,true));
+  makeTunnel(-38,224,198,3.2,3.2).forEach(c=>ar.push(c));
+  ar.push(makeGate(new V3(-26,0,182),new V3(1,0,-0.6),5,4,'neon'));
+  ar.push(makeGate(new V3(-6,0,168),new V3(1,0,0),4.5,3.5,'neon'));
+  courses.arena={key:'arena',name:'🏟️ Race Arena',cps:ar,start:{x:APAD.x,z:APAD.z,yaw:Math.PI}};
+  courses.balloons={key:'balloons',name:'🎈 Balloon Pop',cps:[],pop:true,start:pad};
+})();
+const balloons=[];
+(function(){const cols=[0xff3b30,0xffcc00,0x34c759,0x0a84ff,0xbf5af2,0xff9f0a];const r=rng(77);
+  const spots=[];for(let k=0;k<10;k++){const p=HR[Math.floor(k/10*HR.length+12)%HR.length];spots.push([p.x+(r()-0.5)*3,p.z+(r()-0.5)*3]);}
+  for(let k=0;k<6;k++)spots.push([MEADOW.x0+8+k*13,(r()-0.5)*20]);for(let k=0;k<8;k++){const p=TS[Math.floor(k/8*TS.length+30)%TS.length];spots.push([p.x,p.z]);}
+  spots.forEach((s,k)=>{const y=H(s[0],s[1])+2+r()*9;const g=new THREE.Group();const b=new THREE.Mesh(new THREE.SphereGeometry(0.5,12,10),new THREE.MeshLambertMaterial({color:cols[k%cols.length]}));b.scale.y=1.2;g.add(b);
+    const st=new THREE.Mesh(new THREE.CylinderGeometry(0.01,0.01,1.6,3),MAT.dark);st.position.y=-1.4;g.add(st);g.position.set(s[0],y,s[1]);scene.add(g);balloons.push({g,y0:y,ph:r()*6,alive:true});});
+})();
+function resetBalloons(){balloons.forEach(b=>{b.alive=true;b.g.visible=true;});}
+function popBalloon(b){if(!b.alive)return;b.alive=false;b.g.visible=false;beep(1500,0.08,0.09);beep(300,0.12,0.06);if(course&&course.pop&&cRun){const left=balloons.filter(x=>x.alive).length;if(!left)finishCourse();else toast('🎈 Pop! '+left+' left',700);}}
+function tickBalloons(t){for(const b of balloons){if(!b.alive)continue;b.g.position.y=b.y0+Math.sin(t*1.2+b.ph)*0.25;if(b.g.position.distanceTo(D.pos)<ST.rad+0.55&&(D.state==='flying'||D.state==='takeoff'))popBalloon(b);}}
+
+let course=null,cpI=0,cTime=0,cRun=false,cPen=0,count=0,ghostRec=[],ghost=null,ghostData=null;
+function setCourseVisible(){
+  const best=new Map();const pri={todo:0,done:1,next:2};
+  Object.values(courses).forEach(C=>C.cps.forEach((cp,i)=>{const on=course===C;const st=!on?'todo':i<cpI?'done':i===cpI?'next':'todo';
+    cp.mesh.forEach(m=>{const b=best.get(m);if(!b||pri[st]>pri[b])best.set(m,st);});
+    cp.label.visible=on&&i>=cpI&&i<cpI+3;if(cp.label.visible){const c=cp.label.material.map.image,x=c.getContext('2d');x.clearRect(0,0,64,64);x.fillStyle=i===cpI?'rgba(20,160,60,0.9)':'rgba(0,0,0,0.5)';x.beginPath();x.arc(32,32,30,0,7);x.fill();x.fillStyle='#fff';x.font='bold 32px sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(i+1,32,34);cp.label.material.map.needsUpdate=true;}}));
+  best.forEach((st,m)=>m.material=MAT[st]);
+}
+function startCourse(k){
+  course=k==='free'?null:courses[k];cpI=0;cTime=0;cRun=false;cPen=0;ghostRec=[];setCourseVisible();
+  if(course&&course.pop)resetBalloons();
+  const s=course?course.start:{x:PAD.x,z:PAD.z,yaw:0};resetDrone(s);chunkTick(true);
+  if(ghost){scene.remove(ghost.g);ghost=null;}ghostData=course&&!course.pop?LS.get('ghost_'+k,null):null;
+  if(ghostData&&ghostData.length){ghost=buildDrone(sanitize(LS.get('ghostSpec_'+k,PRESETS.mini)),{ghost:true});scene.add(ghost.g);}
+  if(course){count=3.5;D.lock=true;$('count').style.display='block';}else{count=0;$('count').style.display='none';}
+  $('course').style.display=course?'flex':'none';$('arrow').style.display=course&&!course.pop?'block':'none';
+  if(!course)toast('🌲 Free fly — the woods keep going in every direction',2500);
+  mpSendNow();
+}
+function fmt(t){const m=Math.floor(t/60),s=t-m*60;return m+':'+(s<10?'0':'')+s.toFixed(1);}
+function finishCourse(){
+  cRun=false;const tot=cTime+cPen,k=course.key,best=LS.get('best_'+k,0);
+  if(!best||tot<best){LS.set('best_'+k,tot);if(!course.pop){LS.set('ghost_'+k,ghostRec);LS.set('ghostSpec_'+k,SPEC);}toast('🏆 FINISHED '+fmt(tot)+' — NEW BEST!'+(course.pop?'':' (your ghost races you next time)'),5000);beep(1320,0.4,0.1);}
+  else toast('🏁 FINISHED '+fmt(tot)+' · best '+fmt(best),5000);
+  cpI=course.cps.length;setCourseVisible();mpSendNow();
+}
+function tickCourse(dt,prev,cur){
+  if(!course)return;
+  if(count>0){const was=Math.ceil(count);count-=dt;const now=Math.ceil(count);const el=$('count');el.style.display='block';
+    if(count<=0){el.textContent='GO!';el.style.color='#33ff66';D.lock=false;cRun=true;beep(1320,0.3,0.1);setTimeout(()=>{if(count<=0)el.style.display='none';},700);vrMsg('GO! '+(D.armed?'':'— start the motors'),900);}
+    else{if(now!==was&&now<=3)beep(660,0.15,0.08);el.textContent=now<=3?now:'';el.style.color='#fff';}}
+  if(!cRun)return;cTime+=dt;
+  if(!course.pop&&ghostRec.length<6000&&(ghostRec.length===0||cTime-ghostRec[ghostRec.length-1][0]>=0.1))ghostRec.push([+cTime.toFixed(2),+D.pos.x.toFixed(2),+D.pos.y.toFixed(2),+D.pos.z.toFixed(2),+D.yaw.toFixed(3)]);
+  const cp=course.cps[cpI];if(!cp||!prev)return;
+  const sp=_v.subVectors(prev,cp.c).dot(cp.n),sc=_w.subVectors(cur,cp.c).dot(cp.n);
+  if(sp<0&&sc>=0){
+    const t=sp/(sp-sc),hit=prev.clone().lerp(cur,t),off=hit.clone().sub(cp.c);off.addScaledVector(cp.n,-off.dot(cp.n));
+    let ok;if(cp.kind==='hoop')ok=off.length()<cp.R;else{const lat=Math.abs(off.x*-cp.n.z+off.z*cp.n.x);ok=lat<cp.w&&hit.y<cp.gy+cp.h-0.05&&hit.y>cp.gy;}
+    if(ok){cpI++;beep(880,0.12,0.08);setCourseVisible();mpSendNow();if(cpI>=course.cps.length)finishCourse();else toast('✅ '+cpI+' / '+course.cps.length,800);}
+  }
+}
+function tickGhost(){
+  if(!ghost||!ghostData||!ghostData.length)return;const t=cRun?cTime:0;let i=0;while(i<ghostData.length-1&&ghostData[i+1][0]<t)i++;
+  const a=ghostData[i],b=ghostData[Math.min(i+1,ghostData.length-1)],f=b[0]>a[0]?clamp((t-a[0])/(b[0]-a[0]),0,1):0;
+  ghost.g.position.set(lerp(a[1],b[1],f),lerp(a[2],b[2],f),lerp(a[3],b[3],f));ghost.g.rotation.set(0,lerp(a[4],b[4],f),0);
+  ghost.props.forEach((P,k)=>P.g.rotation.y+=0.9*(k%2?1:-1));
+}
+
+// ---------------------------------------------------------------- drones: presets, stats, model
+const VS=2; // drawn twice real size so you can see it from far away
+const PAL=['#9aa0a6','#3b3f45','#f2f2f2','#111111','#e0451f','#ffd60a','#34c759','#0a84ff','#bf5af2','#ff2d55','#ff9f0a','#64d2ff','#8e5b3a','#2b2b2b','#ff3030','#30a0ff','#00ff88'];
+const PRESETS={
+  mini:{name:'Mini 4 (easy)',size:0.12,motor:4,rotors:4,mah:2590,bat:'LiPo',guards:false,assist:true,cam:'front',fpvUp:12,colors:{body:'#9aa0a6',arms:'#7d838a',props:'#2b2b2b',leds:'#ff3030'}},
+  avata:{name:'Avata whoop (bouncy)',size:0.10,motor:6,rotors:4,mah:2420,bat:'LiPo',guards:true,assist:true,cam:'front',fpvUp:18,colors:{body:'#3b3f45',arms:'#2a2d31',props:'#111111',leds:'#30a0ff'}},
+  racer:{name:'Racer 5" (fast!)',size:0.16,motor:9,rotors:4,mah:1300,bat:'LiPo',guards:false,assist:false,cam:'front',fpvUp:28,colors:{body:'#e0451f',arms:'#1d1d1d',props:'#ffd60a',leds:'#00ff88'}},
+  heavy:{name:'Cine Heavy (steady)',size:0.30,motor:6,rotors:4,mah:5000,bat:'Li-ion',guards:false,assist:true,cam:'belly',fpvUp:5,colors:{body:'#2b2b2b',arms:'#555555',props:'#111111',leds:'#ff3030'}},
+  hexa:{name:'Hexa Lifter',size:0.26,motor:5,rotors:6,mah:6000,bat:'Li-ion',guards:false,assist:true,cam:'belly',fpvUp:5,colors:{body:'#f2f2f2',arms:'#ff2d55',props:'#222222',leds:'#ff3030'}},
+};
+function cloneSpec(s){return JSON.parse(JSON.stringify(s));}
+function sanitize(s){const d=cloneSpec(PRESETS.mini);s=s||{};const o=Object.assign(d,s);o.colors=Object.assign(cloneSpec(PRESETS.mini.colors),s.colors||{});
+  o.size=clamp(+o.size||0.12,0.06,0.4);o.motor=clamp(+o.motor||4,1,10);o.rotors=[4,6,8].includes(+o.rotors)?+o.rotors:4;o.mah=clamp(+o.mah||2000,300,8000);if(!['LiPo','HV LiPo','Li-ion'].includes(o.bat))o.bat='LiPo';o.cam=['front','top','belly'].includes(o.cam)?o.cam:'front';o.fpvUp=clamp(+o.fpvUp||0,0,45);o.name=String(o.name||'My drone').slice(0,24);o.guards=!!o.guards;o.assist=o.assist!==false;return o;}
+function stats(sp){
+  const bk={LiPo:[1,1,0.062],'HV LiPo':[1.08,1.06,0.06],'Li-ion':[0.85,1.35,0.05]}[sp.bat];
+  const w=60+sp.size*900*sp.rotors/4+sp.rotors*12*sp.motor/5+sp.mah*bk[2]+(sp.guards?40*sp.rotors/4:0);
+  const thrust=sp.rotors*(90+sp.motor*55)*Math.sqrt(sp.size/0.15)*bk[0];
+  const tw=thrust/w,top=clamp(6+tw*4.2,4,42)*(sp.guards?0.85:1),tau=clamp(0.55/Math.pow(tw,0.7),0.1,1.1);
+  const mins=clamp(sp.mah*bk[1]/(w*(1+sp.motor*0.12))*5,1.5,60);
+  const L=sp.size*VS;
+  return{w,thrust,tw,top,tau,mins,tough:clamp(Math.round(2+(sp.guards?4:0)+sp.size*12-(sp.motor>7?1:0)),1,10),agile:clamp(Math.round(11-tau*13),1,10),
+    vz:tw<1.15?Math.max(0,(tw-1)*6):clamp(2+tw*0.9,2,8),yaw:clamp(60+tw*22,50,260),tilt:clamp(0.3+tw*0.045,0.3,0.8),L,rad:L*(1+Math.sin(Math.PI/sp.rotors)*0.88)*0.72+0.05,legs:sp.size*0.32*VS};
+}
+function buildDrone(sp,opt){
+  opt=opt||{};const g=new THREE.Group(),S=sp.size,C=sp.colors;
+  const mat=c=>opt.ghost?new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:0.33,depthWrite:false}):new THREE.MeshLambertMaterial({color:c});
+  const mBody=mat(C.body),mArm=mat(C.arms),mDark=mat('#202226');
+  const bw=S*0.75,bl=S*1.5,bh=S*0.4;
+  g.add(new THREE.Mesh(new THREE.BoxGeometry(bw,bh,bl),mBody));
+  const top=new THREE.Mesh(new THREE.BoxGeometry(bw*0.8,bh*0.4,bl*0.7),mDark);top.position.y=bh*0.6;g.add(top);
+  const bat=new THREE.Mesh(new THREE.BoxGeometry(bw*0.7,bh*0.5,clamp(sp.mah/4000,0.3,1.3)*S*0.8),mat(sp.bat==='Li-ion'?'#2a5a8a':'#3b3b3b'));bat.position.set(0,-bh*0.45,bl*0.22);g.add(bat);
+  const n=sp.rotors,off={4:45,6:30,8:22.5}[n],pr=S*Math.sin(Math.PI/n)*0.88;
+  const arms=[],props=[];
+  for(let k=0;k<n;k++){
+    const a=(off+k*360/n)*Math.PI/180,ag=new THREE.Group();ag.rotation.y=-a;
+    const arm=new THREE.Mesh(new THREE.BoxGeometry(S*0.12,S*0.08,S),mArm);arm.position.z=-S/2;ag.add(arm);
+    const mg=new THREE.Group();mg.position.set(0,S*0.06,-S);ag.add(mg);
+    mg.add(new THREE.Mesh(new THREE.CylinderGeometry(S*0.11,S*0.11,S*0.16,10),mDark));
+    const pg=new THREE.Group();pg.position.y=S*0.12;mg.add(pg);
+    const mProp=opt.ghost?mat(C.props):new THREE.MeshLambertMaterial({color:C.props,transparent:true,opacity:0.85});
+    const bg=new THREE.BoxGeometry(pr,S*0.02,S*0.12);bg.translate(pr/2,0,0);
+    const b1=new THREE.Mesh(bg,mProp),b2=new THREE.Mesh(bg,mProp);b2.rotation.y=Math.PI;pg.add(b1);pg.add(b2);
+    if(sp.guards){const gd=new THREE.Mesh(new THREE.TorusGeometry(pr*1.06,S*0.035,6,20),mArm);gd.rotation.x=Math.PI/2;gd.position.y=S*0.12;mg.add(gd);}
+    const front=Math.cos(a)>0.01;const led=new THREE.Mesh(new THREE.SphereGeometry(S*0.06,6,4),new THREE.MeshBasicMaterial({color:front?C.leds:'#30ff60',transparent:!!opt.ghost,opacity:opt.ghost?0.4:1}));led.position.set(0,-S*0.08,0);mg.add(led);
+    g.add(ag);arms.push({g:ag,state:'ok',k});props.push({g:pg,b1,b2,state:'ok',k,pr,screw:0});
+  }
+  const cp=sp.cam==='belly'?[0,-bh*0.95,-bl*0.15]:sp.cam==='top'?[0,bh*0.95,-bl*0.3]:[0,-bh*0.15,-bl*0.56];
+  const gim=new THREE.Mesh(new THREE.SphereGeometry(S*0.13,10,8),mDark);gim.position.set(cp[0],cp[1],cp[2]);g.add(gim);
+  const lens=new THREE.Mesh(new THREE.CylinderGeometry(S*0.07,S*0.07,S*0.06,10),mat('#0a2440'));lens.rotation.x=Math.PI/2;lens.position.set(cp[0],cp[1],cp[2]-S*0.12);g.add(lens);
+  g.scale.setScalar(VS);
+  return{g,arms,props,camLocal:new V3(cp[0]*VS,cp[1]*VS,(cp[2]-S*0.2)*VS),sp};
+}
+function setPropState(P,st){P.state=st;if(st==='loose')P.screw=0;
+  P.b1.visible=st!=='none';P.b2.visible=st==='ok'||st==='chip'||st==='loose';
+  P.b1.scale.x=st==='broken'?0.5:1;P.b2.scale.x=st==='chip'?0.6:1; // chipped = a notch out of one blade · broken = half a propeller
+  P.b1.material.opacity=st==='loose'?0.45:0.85;}
+const shadowTex=document.createElement('canvas');shadowTex.width=shadowTex.height=128;
+const shadow=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(shadowTex),transparent:true,depthWrite:false,opacity:0.6}));scene.add(shadow);
+function makeShadow(){ // looks like the drone: body, arms and see-through spinning prop discs, soft edges
+  const c=shadowTex.getContext('2d'),S=SPEC.size,n=SPEC.rotors,off={4:45,6:30,8:22.5}[n],pr=S*Math.sin(Math.PI/n)*0.88,ext=S+pr,k=56/ext;
+  c.clearRect(0,0,128,128);c.save();try{c.filter='blur(2px)';}catch(e){}c.translate(64,64);c.fillStyle='rgba(0,0,0,0.85)';c.strokeStyle='rgba(0,0,0,0.85)';
+  c.fillRect(-S*0.375*k,-S*0.75*k,S*0.75*k,S*1.5*k);c.lineWidth=S*0.12*k;
+  for(let i=0;i<n;i++){const a=(off+i*360/n)*Math.PI/180,x=Math.sin(a)*S*k,y=-Math.cos(a)*S*k;c.beginPath();c.moveTo(0,0);c.lineTo(x,y);c.stroke();c.globalAlpha=0.35;c.beginPath();c.arc(x,y,pr*k,0,7);c.fill();c.globalAlpha=1;}
+  c.restore();shadow.material.map.needsUpdate=true;shadow.userData.size=ext*2*VS*1.15;
+}
+
+// ---------------------------------------------------------------- drone state + physics
+const D={pos:new V3(),vel:new V3(),yaw:0,pitch:0,roll:0,state:'landed',armed:false,batt:100,speed:LS.get('speed','NORMAL'),home:new V3(),lock:false,flip:null,upside:false,wet:false,downT:0,fall:new THREE.Euler(),spinV:new V3(),wobT:0,hidden:false,lastSafe:new V3(),gimbal:-10*Math.PI/180,idleT:0,stopT:0};
+let SPEC=sanitize(LS.get('spec',null)||PRESETS.mini),ST=stats(SPEC),DR=null;
+function rebuildDrone(){if(DR)scene.remove(DR.g);DR=buildDrone(SPEC);scene.add(DR.g);ST=stats(SPEC);makeShadow();D.upside=false;D.wet=false;}
+const MODES={CINE:{h:0.25,v:0.45,y:0.5},NORMAL:{h:0.55,v:0.65,y:0.8},SPORT:{h:1,v:1,y:1}};
+function onPad(x,z){return Math.hypot(x-PAD.x,z-PAD.z)<1.7?0.065:Math.hypot(x-APAD.x,z-APAD.z)<1.7?0.085:0;}
+function groundY(x,z){return H(x,z)+onPad(x,z)+(rectD(x,z,ARENA)<0.01?0.02:0)+ST.legs;}
+function resetDrone(s){
+  s=s||{x:PAD.x,z:PAD.z,yaw:0};D.pos.set(s.x,0,s.z+0.15);D.pos.y=groundY(D.pos.x,D.pos.z);D.vel.set(0,0,0);D.yaw=s.yaw||0;D.pitch=D.roll=0;D.state='landed';D.armed=false;D.lock=false;rth=null;D.flip=null;
+  D.home.copy(D.pos);D.lastSafe.copy(D.pos);D.wantLand=false;D.autoLand=false;
+  DR.props.forEach(P=>setPropState(P,'ok'));DR.arms.forEach(A=>{A.state='ok';A.g.rotation.x=0;});D.upside=false;D.wet=false;closeRepair(true);
+}
+let rth=null,rthTap=0;
+function rthPress(){
+  const now=performance.now();
+  if(now-rthTap<550&&(D.state==='flying'||D.state==='takeoff')){rth=null;D.wantLand=true;toast('🛬 Landing right here');rthTap=0;return;} // double-tap = land
+  rthTap=now;
+  if(D.state==='down'){openRepair();return;}
+  if(D.state==='landed'){toast('🏠 On the ground. In the air: tap = fly home, double-tap = land here');return;}
+  if(rth){rth=null;toast('🏠 Return home cancelled');return;}
+  rth={stage:'climb'};toast('🏠 Flying home… (double-tap 🏠 = land here)');
+}
+function armMotors(on,quiet){if(D.state!=='landed')return;D.armed=on;D.idleT=0;D.stopT=0;beep(on?500:300,0.2,0.05);if(!quiet)toast(on?'🌀 Motors on — push the LEFT stick up to take off':'⏹ Motors off',1800);}
+function takeoff(){ // the 🛫 button / Space / controller: starts the motors and takes off for you
+  if(D.state==='down'){openRepair();return;}
+  if(D.state==='landed'){if(D.lock){toast('Wait for GO!');return;}if(D.batt<3){toast('🔋 Battery empty — Menu → Swap battery');return;}if(ST.tw<1.1){toast('🪫 Too heavy to lift off! Smaller battery or stronger motors');return;}
+    D.armed=true;D.state='takeoff';D.home.copy(D.pos);D.toY=D.pos.y+1.2;beep(500,0.15,0.04);return;}
+  D.wantLand=true;toast('🛬 Landing…');
+}
+function doFlip(){if(D.state!=='flying'){toast('Take off first');return;}if(D.pos.y-H(D.pos.x,D.pos.z)<3){toast('🔄 Go higher than 3 m to flip');return;}if(!D.flip){D.flip={t:0,dir:Math.random()<0.5?1:-1};D.vel.y+=3;beep(900,0.2,0.05);}}
+let impactT=0,shake=0;
+function bump(){D.vel.multiplyScalar(-0.35);if(performance.now()-impactT>350){impactT=performance.now();beep(220,0.06,0.06);shake=0.25;}}
+function impact(v,what){
+  const t=ST.tough,bmax=2.5+t*0.35+(SPEC.guards?2.6:0),cmax=bmax+3.5+t*0.3;
+  if(v<bmax){bump();return;}
+  const live=DR.props.filter(P=>P.state==='ok'||P.state==='chip');let broke=false;const pick=L=>L[Math.floor(Math.random()*L.length)];
+  if(v<cmax){
+    if(SPEC.guards&&Math.random()<0.55){bump();toast('🛡 The prop guards saved it!',1000);return;}
+    const ok=live.filter(P=>P.state==='ok'),P=pick(ok.length?ok:live);
+    if(P.state==='ok'){setPropState(P,'chip');toast('⚠️ Chipped a propeller — it wobbles. Land and swap it',2200);bump();shake=0.4;return;}
+    setPropState(P,'broken');broke=true;
+  } else {
+    const nb=v>cmax+4?2:1;for(let k=0;k<nb;k++){const L=DR.props.filter(P=>P.state!=='broken');if(L.length)setPropState(pick(L),'broken');}
+    if(v>cmax+2&&Math.random()<0.4){const A=pick(DR.arms);A.state='bent';A.g.rotation.x=-0.45;}broke=true;
+  }
+  if(broke)fall(what);
+}
+function fall(what){
+  D.state='tumble';D.armed=false;D.upside=Math.random()<0.55;D.spinV.set((Math.random()-0.5)*9,(Math.random()-0.5)*5,(Math.random()-0.5)*9);D.vel.multiplyScalar(-0.25);D.vel.y=Math.max(D.vel.y,0.5);
+  D.fall.set(D.pitch,D.yaw,D.roll,'YXZ');beep(140,0.4,0.14);rth=null;shake=0.6;
+  const nb=DR.props.filter(P=>P.state==='broken').length,bent=DR.arms.filter(A=>A.state==='bent').length;
+  toast('💥 Crashed'+(what?' into '+what:'')+' — '+(nb?nb+' broken propeller'+(nb>1?'s':''):'')+(bent?' + bent arm':''),2600);
+}
+function hitName(o){return o.t==='t'?'a hoop':o.t==='v'?'a trunk':o.t==='c'||o.t==='s'?'branches':o.t==='h'?'a wire or log':'a wall';}
+const wind=new V3(),windT=new V3();let windTimer=0;
+function tickDrone(dt,inp){
+  const prev=D.pos.clone(),M=MODES[D.speed];
+  const spinning=D.state==='flying'||D.state==='takeoff'||(D.state==='landed'&&D.armed);DR.props.forEach((P,i)=>{if(P.state!=='none')P.g.rotation.y+=(spinning?60:0)*dt*(i%2?1:-1);});
+  if(D.flip){D.flip.t+=dt;if(D.flip.t>0.65)D.flip=null;}
+  if(D.state==='tumble'){
+    D.vel.y-=9.8*dt;D.pos.addScaledVector(D.vel,dt);D.fall.x+=D.spinV.x*dt;D.fall.y+=D.spinV.y*dt;D.fall.z+=D.spinV.z*dt;
+    if(inWater(D.pos.x,D.pos.z)&&D.pos.y<WATER_Y+0.1){D.wet=true;D.pos.y=WATER_Y;D.state='down';D.downT=0;D.vel.set(0,0,0);beep(200,0.4,0.1);toast('💦 Splash! It landed in the pond');}
+    else if(D.pos.y<groundY(D.pos.x,D.pos.z)){D.pos.y=groundY(D.pos.x,D.pos.z);D.state='down';D.downT=0;D.vel.set(0,0,0);}
+    if(D.state==='tumble'&&hitTest(D.pos,ST.rad*0.6)){D.pos.x=prev.x;D.pos.z=prev.z;D.vel.x*=-0.3;D.vel.z*=-0.3;}
+    return;
+  }
+  if(D.state==='down'){D.downT+=dt;if(D.downT>0.9&&!repair.open&&!repair.later)openRepair();return;}
+  if(D.state==='landed'){D.vel.set(0,0,0);D.pitch=lerp(D.pitch,0,0.2);D.roll=lerp(D.roll,0,0.2);D.pos.y=groundY(D.pos.x,D.pos.z);
+    // DJI "CSC": pull both sticks down and in (or down and out) to start / stop the motors
+    const r=rawIn,csc=r.ly<-0.65&&r.ry<-0.65&&((r.lx>0.55&&r.rx<-0.55)||(r.lx<-0.55&&r.rx>0.55));
+    if(csc&&!D.cscHeld&&!menu.open&&!repair.open){D.cscHeld=true;if(!D.lock)armMotors(!D.armed);else toast('Wait for GO!');}
+    if(!csc)D.cscHeld=false;
+    if(D.armed&&!csc){
+      if(inp.ly>0.25&&!D.lock&&!menu.open){if(D.batt<3){toast('🔋 Battery empty');}else if(ST.tw<1.1){toast('🪫 Too heavy to lift off');}else{D.state='flying';D.home.copy(D.pos);D.vel.y=0.5;}}
+      if(r.ly<-0.8){D.stopT+=dt;if(D.stopT>1.2)armMotors(false);}else D.stopT=0;
+      D.idleT+=dt;if(D.idleT>20)armMotors(false);
+      if(Math.abs(inp.lx)>0.2)D.yaw-=inp.lx*0.6*dt;
+    } else if(!D.armed&&inp.ly>0.6&&!D.lock&&!menu.open&&!csc&&!tickDrone.hinted){tickDrone.hinted=true;toast('🌀 Start the motors first: pull BOTH sticks down and in (or press 🛫)',3500);setTimeout(()=>tickDrone.hinted=false,6000);}
+    return;}
+  if(D.state!=='flying'&&D.state!=='takeoff')return;
+  D.idleT=0;
+  const use=0.75+0.5*Math.min(1,Math.abs(inp.ly)+Math.hypot(inp.rx,inp.ry)*0.6);D.batt=Math.max(0,D.batt-dt*100/(ST.mins*60)*use);
+  if(D.batt<=3&&!D.autoLand){D.autoLand=true;toast('🔋 Battery empty — landing now');}
+  else if(D.batt<15&&!D.lowWarn){D.lowWarn=true;toast('🔋 Low battery — head home (🏠)');}
+  let lx=inp.lx,ly=inp.ly,rx=inp.rx,ry=inp.ry;
+  if(rth&&(Math.abs(lx)+Math.abs(ly)+Math.abs(rx)+Math.abs(ry))>0.5){rth=null;toast('🏠 Return home cancelled — you have control');}
+  if(D.state==='takeoff'){ly=Math.max(ly,0.7);if(D.pos.y>=D.toY)D.state='flying';}
+  if(D.wantLand||D.autoLand){ly=-0.8;if(D.autoLand){rx*=0.3;ry*=0.3;}}
+  if(rth){const tgt=H(D.home.x,D.home.z)+22,dx=D.home.x-D.pos.x,dz=D.home.z-D.pos.z,dist=Math.hypot(dx,dz);
+    if(rth.stage==='climb'){ly=D.pos.y<tgt?1:0;rx=ry=lx=0;if(D.pos.y>=tgt-0.3)rth.stage='fly';}
+    else if(rth.stage==='fly'){const want=Math.atan2(-dx,-dz);let dy=((want-D.yaw+Math.PI*3)%(Math.PI*2))-Math.PI;lx=clamp(-dy*1.5,-1,1);ry=Math.abs(dy)<0.4?clamp(dist/14,0.15,1):0;rx=0;ly=clamp((tgt-D.pos.y)*0.3,-1,1);if(dist<1.0)rth.stage='down';}
+    else{const fx=-Math.sin(D.yaw),fz=-Math.cos(D.yaw);ry=clamp((dx*fx+dz*fz)*0.4,-0.25,0.25);rx=clamp((dx*-fz+dz*fx)*0.4,-0.25,0.25);lx=0;ly=-0.7;}}
+  const chips=DR.props.filter(P=>P.state==='chip').length;
+  const hMax=Math.max(2,ST.top*M.h*CFG.speedPct/100*(1-chips*0.12)),vMax=ST.vz*M.v,yawR=ST.yaw*M.y*Math.PI/180,tau=ST.tau*100/CFG.resp;
+  D.yaw-=lx*yawR*dt;
+  const fx=-Math.sin(D.yaw),fz=-Math.cos(D.yaw),sx=-fz,sz=fx;
+  windTimer-=dt;if(windTimer<=0){windTimer=2+Math.random()*3;const a=Math.random()*6.28;windT.set(Math.cos(a),0,Math.sin(a)).multiplyScalar(CFG.wind*(0.5+Math.random()));}wind.lerp(windT,Math.min(1,dt*0.5));
+  let tvx=(fx*ry+sx*rx)*hMax,tvz=(fz*ry+sz*rx)*hMax;
+  tvx+=wind.x*(SPEC.assist?0.2:0.7);tvz+=wind.z*(SPEC.assist?0.2:0.7);
+  const stickOn=Math.abs(rx)+Math.abs(ry)>0.05;
+  const k=1-Math.exp(-dt/(SPEC.assist||stickOn?tau:tau*4));
+  const ax=(tvx-D.vel.x)*k/dt,az=(tvz-D.vel.z)*k/dt;
+  D.vel.x+=(tvx-D.vel.x)*k;D.vel.z+=(tvz-D.vel.z)*k;
+  let tvy=ly*vMax;const alt=D.pos.y-groundY(D.pos.x,D.pos.z);
+  if(SPEC.assist&&CFG.landProt&&tvy<0&&alt<2.2)tvy=Math.max(tvy,-0.6-alt*0.4); // landing protection
+  if(ST.tw<1.15&&tvy>0)tvy=Math.min(tvy,ST.vz);
+  D.vel.y+=(tvy-D.vel.y)*(1-Math.exp(-dt/0.35));
+  if(D.flip)D.vel.y-=4*dt;
+  let warn=false;
+  if(SPEC.assist&&CFG.avoid&&D.speed!=='SPORT'&&!rth){const hv=Math.hypot(D.vel.x,D.vel.z);
+    if(hv>0.6){const ux=D.vel.x/hv,uz=D.vel.z/hv;for(let d=0.6;d<=4.2;d+=0.6){_p.set(D.pos.x+ux*d,D.pos.y,D.pos.z+uz*d);if(hitTest(_p,ST.rad)){const allow=Math.max(0,d-0.7)*1.6;if(hv>allow){const s=allow/hv;D.vel.x*=s;D.vel.z*=s;warn=true;}break;}}}
+    if(D.vel.y>0.5){_p.set(D.pos.x,D.pos.y+1.0,D.pos.z);if(hitTest(_p,ST.rad)){D.vel.y=0;warn=true;}}}
+  $('warn').style.display=warn?'block':'none';if(warn&&!tickDrone.wb){tickDrone.wb=1;beep(1000,0.08,0.04);setTimeout(()=>tickDrone.wb=0,500);}
+  D.pos.addScaledVector(D.vel,dt);
+  const fwdA=ax*fx+az*fz,rgtA=ax*sx+az*sz,fwdV=D.vel.x*fx+D.vel.z*fz,rgtV=D.vel.x*sx+D.vel.z*sz,tm=ST.tilt*CFG.tilt/100;
+  D.pitch=lerp(D.pitch,clamp(-(fwdV/hMax)*tm*0.8-fwdA*0.02,-tm,tm),0.15);D.roll=lerp(D.roll,clamp(-(rgtV/hMax)*tm*0.8-rgtA*0.02,-tm,tm),0.15);
+  if(chips){D.wobT+=dt;D.roll+=Math.sin(D.wobT*19)*0.025*chips;D.pitch+=Math.cos(D.wobT*23)*0.02*chips;}
+  D.pos.y=Math.min(D.pos.y,150);
+  const hit=hitTest(D.pos,ST.rad);
+  if(hit){const v=D.vel.length();D.pos.copy(prev);if(hitTest(D.pos,ST.rad))D.pos.y+=0.08;impact(v,hitName(hit));}
+  if(D.state!=='flying'&&D.state!=='takeoff'){tickCourse(dt,null,D.pos);return;}
+  if(inWater(D.pos.x,D.pos.z)&&D.pos.y<WATER_Y+ST.legs){D.wet=true;D.armed=false;D.state='tumble';D.upside=Math.random()<0.4;D.spinV.set(0,0,0);D.fall.set(0,D.yaw,0,'YXZ');D.vel.set(0,-0.5,0);toast('💦 You flew into the pond!');}
+  else{const g=groundY(D.pos.x,D.pos.z);
+    if(D.pos.y<g){const vy=-D.vel.y,hs=Math.hypot(D.vel.x,D.vel.z);D.pos.y=g;
+      if(vy<3.6&&hs<3.4){D.vel.y=0;D.vel.x*=0.5;D.vel.z*=0.5;if(ly<=0.1){D.state='landed';D.armed=true;D.idleT=0;const was=D.wantLand||D.autoLand;D.wantLand=D.autoLand=false;rth=null;toast('🛬 Landed'+(was?'':'')+' — hold the left stick down to stop the motors',1800);mpSendNow();}}
+      else impact(Math.max(vy,hs*0.85),'the ground');}}
+  if(D.state==='flying'&&!hit&&D.pos.y>groundY(D.pos.x,D.pos.z)+0.5)D.lastSafe.copy(D.pos);
+  tickCourse(dt,prev,D.pos);
+}
+function placeDrone(){
+  const g=DR.g;g.position.copy(D.pos);g.rotation.order='YXZ';
+  if(D.state==='tumble')g.rotation.copy(D.fall);
+  else if(D.state==='down'){const fl=repair.flipAnim;g.rotation.set(0,D.yaw,D.upside?Math.PI*(1-fl):0);if(D.upside)g.position.y+=ST.legs*0.4;}
+  else g.rotation.set(D.pitch,D.yaw,D.roll+(D.flip?D.flip.dir*Math.PI*2*smooth(0,0.65,D.flip.t):0));
+  const cn=camName();g.visible=!D.hidden&&!(cn==='GIMBAL'||cn==='FPV');
+  const gy=H(D.pos.x,D.pos.z)+0.05,hgt=Math.max(0,D.pos.y-gy);
+  shadow.position.set(D.pos.x,gy+onPad(D.pos.x,D.pos.z)+(rectD(D.pos.x,D.pos.z,ARENA)<0.01?0.03:0),D.pos.z);
+  shadow.rotation.set(-Math.PI/2,0,D.yaw);const s=(shadow.userData.size||1)*(1+hgt*0.04);shadow.scale.set(s,s,1);shadow.material.opacity=clamp(0.62-hgt*0.025,0.08,0.62);
+  shadow.visible=!inWater(D.pos.x,D.pos.z);
+}
+
+// ---------------------------------------------------------------- repair (flip it over, grab a new prop, screw it on)
+const repair={open:false,later:false,sel:0,flipAnim:0,prog:0,hold:false,drag:null,twistA:null,spares:LS.get('spares',12)};
+function repairJobs(){const J=[];if(D.upside)J.push({t:'flip'});if(D.wet)J.push({t:'dry'});DR.arms.forEach(A=>{if(A.state==='bent')J.push({t:'arm',A});});DR.props.forEach(P=>{if(P.state!=='ok')J.push({t:'prop',P});});return J;}
+function openRepair(){if(D.state!=='down'&&!DR.props.some(P=>P.state!=='ok')){toast('✅ Nothing to fix');return;}
+  if(D.state!=='down'&&D.state!=='landed'){toast('🛬 Land first, then fix it');return;}
+  if(D.state==='landed'){D.armed=false;D.state='down';}
+  repair.open=true;repair.later=false;repair.sel=0;repair.prog=0;$('repair').style.display='flex';if(menu.open)menuToggle(false);drawRepair();toast('🔧 Fix it: tap / PHOTO, then twist to screw on',2400);}
+function closeRepair(silent){repair.open=false;$('repair').style.display='none';if(!silent&&D.state==='down'){repair.later=true;toast('🔧 Drone still broken — press PHOTO or 🔧 to fix it');}}
+function repairDone(){
+  repair.open=false;$('repair').style.display='none';repair.flipAnim=0;
+  if(D.wet){const p=pondOf(D.pos.x,D.pos.z);if(p){const a=Math.atan2(D.pos.z-p.z,D.pos.x-p.x);D.pos.x=p.x+Math.cos(a)*(p.r+2);D.pos.z=p.z+Math.sin(a)*(p.r+2);}D.wet=false;}
+  D.upside=false;D.state='landed';D.armed=false;D.pos.y=groundY(D.pos.x,D.pos.z);D.pitch=D.roll=0;beep(1200,0.2,0.08);toast('✅ Fixed! Start the motors (both sticks down + in, or 🛫)',2800);LS.set('spares',repair.spares);
+}
+function quickFix(toPad){DR.props.forEach(P=>setPropState(P,'ok'));DR.arms.forEach(A=>{A.state='ok';A.g.rotation.x=0;});D.upside=false;D.wet=false;
+  if(toPad){D.pos.x=D.home.x;D.pos.z=D.home.z;}repair.flipAnim=0;D.state='down';repairDone();if(toPad)toast('🚶 Carried it back and fixed it');}
+function jobAct(J,amt){
+  if(!J)return;
+  if(J.t==='prop'&&(J.P.state==='chip'||J.P.state==='broken'||J.P.state==='none')){
+    if(repair.spares<=0){toast('No spare props left — use Quick fix');return;}
+    repair.spares--;setPropState(J.P,'loose');beep(700,0.06,0.05);toast('🔩 New prop on — now twist it tight (circle with your finger / turn the wheel / keep pressing)',2600);drawRepair();return;}
+  if(J.t==='prop'){J.P.screw=Math.min(1,J.P.screw+amt);if(J.P.screw>=1){setPropState(J.P,'ok');beep(1000,0.1,0.06);toast('✅ Prop tight',800);}}
+  else{repair.prog=Math.min(1,repair.prog+amt);if(J.t==='flip')repair.flipAnim=repair.prog;if(J.t==='arm')J.A.g.rotation.x=-0.45*(1-repair.prog);
+    if(repair.prog>=1){repair.prog=0;if(J.t==='flip'){D.upside=false;repair.flipAnim=0;toast('🔄 Right way up',800);}if(J.t==='dry'){D.wet=false;toast('💨 Dried off',800);}if(J.t==='arm'){J.A.state='ok';J.A.g.rotation.x=0;toast('🦾 Arm snapped back',800);}beep(1000,0.1,0.06);}}
+  if(!repairJobs().length)repairDone();else drawRepair();
+}
+function curJob(){const J=repairJobs();if(!J.length)return null;const first=J.filter(j=>j.t==='flip'||j.t==='dry');if(first.length)return first[0];repair.sel=((repair.sel%J.length)+J.length)%J.length;return J[repair.sel];}
+function motorXY(P){const n=SPEC.rotors,off={4:45,6:30,8:22.5}[n],a=(off+P.k*360/n)*Math.PI/180,sc=118/(SPEC.size*(1+Math.sin(Math.PI/n)*0.9));return[200+Math.sin(a)*SPEC.size*sc,175-Math.cos(a)*SPEC.size*sc,sc];}
+function drawRepair(){
+  const cv=$('rcv'),c=cv.getContext('2d'),W=640,Hh=400;c.clearRect(0,0,W,Hh);c.fillStyle='#0b120d';c.fillRect(0,0,W,Hh);
+  const cur=curJob(),S=SPEC.size,sc=motorXY(DR.props[0])[2];
+  c.save();if(D.upside)c.globalAlpha=0.55;
+  c.fillStyle=SPEC.colors.body;c.fillRect(200-S*0.375*sc,175-S*0.75*sc,S*0.75*sc,S*1.5*sc);
+  DR.arms.forEach(A=>{const m=motorXY(DR.props[A.k]);c.strokeStyle=A.state==='bent'?'#ff6b6b':SPEC.colors.arms;c.lineWidth=S*0.12*sc;c.beginPath();c.moveTo(200,175);c.lineTo(m[0],m[1]+(A.state==='bent'?18*(1-(cur&&cur.A===A?repair.prog:0)):0));c.stroke();});
+  DR.props.forEach(P=>{const m=motorXY(P),pr=P.pr*sc,sel=cur&&cur.P===P;c.fillStyle='#202226';c.beginPath();c.arc(m[0],m[1],S*0.11*sc,0,7);c.fill();
+    c.save();c.translate(m[0],m[1]);c.rotate(P.state==='loose'?P.screw*Math.PI*3:P.k);c.fillStyle=P.state==='loose'?'rgba(255,214,10,0.75)':SPEC.colors.props;c.strokeStyle='#000';c.lineWidth=1;
+    const blade=(len,notch)=>{c.beginPath();c.moveTo(0,-6);c.lineTo(len,-4);c.lineTo(len,4);if(notch){c.lineTo(len*0.78,4);c.lineTo(len*0.72,-1);c.lineTo(len*0.64,4);}c.lineTo(0,6);c.closePath();c.fill();c.stroke();};
+    if(P.state==='ok'||P.state==='loose'){blade(pr);c.rotate(Math.PI);blade(pr);}else if(P.state==='chip'){blade(pr);c.rotate(Math.PI);blade(pr*0.85,true);}else if(P.state==='broken'){blade(pr*0.5);}
+    c.restore();
+    if(P.state!=='ok'){c.strokeStyle=sel?'#ffd60a':'#ff6b6b';c.lineWidth=sel?5:2;c.beginPath();c.arc(m[0],m[1],pr+8,0,7);c.stroke();
+      if(P.state==='loose'){c.strokeStyle='#33ff66';c.lineWidth=6;c.beginPath();c.arc(m[0],m[1],pr+14,-Math.PI/2,-Math.PI/2+P.screw*Math.PI*2);c.stroke();}}});
+  c.restore();
+  if(D.upside){c.fillStyle='#ffd60a';c.font='bold 22px sans-serif';c.textAlign='center';c.fillText('UPSIDE DOWN',200,46);}
+  c.fillStyle='#16241b';roundRect(c,20,330,360,58,12);c.fill();c.fillStyle='#cde';c.font='bold 14px sans-serif';c.textAlign='left';c.fillText('Spare props ×'+repair.spares+'  (drag one onto a red motor)',32,350);
+  for(let k=0;k<Math.min(8,repair.spares);k++){c.fillStyle=SPEC.colors.props;c.fillRect(34+k*42,367,32,6);}
+  if(repair.drag){c.fillStyle='rgba(255,214,10,0.9)';c.fillRect(repair.drag[0]-22,repair.drag[1]-4,44,8);}
+  c.textAlign='left';c.fillStyle='#fff';c.font='bold 20px sans-serif';c.fillText('To fix:',410,40);
+  let y=72;const all=[];if(D.upside)all.push(['🔄 Flip it right way up','flip']);if(D.wet)all.push(['💨 Dry it off','dry']);
+  DR.arms.forEach(A=>{if(A.state==='bent')all.push(['🦾 Bend arm '+(A.k+1)+' back','arm',A]);});
+  DR.props.forEach(P=>{if(P.state!=='ok')all.push([(P.state==='loose'?'🔩 Screw on prop ':'🪛 Replace prop ')+(P.k+1)+(P.state==='chip'?' (chipped)':P.state==='broken'?' (broken)':P.state==='loose'?' '+Math.round(P.screw*100)+'%':''),'prop',P]);});
+  if(!all.length){c.fillStyle='#33ff66';c.fillText('✅ All good!',410,y);}
+  all.forEach(a=>{const on=cur&&cur.t===a[1]&&(!a[2]||cur.P===a[2]||cur.A===a[2]);c.fillStyle=on?'#ffd60a':'#cde';c.font=(on?'bold ':'')+'15px sans-serif';c.fillText((on?'▶ ':'   ')+a[0],406,y);y+=26;});
+  if(cur&&(cur.t==='flip'||cur.t==='dry'||cur.t==='arm')){c.fillStyle='#2a6a3a';roundRect(c,410,290,210,60,14);c.fill();c.fillStyle='#33ff66';c.fillRect(410,346,210*repair.prog,4);c.fillStyle='#fff';c.font='bold 18px sans-serif';c.textAlign='center';c.fillText(cur.t==='flip'?'HOLD to flip it over':cur.t==='dry'?'HOLD to dry it':'HOLD to bend it back',515,326);}
+  c.fillStyle='rgba(255,255,255,0.6)';c.font='12px sans-serif';c.textAlign='left';c.fillText('Remote: sticks = pick · PHOTO = do it · wheel or circle the right stick = screw · Fn = later',14,18);
+  if(vr.on&&vr.hudTex)vr.hudTex.needsUpdate=true;
+}
+(function(){const cv=$('rcv');const toXY=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left)*640/r.width,(e.clientY-r.top)*400/r.height];};
+  const motorAt=(x,y)=>DR.props.find(P=>{const m=motorXY(P);return Math.hypot(x-m[0],y-m[1])<P.pr*m[2]+18;});
+  const blockedFirst=()=>repairJobs().some(j=>j.t==='flip'||j.t==='dry');
+  cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);const xy=toXY(e),x=xy[0],y=xy[1],cur=curJob();
+    if(x>20&&x<380&&y>330){repair.drag=[x,y];return;}
+    if(x>410&&y>290&&cur&&cur.t!=='prop'){repair.hold=true;return;}
+    const P=motorAt(x,y);if(P&&P.state!=='ok'&&!blockedFirst()){const J=repairJobs();repair.sel=J.findIndex(j=>j.P===P);if(P.state==='loose'){const m=motorXY(P);repair.twistA=[Math.atan2(y-m[1],x-m[0]),P];}else jobAct(J[repair.sel],0);}
+    drawRepair();});
+  cv.addEventListener('pointermove',e=>{const xy=toXY(e),x=xy[0],y=xy[1];if(repair.drag){repair.drag=[x,y];drawRepair();}
+    if(repair.twistA){const P=repair.twistA[1],m=motorXY(P),a=Math.atan2(y-m[1],x-m[0]);let d=a-repair.twistA[0];if(d>Math.PI)d-=Math.PI*2;if(d<-Math.PI)d+=Math.PI*2;repair.twistA[0]=a;if(d>0){const J=repairJobs().find(j=>j.P===P);if(J)jobAct(J,d/(Math.PI*3));}}});
+  const up=()=>{if(repair.drag){const x=repair.drag[0],y=repair.drag[1];repair.drag=null;const P=motorAt(x,y);if(P&&P.state!=='ok'&&P.state!=='loose'&&!blockedFirst()){const J=repairJobs();repair.sel=J.findIndex(j=>j.P===P);jobAct(J[repair.sel],0);}}repair.hold=false;repair.twistA=null;if(repair.open)drawRepair();};
+  cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+  $('rClose').onclick=()=>closeRepair();$('rQuick').onclick=()=>quickFix(false);$('rPad').onclick=()=>quickFix(true);})();
+let rTwistPrev=null;
+function tickRepair(dt,raw){
+  if(!repair.open)return;const cur=curJob();if(!cur){repairDone();return;}
+  if(repair.hold&&cur.t!=='prop')jobAct(cur,dt*1.1);
+  if(raw){
+    const x=raw.rx||raw.lx;repair.rep=(repair.rep||0)-dt;
+    if(Math.abs(x)>0.6&&repair.rep<=0&&cur.t==='prop'){repair.sel+=x>0?1:-1;repair.rep=0.3;beep(660,0.03,0.04);drawRepair();}
+    else if(Math.abs(x)<0.3)repair.rep=0;
+    if(Math.abs(raw.gim)>0.3&&(cur.t!=='prop'||cur.P.state==='loose'))jobAct(cur,Math.abs(raw.gim)*dt*0.9);
+    const m=Math.hypot(raw.rx,raw.ry);if(m>0.7&&cur.t==='prop'&&cur.P.state==='loose'){const a=Math.atan2(raw.ry,raw.rx);if(rTwistPrev!==null){let d=rTwistPrev-a;if(d>Math.PI)d-=Math.PI*2;if(d<-Math.PI)d+=Math.PI*2;if(d>0)jobAct(cur,d/(Math.PI*3));}rTwistPrev=a;}else rTwistPrev=null;
+  }
+}
+
+// ---------------------------------------------------------------- cameras
+const CAMS=['GIMBAL','FPV','CHASE','FOLLOW','TOP','PILOT','ORBIT','SIDE'];
+const CAMHELP={GIMBAL:'steady camera — wheel tilts',FPV:'tilts with the drone',CHASE:'keeps the drone in the middle',FOLLOW:'follows right behind',TOP:'looking straight down',PILOT:'from where you took off — auto zoom',ORBIT:'circles around',SIDE:'from the side'};
+let camI=Math.max(0,CAMS.indexOf(LS.get('cam','GIMBAL'))),zoom=1,orbitA=0,rcView=LS.get('rcView',false);
+const chasePos=new V3(0,3,6),followPos=new V3();let chaseInit=false;
+function camName(){return builder.open?'SHOW':repair.open?'REPAIR':CAMS[camI];}
+function nextCam(d){camI=(camI+(d||1)+CAMS.length)%CAMS.length;LS.set('cam',CAMS[camI]);$('camName').textContent=CAMS[camI];chaseInit=false;toast('🎥 '+CAMS[camI]+' — '+CAMHELP[CAMS[camI]],1300);$('bRC').style.display=CAMS[camI]==='PILOT'?'':'none';}
+const _e=new THREE.Euler(),_m=new V3();
+function mountPos(out){out.copy(DR.camLocal);out.applyEuler(_e.set(0,D.yaw,0,'YXZ'));return out.add(D.pos);}
+function aimGimbal(c){mountPos(c.position);c.quaternion.setFromEuler(_e.set(D.gimbal,D.yaw,0,'YXZ'));}
+function updateCam(dt){
+  const c=camName(),p=D.pos,fx=-Math.sin(D.yaw),fz=-Math.cos(D.yaw);let fov=75;
+  scene.fog.far=Q.fogF;scene.fog.near=Q.fogN;
+  if(c==='GIMBAL'){aimGimbal(cam);fov=72/zoom;}
+  else if(c==='FPV'){mountPos(cam.position);const up=(CFG.fpvUp>=0?CFG.fpvUp:SPEC.fpvUp)*Math.PI/180;cam.quaternion.setFromEuler(_e.set(D.pitch*0.6+up,D.yaw,D.roll*0.6,'YXZ'));fov=100/Math.sqrt(zoom);}
+  else if(c==='CHASE'){const dist=3.5+ST.L*6;if(!chaseInit){chasePos.set(p.x-fx*dist,p.y+1.5,p.z-fz*dist);chaseInit=true;}
+    _m.subVectors(chasePos,p);const dd=_m.length()||1;_m.multiplyScalar(lerp(dd,dist,1-Math.exp(-dt*2.5))/dd);chasePos.copy(p).add(_m);chasePos.y=lerp(chasePos.y,p.y+1.4,1-Math.exp(-dt*1.5));
+    const g=H(chasePos.x,chasePos.z)+0.6;if(chasePos.y<g)chasePos.y=g;cam.position.copy(chasePos);cam.lookAt(p);fov=68/zoom;}
+  else if(c==='FOLLOW'){const want=new V3(p.x-fx*(3+ST.L*5),p.y+1.4,p.z-fz*(3+ST.L*5));const g=H(want.x,want.z)+0.5;if(want.y<g)want.y=g;followPos.lerp(want,1-Math.exp(-dt*5));cam.position.copy(followPos);cam.lookAt(p.x+fx*2,p.y+0.3,p.z+fz*2);fov=70/zoom;}
+  else if(c==='TOP'){cam.position.set(p.x,p.y+12,p.z);cam.quaternion.setFromEuler(_e.set(-Math.PI/2,D.yaw,0,'YXZ'));fov=60/zoom;}
+  else if(c==='PILOT'){const g=H(D.home.x,D.home.z);cam.position.set(D.home.x+1.8,g+1.65,D.home.z+2.6);cam.lookAt(p);const dd=cam.position.distanceTo(p);
+    fov=(CFG.autoZoom?clamp(2*Math.atan(Math.max(2.2,ST.L*8)/dd)*180/Math.PI,5,65):65)/zoom;scene.fog.far=Math.max(Q.fogF,dd+60);scene.fog.near=Math.max(Q.fogN,dd*0.9);}
+  else if(c==='ORBIT'){orbitA+=dt*0.35;const r=4+ST.L*6;cam.position.set(p.x+Math.cos(orbitA)*r,p.y+1.6,p.z+Math.sin(orbitA)*r);const g=H(cam.position.x,cam.position.z)+0.5;if(cam.position.y<g)cam.position.y=g;cam.lookAt(p);fov=65/zoom;}
+  else if(c==='SIDE'){const r=2.5+ST.L*4;cam.position.set(p.x+fz*r,p.y+0.4,p.z-fx*r);cam.lookAt(p.x+fx*1.5,p.y,p.z+fz*1.5);fov=70/zoom;}
+  else if(c==='REPAIR'){const r=0.9+ST.L*3;cam.position.set(p.x+r*0.8,p.y+r*1.1,p.z+r*0.9);cam.lookAt(p);fov=55;}
+  else if(c==='SHOW'){const P=builder.prev?builder.prev.g.position:p,r=0.8+builder.spec.size*VS*4;builder.ang+=dt*0.25;cam.position.set(P.x+Math.cos(builder.ang)*r,P.y+r*0.5,P.z+Math.sin(builder.ang)*r);cam.lookAt(P.x,P.y,P.z);const side=innerWidth>600?0.45:0;cam.rotateY(-side*0.5);fov=50;}
+  if(shake>0){shake=Math.max(0,shake-dt);cam.position.x+=(Math.random()-0.5)*shake*0.2;cam.position.y+=(Math.random()-0.5)*shake*0.2;}
+  if(vr.on&&vr.head)cam.quaternion.multiply(vr.head);
+  cam.fov=fov;cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();
+}
+
+// ---------------------------------------------------------------- input: touch sticks / keys / gamepad
+const touch={lx:0,ly:0,rx:0,ry:0};
+function bindStick(el,kx,ky){const knob=el.querySelector('.k');let id=null;
+  const set=e=>{const r=el.getBoundingClientRect();let x=(e.clientX-r.left-r.width/2)/(r.width/2),y=(e.clientY-r.top-r.height/2)/(r.height/2);const m=Math.hypot(x,y);if(m>1){x/=m;y/=m;}touch[kx]=x;touch[ky]=-y;knob.style.transform='translate('+x*37+'px,'+y*37+'px)';};
+  el.addEventListener('pointerdown',e=>{id=e.pointerId;el.setPointerCapture(id);set(e);e.preventDefault();});el.addEventListener('pointermove',e=>{if(e.pointerId===id)set(e);});
+  const up=e=>{if(e.pointerId!==id)return;id=null;touch[kx]=0;touch[ky]=0;knob.style.transform='';};el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);}
+bindStick($('stL'),'lx','ly');bindStick($('stR'),'rx','ry');
+const keys={};
+addEventListener('keydown',e=>{keys[e.code]=true;
+  if(repair.open){if(e.code==='Enter'||e.code==='Space'||e.code==='KeyP'){jobAct(curJob(),0.34);}else if(e.code==='ArrowRight'||e.code==='KeyD'){repair.sel++;drawRepair();}else if(e.code==='ArrowLeft'||e.code==='KeyA'){repair.sel--;drawRepair();}else if(e.code==='Escape')closeRepair();e.preventDefault();return;}
+  if(menu.open){if(e.code==='ArrowUp'||e.code==='KeyW')menuMove(-1);else if(e.code==='ArrowDown'||e.code==='KeyS')menuMove(1);else if(e.code==='ArrowLeft'||e.code==='KeyA')menuAdj(-1);else if(e.code==='ArrowRight'||e.code==='KeyD')menuAdj(1);else if(e.code==='Enter'||e.code==='Space')menuSelect();else if(e.code==='Escape'||e.code==='KeyM'||e.code==='Backspace')menuBack();e.preventDefault();return;}
+  const k=e.code;if(k==='KeyC')nextCam();else if(k==='KeyP')shutter(true);else if(k==='KeyM'||k==='Escape')menuToggle(true);else if(k==='Space')takeoff();else if(k==='KeyH')rthPress();else if(k==='KeyV')toggleVR();else if(k==='KeyR')respawn();else if(k==='KeyF')doFlip();else if(k==='KeyG')cycleShot();else if(k==='KeyB')openBuilder();else if(k==='Digit1')setSpeed('CINE');else if(k==='Digit2')setSpeed('NORMAL');else if(k==='Digit3')setSpeed('SPORT');
+  if(k.indexOf('Arrow')===0||k==='Space')e.preventDefault();});
+addEventListener('keyup',e=>{keys[e.code]=false;if(e.code==='KeyP')shutter(false);});
+function keyAxes(){return{lx:(keys.ArrowRight?1:0)-(keys.ArrowLeft?1:0),ly:(keys.ArrowUp?1:0)-(keys.ArrowDown?1:0),rx:(keys.KeyD?1:0)-(keys.KeyA?1:0),ry:(keys.KeyW?1:0)-(keys.KeyS?1:0),gim:(keys.KeyE?1:0)-(keys.KeyQ?1:0)};}
+const gpPrev={};
+function gamepadAxes(){
+  let gps=[];try{gps=navigator.getGamepads?[...navigator.getGamepads()]:[];}catch(e){}const gp=gps.filter(Boolean)[0];if(!gp)return null;
+  const dz=v=>Math.abs(v)<0.1?0:v,b=i=>!!(gp.buttons[i]&&gp.buttons[i].pressed),down=i=>{const now=b(i),was=gpPrev[i];gpPrev[i]=now;return now&&!was;};
+  if(repair.open){if(down(0))jobAct(curJob(),0.34);if(down(1))closeRepair();}
+  else if(menu.open){if(down(12))menuMove(-1);if(down(13))menuMove(1);if(down(14))menuAdj(-1);if(down(15))menuAdj(1);if(down(0))menuSelect();if(down(1)||down(9))menuBack();}
+  else{if(down(0))shutter(true);else if(!b(0)&&gpPrev.f0)shutter(false);gpPrev.f0=b(0);if(down(1))nextCam();if(down(3))takeoff();if(down(2))rthPress();if(down(9))menuToggle(true);if(down(5))cycleShot();if(down(4))doFlip();}
+  return{lx:dz(gp.axes[0]),ly:-dz(gp.axes[1]),rx:dz(gp.axes[2]||0),ry:-dz(gp.axes[3]||0),gim:(b(7)?1:0)-(b(6)?1:0)};
+}
+
+// ---------------------------------------------------------------- DJI RC-N1 remote: USB (Web Serial) and DJI Phone Link (Wi-Fi)
+const DJI_REQ=new Uint8Array([0x55,0x0d,0x04,0x33,0x0a,0x06,0xeb,0x34,0x40,0x06,0x01,0x74,0x24]);
+const DJI_REQ_BTN=new Uint8Array([0x55,0x0d,0x04,0x33,0x0a,0x06,0xeb,0x34,0x40,0x06,0x27,0x40,0x60]);
+const DJI_SIM_ON=new Uint8Array([0x55,0x0e,0x04,0x66,0x0a,0x06,0xeb,0x34,0x40,0x06,0x24,0x01,0xd9,0xec]);
+const dji={on:false,ax:{lx:0,ly:0,rx:0,ry:0,dial:0},last:0,buf:[],btn:null,latch:0,sticks:0,btnPk:0,writer:null,waiting:false,sentAt:0,n:0,via:'',stage:'not connected',bytes:0};
+function djiFeed(bytes){
+  if(dji.buf.length+bytes.length>800){dji.buf.length=0;if(bytes.length>400)bytes=bytes.slice(bytes.length-400);}
+  const buf=dji.buf;dji.bytes+=bytes.length;for(let i=0;i<bytes.length;i++)buf.push(bytes[i]);
+  while(buf.length>=3){if(buf[0]!==0x55){buf.shift();continue;}const len=(buf[1]|(buf[2]<<8))&0x3ff;if(len<4||len>600){buf.shift();continue;}if(buf.length<len)break;
+    const pk=buf.splice(0,len);
+    if(len===58){const mk=(pk[28]<<8)|pk[29];dji.btnPk++;dji.latch|=mk;dji.btn={mask:mk,flight:({0:'SPORT',4096:'NORMAL',8192:'CINE'})[mk&0x3000]||'NORMAL'};}
+    if(len===38||len===58)dji.waiting=false;
+    if(len===38){dji.sticks++;const v=o=>clamp(((pk[o]|(pk[o+1]<<8))-1024)/660,-1,1);dji.ax={rx:v(13),ry:v(16),ly:v(19),lx:v(22),dial:v(25)};dji.last=performance.now();
+      if(!dji.btnPk){dji.btn=dji.btn||{mask:0,flight:null,fallback:true};dji.fnFallback=!!(pk[28]&1);}}}
+}
+function djiSend(){const w=dji.writer;if(!w||dji.wbusy)return;dji.n++;dji.waiting=true;dji.sentAt=performance.now();dji.wbusy=true;w.write(dji.n%2?DJI_REQ:DJI_REQ_BTN).then(()=>dji.wbusy=false,()=>dji.wbusy=false);}
+function djiLive(){return dji.on&&performance.now()-dji.last<1200;}
+function djiStatus(show){const el=$('djiStat');if(show)el.style.display='block';if(el.style.display==='none')return;
+  el.innerHTML='<b>🎮 DJI remote</b>\n'+dji.stage+'\nvia: '+(dji.via||'—')+'\nstick packets: '+dji.sticks+'   button packets: '+dji.btnPk+'\nsticks  L '+dji.ax.lx.toFixed(2)+','+dji.ax.ly.toFixed(2)+'   R '+dji.ax.rx.toFixed(2)+','+dji.ax.ry.toFixed(2)+'   wheel '+dji.ax.dial.toFixed(2)+'\n\n<button class="btn" onclick="$(\'djiStat\').style.display=\'none\'">OK</button>';}
+setInterval(()=>{if(dji.on)dji.stage=dji.sticks&&performance.now()-dji.last<1500?'WORKING ✓ — move the sticks':'connected, waiting for the remote… (is it on?)';djiStatus();const ok=dji.on&&performance.now()-dji.last<1500;$('bDJI').textContent=ok?'🎮 DJI ✓':'🎮 DJI';$('bDJI').style.borderColor=ok?'#4ade80':'';document.body.classList.toggle('remote',dji.on&&performance.now()-dji.last<3000);},400);
+async function connectDJI(){
+  if(window._relay){connectWifi();djiStatus(true);return;}
+  if(!('serial' in navigator)){djiStatus(true);dji.stage='This browser can\'t talk to USB.\n• On a computer: use Chrome or Edge.\n• On a phone: run "Start DJI Phone Link" on the computer and open the address it shows.';djiStatus();return;}
+  try{const port=await navigator.serial.requestPort({});await port.open({baudRate:115200});
+    dji.on=true;dji.via='USB';dji.buf=[];const writer=port.writable.getWriter();writer.write(DJI_SIM_ON).catch(()=>{});dji.writer=writer;
+    clearInterval(dji.timer);dji.timer=setInterval(()=>{if(!dji.waiting||performance.now()-dji.sentAt>100)djiSend();},8);toast('🎮 DJI remote connected!');
+    const reader=port.readable.getReader();(async()=>{try{for(;;){const r=await reader.read();if(r.done)break;if(r.value)djiFeed(r.value);}}catch(e){}dji.on=false;clearInterval(dji.timer);toast('🎮 Remote disconnected');})();
+  }catch(e){djiStatus(true);dji.stage='Couldn\'t open the remote: '+(e.message||e)+(e.name==='NetworkError'?'\n→ close DJI Fly / DJI Assistant / other tabs using it':'')+(e.name==='NotFoundError'?'\n→ nothing picked. Plug the remote into the BOTTOM USB-C port and turn it on.':'');djiStatus();}
+}
+let ws=null;
+function connectWifi(){
+  if(ws&&ws.readyState<2)return;try{ws=new WebSocket((location.protocol==='https:'?'wss://':'ws://')+location.host+'/dji');}catch(e){return;}ws.binaryType='arraybuffer';
+  ws.onopen=()=>{dji.on=true;dji.via='Wi-Fi (DJI Phone Link)';dji.buf=[];if(!window._push){dji.writer={write:u=>{try{ws.send(u);}catch(e){}return Promise.resolve();}};dji.writer.write(DJI_SIM_ON);clearInterval(dji.timer);dji.timer=setInterval(()=>{if(!dji.waiting||performance.now()-dji.sentAt>150)djiSend();},8);}
+    if(!connectWifi.once){connectWifi.once=1;toast('🎮 DJI remote connected over Wi-Fi!');}};
+  ws.onmessage=ev=>djiFeed(new Uint8Array(ev.data));ws.onclose=()=>{dji.on=false;clearInterval(dji.timer);if(CFG.useRemote!==false)setTimeout(connectWifi,1500);};
+}
+(function relayLoop(){if(location.protocol.indexOf('http')!==0)return;
+  if(!(ws&&ws.readyState<2)||!mp.ws)fetch('/dji-info?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(j&&j.ok){window._relay=true;window._push=!!j.push;if(j.remote!==false&&CFG.useRemote!==false&&!(ws&&ws.readyState<2))connectWifi();if(!mp.ws&&mp.want!==false&&j.mp)mpConnect(mp.addr||'');}}).catch(()=>{});
+  setTimeout(relayLoop,3000);})();
+// buttons: PHOTO 0x60 · PHOTO/VIDEO switch 0x04 · Return-home 0x80 · Fn 0x02 · C/N/S 0x3000
+const bPrev={};let fnDownT=0,fnHold=false,fnUsedWheel=false;
+function tickDjiButtons(){
+  if(!dji.on||!dji.btn)return;
+  const m=dji.btn.mask|dji.latch;dji.latch=0;
+  const B={sh:!!(m&0x60),mode:!!(m&0x04),rth:!!(m&0x80),fn:dji.btn.fallback?dji.fnFallback:!!(m&0x02)};
+  const dn=k=>B[k]&&!bPrev[k],up=k=>!B[k]&&bPrev[k],now=performance.now();
+  const shD=dn('sh'),shU=up('sh'),moD=dn('mode'),rtD=dn('rth'),fnD=dn('fn'),fnU=up('fn');Object.assign(bPrev,B);
+  if(dji.btn.flight&&dji.btn.flight!==tickDjiButtons.fl){tickDjiButtons.fl=dji.btn.flight;setSpeed(dji.btn.flight);}
+  if(repair.open){if(shD||moD)jobAct(curJob(),0.34);if(B.sh&&curJob()&&curJob().t!=='prop')jobAct(curJob(),0.012);if(fnD||rtD)closeRepair();return;}
+  if(menu.open){if(shD||moD)menuSelect();if(fnD||rtD){menuBack();fnHold=true;fnDownT=0;}if(fnU)fnHold=false;return;}
+  if(fnD){fnDownT=now;fnHold=false;fnUsedWheel=false;}
+  if(B.fn&&fnDownT&&!fnHold&&!fnUsedWheel&&now-fnDownT>600){fnHold=true;menuToggle(true);}
+  if(fnU){if(!fnHold&&fnDownT&&!fnUsedWheel){if(now-fnDownT>600)menuToggle(true);else nextCam();}fnDownT=0;fnHold=false;}
+  if(rtD)rthPress();if(moD)cycleShot();if(shD)shutter(true);if(shU)shutter(false);
+}
+let rawIn={lx:0,ly:0,rx:0,ry:0,gim:0};
+function getInput(dt){
+  const k=keyAxes(),g=gamepadAxes();let a={lx:0,ly:0,rx:0,ry:0,gim:0};
+  if(djiLive())a={lx:dji.ax.lx,ly:dji.ax.ly,rx:dji.ax.rx,ry:dji.ax.ry,gim:dji.ax.dial};
+  else if(g&&(Math.abs(g.lx)+Math.abs(g.ly)+Math.abs(g.rx)+Math.abs(g.ry)+Math.abs(g.gim))>0)a=g;
+  if(touch.lx||touch.ly||touch.rx||touch.ry){a.lx=touch.lx;a.ly=touch.ly;a.rx=touch.rx;a.ry=touch.ry;}
+  if(k.lx||k.ly||k.rx||k.ry||k.gim)a=Object.assign(a,{lx:k.lx||a.lx,ly:k.ly||a.ly,rx:k.rx||a.rx,ry:k.ry||a.ry,gim:k.gim||a.gim});
+  rawIn=a;
+  const E=CFG.expo/100,ex=v=>{const s=v<0?-1:1;v=Math.abs(v);v=v<0.05?0:(v-0.05)/0.95;return s*((1-E)*v+E*v*v*v);};
+  if(repair.open){tickRepair(dt,a);return{lx:0,ly:0,rx:0,ry:0};}
+  if(menu.open){const y=a.ry||a.ly,x=a.rx||a.lx;menu.rep-=dt;
+    if(Math.abs(y)>0.55&&menu.rep<=0){menuMove(y>0?-1:1);menu.rep=menu.held?0.15:0.3;menu.held=true;}
+    else if(Math.abs(x)>0.6&&menu.rep<=0){menuAdj(x>0?1:-1);menu.rep=menu.held?0.12:0.28;menu.held=true;}
+    else if(Math.abs(y)<0.3&&Math.abs(x)<0.3){menu.rep=0;menu.held=false;}
+    if(djiLive()&&Math.abs(dji.ax.dial)>0.4&&(menu.wheel||0)<=0){menuMove(dji.ax.dial>0?1:-1);menu.wheel=0.22;}menu.wheel=(menu.wheel||0)-dt;
+    return{lx:0,ly:0,rx:0,ry:0};}
+  if(Math.abs(a.gim)>0.08){
+    if(bPrev.fn&&djiLive()){fnUsedWheel=true;zoom=clamp(zoom-a.gim*1.5*dt,1,4);if(!getInput.zt||performance.now()-getInput.zt>400){getInput.zt=performance.now();toast('🔍 Zoom '+zoom.toFixed(1)+'x',600);}} // hold Fn + wheel = zoom (like DJI)
+    else{D.gimbal=clamp(D.gimbal-a.gim*1.2*dt,-Math.PI/2,Math.PI/2);$('gimbal').value=Math.round(D.gimbal*180/Math.PI);}}
+  return{lx:ex(a.lx),ly:ex(a.ly),rx:ex(a.rx),ry:ex(a.ry)};
+}
+$('gimbal').addEventListener('input',e=>D.gimbal=e.target.value*Math.PI/180);
+function setSpeed(s){if(!MODES[s])return;D.speed=s;LS.set('speed',s);$('cSpd').textContent=s;toast('🎚️ '+s+' · up to '+Math.round(ST.top*MODES[s].h*CFG.speedPct/100)+' m/s'+(s==='SPORT'&&SPEC.assist?' · obstacle braking OFF':''),1500);}
+function cycleSpeed(d){const L=['CINE','NORMAL','SPORT'];setSpeed(L[(L.indexOf(D.speed)+(d||1)+3)%3]);}
+
+// ---------------------------------------------------------------- photo · video · paintball gun
+let shotMode='photo',rec=null,firing=false;const gallery=[];
+const comp=document.createElement('canvas'),cctx=comp.getContext('2d');
+function cycleShot(){shotMode=shotMode==='photo'?'video':shotMode==='video'?'gun':'photo';updBadge();toast(shotMode==='photo'?'📷 Photo mode':shotMode==='video'?'🎥 Video mode — PHOTO starts/stops'+(rec?' (still recording)':''):'🎯 Paintball mode — PHOTO fires (hold for rapid fire)'+(rec?' · still recording':''),1500);}
+function updBadge(){const b=$('badge');b.textContent=(rec?'🔴 REC '+fmt((performance.now()-rec.t0)/1000)+' · ':'')+(shotMode==='photo'?'📷 PHOTO':shotMode==='video'?'🎥 VIDEO':'🎯 PAINTBALL');b.style.borderColor=rec?'#ff3b30':shotMode==='photo'?'#4ade80':shotMode==='video'?'#ffb020':'#ff6b6b';
+  $('bShot').textContent=shotMode==='photo'?'📷 PHOTO':shotMode==='video'?(rec?'⏹ STOP':'⏺ REC'):'🎯 FIRE';$('bFire').style.display=shotMode==='gun'&&!vr.on?'block':'none';}
+function osdLines(){const g=H(D.pos.x,D.pos.z),hs=Math.hypot(D.vel.x,D.vel.z),dist=D.pos.distanceTo(D.home);
+  return[SPEC.name+' · '+CAMS[camI]+' · '+D.speed,'H '+(D.pos.y-g).toFixed(1)+'m  D '+dist.toFixed(0)+'m  H.S '+hs.toFixed(1)+'m/s  V.S '+D.vel.y.toFixed(1)+'m/s','🔋 '+Math.ceil(D.batt)+'%   '+new Date().toLocaleString()];}
+function composite(){const w=Math.min(1280,canvas.width),h=Math.round(w*canvas.height/canvas.width);if(comp.width!==w||comp.height!==h){comp.width=w;comp.height=h;}
+  cctx.drawImage(canvas,0,0,w,h);const L=osdLines(),fs=Math.max(11,Math.round(h/40));cctx.font='bold '+fs+'px monospace';let bw=0;L.forEach(l=>bw=Math.max(bw,cctx.measureText(l).width));
+  cctx.fillStyle='rgba(0,0,0,0.45)';cctx.fillRect(8,8,bw+16,L.length*(fs+4)+10);cctx.fillStyle='#eaffea';L.forEach((l,i)=>cctx.fillText(l,16,12+fs+i*(fs+4)));
+  const r=Math.round(h*0.13);cctx.save();cctx.beginPath();cctx.arc(w-r-12,h-r-12,r,0,7);cctx.clip();cctx.drawImage($('mini'),w-2*r-12,h-2*r-12,2*r,2*r);cctx.restore();
+  if(rec&&Math.floor(performance.now()/500)%2){cctx.fillStyle='#ff3b30';cctx.beginPath();cctx.arc(w-22,22,8,0,7);cctx.fill();}return comp;}
+let wantShot=false;
+function shutter(down){
+  if(!down){firing=false;return;}
+  if(D.state==='down'){openRepair();return;}
+  if(shotMode==='gun'){firing=true;fire();return;}
+  if(shotMode==='video'){rec?stopRec():startRec();return;}wantShot=true;
+}
+function grabPhoto(){const c=composite();const url=c.toDataURL('image/jpeg',0.9);gallery.unshift({type:'photo',url,t:new Date()});const f=document.createElement('div');f.style.cssText='position:fixed;inset:0;background:#fff;opacity:0.7;z-index:80;pointer-events:none;transition:opacity 0.3s;';document.body.appendChild(f);setTimeout(()=>{f.style.opacity=0;setTimeout(()=>f.remove(),300);},40);beep(1400,0.05,0.06);toast('📸 Photo saved — Menu → Photos',1400);}
+function startRec(){if(!comp.captureStream||typeof MediaRecorder==='undefined'){toast('🎥 This browser can\'t record video');return;}
+  composite();const st=comp.captureStream(30);let mt='';for(const t of['video/mp4;codecs=avc1','video/mp4','video/webm;codecs=vp9','video/webm'])if(MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t)){mt=t;break;}
+  let mr;try{mr=new MediaRecorder(st,mt?{mimeType:mt,videoBitsPerSecond:5e6}:undefined);}catch(e){toast('🎥 Recording not available');return;}
+  const chunksV=[];mr.ondataavailable=e=>{if(e.data&&e.data.size)chunksV.push(e.data);};
+  mr.onstop=()=>{const blob=new Blob(chunksV,{type:mr.mimeType||'video/webm'});gallery.unshift({type:'video',url:URL.createObjectURL(blob),ext:(mr.mimeType||'').indexOf('mp4')>=0?'mp4':'webm',t:new Date()});toast('🎬 Video saved — Menu → Photos');};
+  mr.start(500);rec={mr,t0:performance.now()};updBadge();beep(900,0.1,0.06);}
+function stopRec(){if(!rec)return;try{rec.mr.stop();}catch(e){}rec=null;updBadge();beep(600,0.1,0.06);}
+function galOpen(){const g=$('galGrid');g.innerHTML=gallery.length?'':'<div style="opacity:0.7">Nothing yet — press PHOTO while flying.</div>';
+  gallery.forEach(it=>{const a=document.createElement('a');a.href=it.url;a.download='woods-drone-'+it.t.toISOString().replace(/[:.]/g,'-')+'.'+(it.type==='photo'?'jpg':it.ext);a.innerHTML=it.type==='photo'?'<img src="'+it.url+'">':'<video src="'+it.url+'" muted playsinline></video>';g.appendChild(a);});$('gal').style.display='block';}
+function galClose(){$('gal').style.display='none';}
+const shots=[],splats=[],pbGeo=new THREE.SphereGeometry(0.07,6,4),PBC=[0xff3b30,0xffcc00,0x34c759,0x0a84ff,0xff2d55];
+function fire(){
+  if(D.state!=='flying'&&D.state!=='takeoff'){if(!fire.warned){fire.warned=1;toast('Take off first');setTimeout(()=>fire.warned=0,1500);}firing=false;return;}
+  const now=performance.now();if(now-(fire.last||0)<130)return;fire.last=now;
+  const dir=new V3(0,0,-1);if(camName()==='GIMBAL'||camName()==='FPV')dir.applyQuaternion(cam.quaternion);else dir.applyEuler(_e.set(D.gimbal*0.5,D.yaw,0,'YXZ'));
+  const col=PBC[Math.floor(Math.random()*PBC.length)];const m=new THREE.Mesh(pbGeo,new THREE.MeshBasicMaterial({color:col}));mountPos(m.position);scene.add(m);
+  shots.push({m,v:dir.multiplyScalar(48).add(D.vel),life:2.5,col});beep(1200,0.03,0.03);
+}
+function splat(p,col){const s=new THREE.Mesh(new THREE.CircleGeometry(0.22,8),new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.9,depthWrite:false}));s.position.copy(p);s.lookAt(cam.position);scene.add(s);splats.push(s);if(splats.length>40){const o=splats.shift();scene.remove(o);o.geometry.dispose();}}
+function tickShots(dt){
+  if(firing&&shotMode==='gun')fire();
+  for(let i=shots.length-1;i>=0;i--){const s=shots[i];s.v.y-=9.8*dt;s.m.position.addScaledVector(s.v,dt);s.life-=dt;let gone=s.life<=0;
+    for(const b of balloons)if(b.alive&&b.g.position.distanceTo(s.m.position)<0.7){popBalloon(b);gone=true;}
+    if(!gone&&(hitTest(s.m.position,0.05)||s.m.position.y<H(s.m.position.x,s.m.position.z))){splat(s.m.position,s.col);gone=true;}
+    if(!gone)for(const d of deer)if(Math.hypot(d.x-s.m.position.x,d.z-s.m.position.z)<0.8&&s.m.position.y-H(d.x,d.z)<1.8){d.state='flee';d.t=4;d.dir=Math.atan2(d.x-D.pos.x,d.z-D.pos.z);splat(s.m.position,s.col);gone=true;break;}
+    if(gone){scene.remove(s.m);s.m.material.dispose();shots.splice(i,1);}}
+}
+
+// ---------------------------------------------------------------- HUD + minimap + pilot RC view
+const trailPath=new Path2D();TS.forEach((p,i)=>i?trailPath.lineTo(p.x,p.z):trailPath.moveTo(p.x,p.z));trailPath.closePath();
+function drawMini(){
+  const c=$('mini'),x=c.getContext('2d'),W=c.width,r=W/2,view=55,s=r/view;
+  x.save();x.clearRect(0,0,W,W);x.beginPath();x.arc(r,r,r-2,0,7);x.clip();x.fillStyle='#2c4a24';x.fillRect(0,0,W,W);
+  x.setTransform(s,0,0,s,r-D.pos.x*s,r-D.pos.z*s);
+  x.fillStyle='#4e7a32';x.fillRect(MEADOW.x0,MEADOW.z0,MEADOW.x1-MEADOW.x0,MEADOW.z1-MEADOW.z0);x.fillStyle='#2b313b';x.fillRect(ARENA.x0,ARENA.z0,ARENA.x1-ARENA.x0,ARENA.z1-ARENA.z0);
+  x.strokeStyle='#a07a4a';x.lineWidth=2.4;x.stroke(trailPath);x.beginPath();x.moveTo(0,16);x.lineTo(0,152);x.stroke();
+  x.fillStyle='#3c7fb4';const ponds=[PONDC];for(const ch of chunks.values())if(ch.pond)ponds.push(ch.pond);ponds.forEach(p=>{x.beginPath();x.arc(p.x,p.z,p.r,0,7);x.fill();});
+  x.fillStyle='rgba(16,48,16,0.95)';for(const ch of chunks.values()){if(Math.abs((ch.i+0.5)*CH-D.pos.x)>view+CH||Math.abs((ch.j+0.5)*CH-D.pos.z)>view+CH)continue;for(const t of ch.trees){x.beginPath();x.arc(t.x,t.z,t.cr*0.85,0,7);x.fill();}}
+  x.strokeStyle='#ddd';x.lineWidth=0.4;x.beginPath();x.moveTo(POWER.x0,POWER.z);x.lineTo(POWER.x1,POWER.z);x.stroke();
+  x.fillStyle='#ffd60a';x.beginPath();x.arc(PAD.x,PAD.z,2,0,7);x.fill();x.fillStyle='#33ccff';x.beginPath();x.arc(APAD.x,APAD.z,2,0,7);x.fill();
+  x.fillStyle='#b07a40';for(const d of deer){x.beginPath();x.arc(d.x,d.z,0.9,0,7);x.fill();}
+  for(const b of balloons)if(b.alive){x.fillStyle='#ff6b9a';x.beginPath();x.arc(b.g.position.x,b.g.position.z,0.9,0,7);x.fill();}
+  if(course)course.cps.forEach((cp,i)=>{x.fillStyle=i<cpI?'#ff3b30':i===cpI?'#33ff66':'#fff';x.beginPath();x.arc(cp.c.x,cp.c.z,1.6,0,7);x.fill();});
+  Object.values(mp.peers).forEach(pe=>{x.fillStyle=pe.col||'#fff';x.beginPath();x.arc(pe.p.x,pe.p.z,2,0,7);x.fill();});
+  x.setTransform(1,0,0,1,0,0);x.restore();
+  x.save();x.translate(r,r);x.rotate(-D.yaw);x.fillStyle='#ffe14d';x.strokeStyle='#000';x.lineWidth=2;x.beginPath();x.moveTo(0,-11);x.lineTo(8,9);x.lineTo(0,4);x.lineTo(-8,9);x.closePath();x.stroke();x.fill();x.restore();
+  x.strokeStyle='rgba(255,255,255,0.6)';x.lineWidth=3;x.beginPath();x.arc(r,r,r-2,0,7);x.stroke();x.fillStyle='#fff';x.font='bold 22px sans-serif';x.textAlign='center';x.fillText('N',r,26);
+}
+function nextInfo(){if(!course||!course.cps[cpI])return null;const cp=course.cps[cpI];const dx=cp.c.x-D.pos.x,dz=cp.c.z-D.pos.z;const want=Math.atan2(-dx,-dz);return{rel:((want-D.yaw+Math.PI*3)%(Math.PI*2))-Math.PI,dist:Math.hypot(dx,dz),dy:cp.c.y-D.pos.y};}
+let hudT=0;
+function drawHud(dt){
+  hudT-=dt;if(hudT>0)return;hudT=0.1;
+  const g=H(D.pos.x,D.pos.z),hs=Math.hypot(D.vel.x,D.vel.z),dist=D.pos.distanceTo(D.home);
+  const dmg=DR.props.filter(P=>P.state!=='ok').length;
+  $('osd').textContent='H '+(D.pos.y-g).toFixed(1)+'m · D '+dist.toFixed(0)+'m · H.S '+hs.toFixed(1)+' · V.S '+D.vel.y.toFixed(1)+(dmg?' · 🛠 '+dmg+' prop'+(dmg>1?'s':''):'')+(D.state==='landed'?(D.armed?' · MOTORS ON':' · MOTORS OFF'):D.state==='down'?' · NEEDS FIXING (PHOTO)':'');
+  $('cBat').textContent='🔋'+Math.ceil(D.batt)+'%';$('cBat').style.color=D.batt<20?'#ff6b6b':'';
+  $('bTake').textContent=D.state==='landed'?'🛫 TAKE OFF':D.state==='down'||D.state==='tumble'?'🔧 FIX':'🛬 LAND';
+  if(course){const n=course.cps.length,best=LS.get('best_'+course.key,0);
+    let t=course.pop?course.name+' · '+balloons.filter(b=>!b.alive).length+'/'+balloons.length+' popped':course.name+' · '+Math.min(cpI+1,n)+'/'+n;t+=' · '+fmt(cTime+cPen)+(best?' · best '+fmt(best):'')+(ghost?' · 👻':'');
+    const others=Object.values(mp.peers).filter(pe=>pe.c===course.key);if(others.length)t+=' · '+others.map(pe=>pe.name+' '+pe.cp+'/'+n).join(' · ');$('courseTxt').textContent=t;
+    const ni=nextInfo(),ac=$('arrow'),x=ac.getContext('2d');x.clearRect(0,0,92,92);if(ni){x.save();x.translate(46,46);x.rotate(-ni.rel);x.fillStyle='#33ff66';x.strokeStyle='#000';x.lineWidth=3;x.beginPath();x.moveTo(0,-36);x.lineTo(22,8);x.lineTo(6,2);x.lineTo(6,30);x.lineTo(-6,30);x.lineTo(-6,2);x.lineTo(-22,8);x.closePath();x.stroke();x.fill();x.restore();x.fillStyle='#fff';x.font='bold 15px sans-serif';x.textAlign='center';x.fillText(ni.dist.toFixed(0)+'m'+(ni.dy>1.5?' ▲':ni.dy<-1.5?' ▼':''),46,90);}}
+  const np=Object.keys(mp.peers).length;$('cMP').style.display=mp.ws&&mp.ws.readyState===1?'':'none';$('cMP').textContent='👥 '+(np+1);
+  if(rec)updBadge();drawMini();
+}
+const rc=$('rc'),rcx=rc.getContext('2d');let rcRect=null;
+function drawRC(){
+  const show=camName()==='PILOT'&&rcView&&!vr.on;rc.style.display=show?'block':'none';document.body.classList.toggle('rcview',show);if(!show){rcRect=null;return;}
+  const W=Math.min(620,innerWidth*0.86),Hh=Math.min(innerHeight*0.62,W*0.62),dpr=Math.min(2,devicePixelRatio||1);
+  if(rc.width!==Math.round(W*dpr)||rc.height!==Math.round(Hh*dpr)){rc.width=Math.round(W*dpr);rc.height=Math.round(Hh*dpr);rc.style.width=W+'px';rc.style.height=Hh+'px';}
+  const c=rcx;c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,W,Hh);
+  const by=Hh*0.52,bh=Hh*0.48;c.fillStyle='#2b2e33';roundRect(c,W*0.08,by,W*0.84,bh,bh*0.35);c.fill();c.strokeStyle='#4a4f57';c.lineWidth=2;c.stroke();
+  const pw=W*0.62,ph=Math.min(by*0.92,pw*0.5),px=(W-pw)/2,py=by-ph-4;c.fillStyle='#111';roundRect(c,px-8,py-8,pw+16,ph+16,14);c.fill();c.fillStyle='#3a3f46';c.fillRect(W/2-30,py+ph+6,60,by-py-ph);
+  c.clearRect(px,py,pw,ph);
+  const r=rc.getBoundingClientRect();rcRect={x:r.left+px,y:r.top+py,w:pw,h:ph};
+  const st=(cx,cy,x,y)=>{c.fillStyle='#1a1c20';c.beginPath();c.arc(cx,cy,bh*0.24,0,7);c.fill();c.strokeStyle='#555';c.lineWidth=2;c.stroke();c.fillStyle='#777';c.beginPath();c.arc(cx+x*bh*0.15,cy-y*bh*0.15,bh*0.11,0,7);c.fill();c.fillStyle='#999';c.beginPath();c.arc(cx+x*bh*0.15,cy-y*bh*0.15,bh*0.06,0,7);c.fill();};
+  st(W*0.25,by+bh*0.5,rawIn.lx,rawIn.ly);st(W*0.75,by+bh*0.5,rawIn.rx,rawIn.ry);
+  c.fillStyle='#ccc';c.font='bold 11px sans-serif';c.textAlign='center';c.fillText(D.speed,W/2,by+bh*0.4);c.fillText('🔋'+Math.ceil(D.batt)+'%  '+SPEC.name,W/2,by+bh*0.62);
+}
+function renderRCInset(){if(!rcRect)return;aimGimbal(camG);camG.aspect=rcRect.w/rcRect.h;camG.fov=72/zoom;camG.updateProjectionMatrix();
+  const vis=DR.g.visible;DR.g.visible=false;renderer.setScissorTest(true);const y=innerHeight-rcRect.y-rcRect.h;renderer.setViewport(rcRect.x,y,rcRect.w,rcRect.h);renderer.setScissor(rcRect.x,y,rcRect.w,rcRect.h);renderer.render(scene,camG);renderer.setScissorTest(false);renderer.setViewport(0,0,innerWidth,innerHeight);DR.g.visible=vis;}
+
+// ---------------------------------------------------------------- VR (Cardboard / DJI goggles style)
+const vr={on:false,cfg:Object.assign({k1:0.28,eye:0.064,fov:95,size:0.96,sep:61},LS.get('vr',{})),head:null,base:null,rt:[null,null],stereo:new THREE.StereoCamera(),hud:null,hudCtx:null,hudTex:null,msg:'',msgT:0};
+function vrMsg(m,ms){vr.msg=m;vr.msgT=performance.now()+(ms||2200);}
+const post=(function(){
+  const mat=new THREE.ShaderMaterial({uniforms:{tex:{value:null},hud:{value:null},k1:{value:0.28},aspect:{value:1},zoom:{value:1}},
+    vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.0,1.0);}',
+    fragmentShader:['uniform sampler2D tex;uniform sampler2D hud;uniform float k1;uniform float aspect;uniform float zoom;varying vec2 vUv;',
+      'void main(){vec2 p=vUv*2.0-1.0;vec2 q=vec2(p.x*aspect,p.y);float r2=dot(q,q);',
+      ' vec2 d=q*(1.0+k1*r2+k1*0.35*r2*r2)/zoom;d.x/=aspect;vec2 uv=d*0.5+0.5;',
+      ' vec2 e=abs(uv*2.0-1.0);vec2 c=max(e-vec2(0.78),0.0);float rr=length(c)/0.22;float edge=max(max(e.x,e.y),max(e.x,e.y)>0.78&&min(e.x,e.y)>0.78?0.78+rr*0.22:0.0);',
+      ' if(edge>=1.0){gl_FragColor=vec4(0.0,0.0,0.0,1.0);return;}',
+      ' vec3 col=texture2D(tex,clamp(uv,0.0,1.0)).rgb;vec4 hc=texture2D(hud,clamp(uv,0.0,1.0));col=mix(col,hc.rgb,hc.a);',
+      ' gl_FragColor=vec4(col*(1.0-smoothstep(0.86,1.0,edge)),1.0);}'].join('\n'),depthTest:false,depthWrite:false});
+  const s=new THREE.Scene(),q=new THREE.Mesh(new THREE.PlaneGeometry(2,2),mat);q.frustumCulled=false;s.add(q);return{scene:s,cam:new THREE.OrthographicCamera(-1,1,1,-1,0,1),mat};})();
+function pxPerMm(){return Math.min(screen.width,screen.height)<560?6.0:3.78;}
+async function toggleVR(){
+  vr.on=!vr.on;document.body.classList.toggle('vr',vr.on);
+  if(vr.on){try{const el=document.documentElement;if(el.requestFullscreen)await el.requestFullscreen();else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();}catch(e){}
+    try{if(screen.orientation&&screen.orientation.lock)await screen.orientation.lock('landscape');}catch(e){}
+    try{if(window.DeviceOrientationEvent&&DeviceOrientationEvent.requestPermission)await DeviceOrientationEvent.requestPermission();}catch(e){}
+    renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.25));renderer.setSize(innerWidth,innerHeight,false);vr.base=null;toast('🥽 VR on — hold Fn for the menu',3000);}
+  else{setPR();vr.head=null;try{if(document.exitFullscreen&&document.fullscreenElement)document.exitFullscreen();}catch(e){}}
+  renderMenu();updBadge();
+}
+const _zee=new V3(0,0,1),_q1=new THREE.Quaternion(-Math.sqrt(0.5),0,0,Math.sqrt(0.5));
+addEventListener('deviceorientation',e=>{if(!vr.on||e.alpha===null)return;const a=THREE.MathUtils.degToRad(e.alpha),b=THREE.MathUtils.degToRad(e.beta),g=THREE.MathUtils.degToRad(e.gamma),o=THREE.MathUtils.degToRad((screen.orientation&&screen.orientation.angle)||window.orientation||0);
+  const q=new THREE.Quaternion().setFromEuler(new THREE.Euler(b,a,-g,'YXZ'));q.multiply(_q1);q.multiply(new THREE.Quaternion().setFromAxisAngle(_zee,-o));if(!vr.base)vr.base=q.clone().invert();vr.head=vr.base.clone().multiply(q);});
+function vrHud(asp){
+  if(!vr.hud){vr.hud=document.createElement('canvas');vr.hudCtx=vr.hud.getContext('2d');vr.hudTex=new THREE.CanvasTexture(vr.hud);vr.hudTex.minFilter=THREE.LinearFilter;}
+  const W=720,Hh=Math.round(720/asp);if(vr.hud.width!==W||vr.hud.height!==Hh){vr.hud.width=W;vr.hud.height=Hh;}
+  const c=vr.hudCtx;c.clearRect(0,0,W,Hh);
+  const pill=(t,x,y,f,fg,bg)=>{c.font=f;const w=c.measureText(t).width+26,h=parseInt(f.match(/(\d+)px/)[1],10)+14;c.fillStyle=bg||'rgba(0,0,0,0.55)';roundRect(c,x-w/2,y-h/2,w,h,h/2);c.fill();c.fillStyle=fg||'#fff';c.textAlign='center';c.textBaseline='middle';c.fillText(t,x,y+1);};
+  const g=H(D.pos.x,D.pos.z);
+  pill((rec?'🔴 REC · ':'')+(shotMode==='photo'?'📷 PHOTO':shotMode==='video'?'🎥 VIDEO':'🎯 PAINTBALL')+'  ·  '+CAMS[camI]+'  ·  '+D.speed,W/2,Hh*0.22,'bold 22px sans-serif');
+  pill('H '+(D.pos.y-g).toFixed(1)+'m   '+Math.hypot(D.vel.x,D.vel.z).toFixed(1)+' m/s   🔋'+Math.ceil(D.batt)+'%'+(D.state==='landed'?(D.armed?'  · MOTORS ON':'  · MOTORS OFF'):''),W/2,Hh*0.3,'19px sans-serif','#d9ffe0','rgba(0,0,0,0.45)');
+  if(count>0)pill(String(Math.ceil(count)),W/2,Hh*0.45,'bold 60px sans-serif','#fff','rgba(0,0,0,0.4)');
+  if($('warn').style.display==='block')pill('⚠ OBSTACLE',W/2,Hh*0.38,'bold 22px sans-serif','#fff','rgba(200,30,20,0.85)');
+  if(repair.open){const rv=$('rcv'),w=W*0.7,h=w*400/640;c.drawImage(rv,W/2-w/2,Hh/2-h/2,w,h);}
+  else if(menu.open){c.save();c.translate(W/2,Hh/2);c.scale(0.8,0.8);c.translate(-W/2,-Hh/2);const it=menu.items,lh=36,MX=7,st=Math.max(0,Math.min(menu.i-3,it.length-MX)),vis=it.slice(st,st+MX),ph=vis.length*lh+20,pw=500,px=W/2-pw/2,py=Hh/2-ph/2;
+    c.fillStyle='rgba(8,14,10,0.9)';c.fillRect(px,py,pw,ph);c.font='bold 21px sans-serif';c.textAlign='left';c.textBaseline='middle';
+    vis.forEach((m,i)=>{const y=py+10+i*lh;if(i+st===menu.i){c.fillStyle='#ffd60a';c.fillRect(px+6,y+2,pw-12,lh-4);c.fillStyle='#000';}else c.fillStyle='#fff';let t=m.label();if(m.range)t+=' : '+(m.range.fmt?m.range.fmt(m.range.get()):m.range.get());c.fillText(t.length>40?t.slice(0,39)+'…':t,px+18,y+lh/2);});
+    pill('sticks/wheel = choose · ◀ ▶ = change · PHOTO = select · Fn = back',W/2,py+ph+22,'15px sans-serif','#ffd60a');c.restore();}
+  else{c.strokeStyle='rgba(255,255,255,0.85)';c.lineWidth=3;c.beginPath();c.arc(W/2,Hh/2,9,0,7);c.stroke();
+    if(course){pill($('courseTxt').textContent.slice(0,48),W/2,Hh*0.71,'bold 19px sans-serif','#fff');const ni=nextInfo();if(ni){c.save();c.translate(W/2,Hh*0.62);c.rotate(-ni.rel);c.fillStyle='#33ff66';c.beginPath();c.moveTo(0,-22);c.lineTo(14,6);c.lineTo(0,0);c.lineTo(-14,6);c.closePath();c.fill();c.restore();}}}
+  if(performance.now()<vr.msgT)pill(vr.msg.length>46?vr.msg.slice(0,44)+'…':vr.msg,W/2,Hh*0.8,'bold 20px sans-serif','#ffd60a','rgba(0,0,0,0.7)');
+  vr.hudTex.needsUpdate=true;return vr.hudTex;
+}
+function renderVR(){
+  const sz=new THREE.Vector2();renderer.getSize(sz);const pr=renderer.getPixelRatio();
+  const sep=Math.min(vr.cfg.sep*pxPerMm(),sz.x*0.62),ew=Math.floor(Math.min(sep,sz.x-sep)*vr.cfg.size),eh=Math.floor(Math.min(sz.y*vr.cfg.size,ew*1.25));
+  const cx=[sz.x/2-sep/2,sz.x/2+sep/2],my=Math.floor((sz.y-eh)/2),rw=Math.max(64,Math.floor(ew*pr)),rh=Math.max(64,Math.floor(eh*pr));
+  for(let i=0;i<2;i++){if(!vr.rt[i])vr.rt[i]=new THREE.WebGLRenderTarget(rw,rh);else if(vr.rt[i].width!==rw||vr.rt[i].height!==rh)vr.rt[i].setSize(rw,rh);}
+  const of=cam.fov,oa=cam.aspect;cam.fov=vr.cfg.fov;cam.aspect=ew/eh;cam.updateProjectionMatrix();cam.updateMatrixWorld();
+  vr.stereo.eyeSep=vr.cfg.eye;vr.stereo.aspect=1;vr.stereo.update(cam);
+  renderer.setRenderTarget(vr.rt[0]);renderer.clear();renderer.render(scene,vr.stereo.cameraL);renderer.setRenderTarget(vr.rt[1]);renderer.clear();renderer.render(scene,vr.stereo.cameraR);renderer.setRenderTarget(null);
+  cam.fov=of;cam.aspect=oa;cam.updateProjectionMatrix();
+  renderer.setClearColor(0,1);renderer.setScissorTest(false);renderer.setViewport(0,0,sz.x,sz.y);renderer.clear();
+  const asp=ew/eh,mm=Math.max(asp*asp,1),U=post.mat.uniforms;U.k1.value=vr.cfg.k1;U.aspect.value=asp;U.zoom.value=(1+vr.cfg.k1*mm+vr.cfg.k1*0.35*mm*mm)*0.93;U.hud.value=vrHud(asp);
+  renderer.setScissorTest(true);for(let e=0;e<2;e++){const x0=Math.floor(cx[e]-ew/2);renderer.setViewport(x0,my,ew,eh);renderer.setScissor(x0,my,ew,eh);U.tex.value=vr.rt[e].texture;renderer.render(post.scene,post.cam);}
+  renderer.setScissorTest(false);renderer.setViewport(0,0,sz.x,sz.y);
+}
+
+// ---------------------------------------------------------------- menu (touch, keyboard, gamepad, remote, VR)
+const menu={open:false,i:0,items:[],rep:0,held:false,stack:[],title:''};
+function mItem(label,act,adj){return{label:typeof label==='function'?label:()=>label,act,adj};}
+function mRange(label,get,set,min,max,step,fmt){const it=mItem(label,null,d=>set(clamp(+(get()+d*step).toFixed(4),min,max)));it.range={get,set,min,max,step,fmt};return it;}
+function mInfo(label){const it=mItem(label,()=>{});it.info=true;return it;}
+function bestTxt(k){const b=LS.get('best_'+k,0);return b?'   (best '+fmt(b)+')':'';}
+function mainItems(){return[
+  mItem('▶ Back to flying',()=>menuToggle(false)),
+  mItem('🏁 Races & games ▸',()=>menuPush('🏁 Races & games',raceItems())),
+  mItem(()=>'🚁 Drone: '+SPEC.name+' ▸',()=>menuPush('🚁 Pick a drone',droneItems())),
+  mItem('🛠 Build your own drone ▸',()=>openBuilder()),
+  ...(D.state==='down'||DR.props.some(P=>P.state!=='ok')?[mItem('🔧 Fix the drone',()=>{menuToggle(false);openRepair();})]:[]),
+  mItem(()=>'🎥 Camera: '+CAMS[camI]+'  ◀ ▶',()=>nextCam(),d=>nextCam(d)),
+  ...(CAMS[camI]==='PILOT'?[mItem(()=>'🎮 Pilot view: '+(rcView?'over the remote':'plain'),()=>toggleRC())]:[]),
+  mItem(()=>'🎚️ Speed: '+D.speed+'  ◀ ▶',()=>cycleSpeed(1),d=>cycleSpeed(d)),
+  mItem('⚙️ Flight settings ▸',()=>menuPush('⚙️ Flight settings',flightItems())),
+  mItem(()=>'🔍 Zoom: '+zoom.toFixed(1)+'x  ◀ ▶',()=>{zoom=zoom>=4?1:zoom+0.5;},d=>{zoom=clamp(zoom+d*0.5,1,4);}),
+  mItem(()=>'📷 Shutter: '+(shotMode==='photo'?'Photo':shotMode==='video'?'Video':'Paintball')+'  ◀ ▶',()=>cycleShot(),()=>cycleShot()),
+  mItem('📸 Photos & videos',()=>{menuToggle(false);galOpen();}),
+  mItem('🔄 Do a flip',()=>{menuToggle(false);doFlip();}),
+  mItem(()=>'🌀 Motors: '+(D.armed?'ON':'off')+' (or both sticks down + in)',()=>{if(D.state==='landed')armMotors(!D.armed);else toast('Only on the ground');}),
+  mItem(()=>'👁 Drone: '+(D.hidden?'hidden':'shown'),()=>{D.hidden=!D.hidden;}),
+  mItem('↩ Back to last checkpoint',()=>{respawn();menuToggle(false);}),
+  mItem('🛬 Back to the pad',()=>{resetDrone(course?course.start:null);menuToggle(false);}),
+  mItem('🔋 Swap battery',()=>{D.batt=100;D.lowWarn=false;D.autoLand=false;toast('🔋 Fresh battery');}),
+  mItem(()=>'👥 Multiplayer'+(mp.ws&&mp.ws.readyState===1?' ('+(Object.keys(mp.peers).length+1)+' flying)':'')+' ▸',()=>menuPush('👥 Multiplayer',mpItems())),
+  mItem(()=>'🥽 VR: '+(vr.on?'ON':'off'),()=>{menuToggle(false);toggleVR();}),
+  mItem('⚙️ VR lens settings ▸',()=>menuPush('⚙️ VR lens settings',vrItems())),
+  mItem(()=>'✨ Graphics: '+CFG.quality+'  ◀ ▶',()=>setQuality(1),d=>setQuality(d)),
+  mItem('🎮 DJI remote status',()=>{menuToggle(false);connectDJI();djiStatus(true);}),
+  mItem('⛶ Full screen',()=>{menuToggle(false);goFull();}),
+  mItem('❓ How to play',()=>menuPush('❓ How to play',helpItems())),
+];}
+function raceItems(){return[
+  mItem('🌲 Free fly',()=>{startCourse('free');menuToggle(false);}),
+  mItem(()=>'⭕ Hoop Run'+bestTxt('hoops'),()=>{startCourse('hoops');menuToggle(false);}),
+  mItem(()=>'🚩 Slalom'+bestTxt('slalom'),()=>{startCourse('slalom');menuToggle(false);}),
+  mItem(()=>'🛤️ Forest Trail'+bestTxt('trail'),()=>{startCourse('trail');menuToggle(false);}),
+  mItem(()=>'🏟️ Race Arena (light tunnels)'+bestTxt('arena'),()=>{startCourse('arena');menuToggle(false);}),
+  mItem(()=>'🎈 Balloon Pop'+bestTxt('balloons'),()=>{startCourse('balloons');menuToggle(false);}),
+  mItem('🗑 Clear best times + ghosts',()=>{['hoops','slalom','trail','arena','balloons'].forEach(k=>{LS.set('best_'+k,0);LS.set('ghost_'+k,null);});toast('Cleared');}),
+  mItem('◀ Back',()=>menuBack()),
+];}
+function droneItems(){const L=Object.keys(PRESETS).map(k=>{const st=stats(PRESETS[k]);return mItem(()=>(SPEC.name===PRESETS[k].name?'✅ ':'')+PRESETS[k].name+'  ·  '+Math.round(st.top)+' m/s · '+Math.round(st.mins)+' min',()=>{useSpec(cloneSpec(PRESETS[k]));menuToggle(false);});});
+  LS.get('hangar',[]).forEach(s=>L.push(mItem('⭐ '+s.name,()=>{useSpec(sanitize(s));menuToggle(false);})));
+  L.push(mItem('📂 Open a drone file…',()=>loadDroneFile(sp=>{useSpec(sp);menuToggle(false);})));
+  L.push(mItem('🛠 Build your own ▸',()=>openBuilder()));L.push(mItem('◀ Back',()=>menuBack()));return L;}
+function flightItems(){return[
+  mRange('🏎 Top speed',()=>CFG.speedPct,v=>{CFG.speedPct=v;saveCfg();},40,150,10,v=>v+'%'),
+  mRange('⚡ How quick it reacts',()=>CFG.resp,v=>{CFG.resp=v;saveCfg();},40,200,10,v=>v+'%'),
+  mRange('↗ How much it tilts',()=>CFG.tilt,v=>{CFG.tilt=v;saveCfg();},30,150,10,v=>v+'%'),
+  mRange('🎯 Stick feel (expo)',()=>CFG.expo,v=>{CFG.expo=v;saveCfg();},0,90,10,v=>v<20?'straight':v<60?'medium':'gentle middle'),
+  mRange('📹 FPV camera tilt-up',()=>CFG.fpvUp<0?SPEC.fpvUp:CFG.fpvUp,v=>{CFG.fpvUp=v;saveCfg();},0,45,5,v=>v+'°'),
+  mRange('🌬 Wind',()=>CFG.wind,v=>{CFG.wind=v;saveCfg();},0,6,1,v=>v?v+' m/s gusts':'calm'),
+  mItem(()=>'🛑 Obstacle braking: '+(CFG.avoid?'ON':'off')+(SPEC.assist?'':' (this drone has none)'),()=>{CFG.avoid=!CFG.avoid;saveCfg();}),
+  mItem(()=>'🛬 Landing protection: '+(CFG.landProt?'ON':'off'),()=>{CFG.landProt=!CFG.landProt;saveCfg();}),
+  mItem(()=>'🔍 Pilot view auto-zoom: '+(CFG.autoZoom?'ON':'off'),()=>{CFG.autoZoom=!CFG.autoZoom;saveCfg();}),
+  mItem('↺ Reset these',()=>{Object.assign(CFG,{speedPct:100,resp:100,tilt:100,fpvUp:-1,expo:60,avoid:true,landProt:true,wind:0,autoZoom:true});saveCfg();}),
+  mItem('◀ Back',()=>menuBack()),
+];}
+function vrItems(){const C=vr.cfg,sv=()=>LS.set('vr',C);return[
+  mRange('Lens spacing',()=>C.sep,v=>{C.sep=v;sv();},50,75,1,v=>v+' mm'),mRange('Lens bend',()=>C.k1,v=>{C.k1=v;sv();},0,0.6,0.02,v=>v.toFixed(2)),
+  mRange('Picture size',()=>C.size,v=>{C.size=v;sv();},0.6,1,0.02,v=>v.toFixed(2)),mRange('Field of view',()=>C.fov,v=>{C.fov=v;sv();},60,120,5,v=>v+'°'),
+  mRange('3D depth',()=>C.eye,v=>{C.eye=v;sv();},0,0.12,0.004,v=>(v*1000).toFixed(0)+' mm'),
+  mItem('🎯 Re-center head view',()=>{vr.base=null;toast('🎯 Centered');}),mItem('↺ Reset lens settings',()=>{Object.assign(C,{k1:0.28,eye:0.064,fov:95,size:0.96,sep:61});sv();}),mItem('◀ Back',()=>menuBack())];}
+function helpItems(){return[mInfo('Start the motors: pull BOTH sticks down and in (or down and out) — or press 🛫.'),mInfo('Then push the left stick up to take off. Hold it down after landing to stop.'),mInfo('Left stick: up/down + turn. Right stick: fly. Push further = faster.'),mInfo('Small bumps bounce off. Bigger hits chip or break props.'),mInfo('Broken? It falls — flip it, swap props, screw them on.'),mInfo('Lights: coloured = front, green = back.'),mInfo('🏠 tap = fly home · double-tap = land right here.'),mInfo('Fn tap = next camera · hold = this menu · hold Fn + wheel = zoom.'),mInfo('PHOTO/VIDEO switch = photo → video → paintball.'),mItem('◀ Back',()=>menuBack())];}
+function setQuality(d){const L=['low','normal','high'];CFG.quality=L[(L.indexOf(CFG.quality)+(d||1)+3)%3];saveCfg();Q=QUALS[CFG.quality];setPR();reloadWorld();toast('✨ Graphics '+CFG.quality+(CFG.quality==='low'?' — fastest':CFG.quality==='high'?' — see further':''));}
+function toggleRC(){rcView=!rcView;LS.set('rcView',rcView);toast(rcView?'🎮 Looking over your remote — the drone camera is on its screen':'Pilot view: plain');}
+function menuToggle(on){if(builder.open&&on===false)closeBuilder();menu.open=on===undefined?!menu.open:on;menu.stack=[];if(menu.open){menu.items=mainItems();menu.i=0;menu.title='🌲 Woods Drone Sim';}beep(menu.open?700:500,0.05,0.05);renderMenu();}
+function menuPush(title,items){menu.stack.push({items:menu.items,i:menu.i,title:menu.title});menu.items=items;menu.i=0;menu.title=title;renderMenu();}
+function menuBack(){if(builder.open&&menu.stack.length<=1)closeBuilder();if(menu.stack.length){const p=menu.stack.pop();menu.items=p.items;menu.i=p.i;menu.title=p.title;if(menu.title.indexOf('Woods')>=0)menu.items=mainItems();renderMenu();}else menuToggle(false);}
+function menuMove(d){let n=0;do{menu.i=(menu.i+d+menu.items.length)%menu.items.length;n++;}while(menu.items[menu.i].info&&n<menu.items.length);beep(660,0.03,0.04);renderMenu();}
+function menuAdj(d){const it=menu.items[menu.i];if(it&&it.adj){it.adj(d);beep(760,0.03,0.04);renderMenu();}}
+function menuSelect(){const it=menu.items[menu.i];if(!it)return;beep(900,0.05,0.05);if(it.act)it.act();else if(it.adj)it.adj(1);if(menu.open)renderMenu();}
+function renderMenu(){
+  const show=menu.open&&!vr.on;$('menu').style.display=show?'flex':'none';$('menu').classList.toggle('side',builder.open);if(!show)return;
+  $('menuTitle').textContent=menu.title;const L=$('menuList');L.innerHTML='';
+  menu.items.forEach((it,i)=>{const d=document.createElement('div');d.className='mi'+(i===menu.i?' sel':'')+(it.info?' info':'');let lab=it.label();
+    if(it.range){const v=it.range.get();lab+=' : <b>'+(it.range.fmt?it.range.fmt(v):v)+'</b>';}
+    if(it.swatch)lab+='<span class="sw" style="background:'+it.swatch()+'"></span>';
+    const sp0=document.createElement('span');sp0.innerHTML=lab;d.appendChild(sp0);
+    if(it.range){const r=document.createElement('input');r.type='range';r.min=it.range.min;r.max=it.range.max;r.step=it.range.step;r.value=it.range.get();r.oninput=()=>{it.range.set(+r.value);menu.i=i;const s=d.querySelector('b');if(s)s.textContent=it.range.fmt?it.range.fmt(+r.value):r.value;if(it.after)it.after();};r.onchange=()=>renderMenu();r.onclick=e=>e.stopPropagation();r.onpointerdown=e=>e.stopPropagation();d.appendChild(r);}
+    else if(it.adj){const sp=document.createElement('span');const a=document.createElement('button');a.className='btn';a.textContent='◀';a.onclick=e=>{e.stopPropagation();menu.i=i;menuAdj(-1);};const b=document.createElement('button');b.className='btn';b.textContent='▶';b.onclick=e=>{e.stopPropagation();menu.i=i;menuAdj(1);};sp.appendChild(a);sp.appendChild(b);d.appendChild(sp);}
+    if(!it.info)d.onclick=()=>{menu.i=i;menuSelect();};L.appendChild(d);if(i===menu.i)setTimeout(()=>d.scrollIntoView({block:'nearest'}),0);});
+}
+$('menu').addEventListener('click',e=>{if(e.target.id==='menu'&&!builder.open)menuToggle(false);});
+
+// ---------------------------------------------------------------- drone builder (sliders, colours, save/load file)
+const builder={open:false,spec:null,prev:null,ang:0};
+function useSpec(sp){SPEC=sanitize(sp);LS.set('spec',SPEC);rebuildDrone();resetDrone(course?course.start:{x:D.pos.x,z:D.pos.z,yaw:D.yaw});toast('🚁 '+SPEC.name+' ready · '+Math.round(ST.top)+' m/s top · '+Math.round(ST.mins)+' min battery',2500);mpSendNow(true);}
+function refreshPreview(){if(builder.prev)scene.remove(builder.prev.g);builder.prev=buildDrone(sanitize(builder.spec));builder.prev.g.position.set(PAD.x+4,1.4,PAD.z+4);scene.add(builder.prev.g);}
+function openBuilder(){builder.open=true;builder.spec=sanitize(LS.get('draft',null)||SPEC);refreshPreview();menu.open=true;menu.stack=[{items:mainItems(),i:0,title:'🌲 Woods Drone Sim'}];menu.items=builderItems();menu.i=1;menu.title='🛠 Build your own drone';renderMenu();toast('🛠 Change anything — the drone updates live',2000);}
+function closeBuilder(){builder.open=false;if(builder.prev){scene.remove(builder.prev.g);builder.prev=null;}LS.set('draft',builder.spec);renderMenu();}
+function bSet(fn){return v=>{fn(v);refreshPreview();LS.set('draft',builder.spec);};}
+function colorItem(name,key){const it=mItem(()=>name,()=>pickColor(key,1),d=>pickColor(key,d));it.swatch=()=>builder.spec.colors[key];return it;}
+function pickColor(key,d){const c=builder.spec.colors[key],i=PAL.indexOf(c);builder.spec.colors[key]=PAL[((i<0?0:i)+d+PAL.length)%PAL.length];refreshPreview();}
+function builderItems(){const S=()=>builder.spec,st=()=>stats(sanitize(S()));
+  const it=[
+    mInfo(()=>{const s=st();return '⚡ '+Math.round(s.top)+' m/s · ⏱ '+Math.round(s.mins)+' min · 🛡 tough '+s.tough+'/10 · 🌀 agile '+s.agile+'/10 · ⚖ '+Math.round(s.w)+' g'+(s.tw<1.15?' · ⚠ TOO HEAVY':'');}),
+    mItem(()=>'✏️ Name: '+S().name,()=>{const n=prompt('Name your drone',S().name);if(n){S().name=n.slice(0,24);LS.set('draft',S());}}),
+    mItem(()=>'📋 Start from: '+((Object.values(PRESETS).find(p=>p.name===S().name)||{}).name||'(your own)')+'  ◀ ▶',()=>{},d=>{const K=Object.keys(PRESETS);const cur=K.findIndex(k=>PRESETS[k].name===S().name);builder.spec=cloneSpec(PRESETS[K[((cur<0?0:cur)+d+K.length)%K.length]]);refreshPreview();}),
+    mRange('📏 Size (arm length)',()=>Math.round(S().size*100),bSet(v=>S().size=v/100),6,40,1,v=>v+' cm'),
+    mRange('⚙️ Motor power',()=>S().motor,bSet(v=>S().motor=v),1,10,1,v=>v+'/10'),
+    mItem(()=>'🌀 Rotors: '+S().rotors+'  ◀ ▶',()=>{},d=>{const L=[4,6,8];S().rotors=L[(L.indexOf(S().rotors)+d+3)%3];refreshPreview();}),
+    mRange('🔋 Battery size',()=>S().mah,bSet(v=>S().mah=v),300,8000,100,v=>v+' mAh'),
+    mItem(()=>'🔋 Battery type: '+S().bat+'  ◀ ▶',()=>{},d=>{const L=['LiPo','HV LiPo','Li-ion'];S().bat=L[(L.indexOf(S().bat)+d+3)%3];refreshPreview();}),
+    mItem(()=>'🛡 Prop guards: '+(S().guards?'ON (bouncy, a bit slower)':'off'),()=>{S().guards=!S().guards;refreshPreview();}),
+    mItem(()=>'🧭 Flight assist: '+(S().assist?'ON (holds still, brakes)':'off (drifts like a racer)'),()=>{S().assist=!S().assist;}),
+    mItem(()=>'📷 Camera on the: '+S().cam+'  ◀ ▶',()=>{},d=>{const L=['front','top','belly'];S().cam=L[(L.indexOf(S().cam)+d+3)%3];refreshPreview();}),
+    mRange('📹 FPV camera tilt-up',()=>S().fpvUp,bSet(v=>S().fpvUp=v),0,45,5,v=>v+'°'),
+    colorItem('🎨 Body colour ◀ ▶','body'),colorItem('🎨 Arm colour ◀ ▶','arms'),colorItem('🎨 Propeller colour ◀ ▶','props'),colorItem('💡 Front light colour ◀ ▶','leds'),
+    mItem('✅ Fly this drone',()=>{const s=sanitize(builder.spec);closeBuilder();useSpec(s);menuToggle(false);}),
+    mItem('⭐ Save to my hangar',()=>{const h=LS.get('hangar',[]).filter(x=>x.name!==S().name);h.unshift(sanitize(S()));LS.set('hangar',h.slice(0,20));toast('⭐ Saved "'+S().name+'" — Menu → Drone');}),
+    mItem('💾 Save as a file',()=>saveDroneFile(S())),
+    mItem('📂 Open a drone file',()=>loadDroneFile(sp=>{builder.spec=sp;refreshPreview();renderMenu();})),
+    mItem('◀ Back (keeps your draft)',()=>menuBack()),
+  ];
+  it.forEach(x=>{if(x.range)x.after=()=>{refreshPreview();const inf=$('menuList').firstChild;if(inf&&inf.firstChild)inf.firstChild.textContent=it[0].label();};});
+  return it;}
+function saveDroneFile(sp){const blob=new Blob([JSON.stringify({type:'woods-drone',v:2,spec:sanitize(sp)},null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(sp.name||'my-drone').replace(/[^\w\- ]/g,'').trim().replace(/ +/g,'-')+'.drone.json';document.body.appendChild(a);a.click();a.remove();toast('💾 Saved '+a.download+' (Downloads / Files)',2800);}
+function loadDroneFile(cb){const i=document.createElement('input');i.type='file';i.accept='.json,.drone,application/json';i.onchange=()=>{const f=i.files[0];if(!f)return;f.text().then(t=>{const j=JSON.parse(t);cb(sanitize(j.spec||j));toast('📂 Loaded '+((j.spec||j).name||'drone'));}).catch(()=>toast('That file isn\'t a drone file'));};i.click();}
+
+// ---------------------------------------------------------------- multiplayer (through the DJI Phone Link program; anyone opening its address joins)
+const mp={ws:null,id:Math.random().toString(36).slice(2,8),peers:{},addr:LS.get('mpAddr',''),t:0,lastSpec:0,want:true};
+function mpUrl(addr){if(!addr)return(location.protocol==='https:'?'wss://':'ws://')+location.host+'/mp';addr=addr.replace(/^https?:\/\//,'').replace(/\/.*$/,'');if(!/:\d+$/.test(addr))addr+=':8765';return'ws://'+addr+'/mp';}
+function mpConnect(addr){
+  if(mp.ws){const o=mp.ws;mp.ws=null;try{o.close();}catch(e){}}if(addr===null)return;
+  let w;try{w=new WebSocket(mpUrl(addr));}catch(e){toast('👥 Couldn\'t connect');return;}mp.ws=w;mp.addr=addr;
+  w.onopen=()=>{toast('👥 Multiplayer on — '+(addr?'joined '+addr:'friends who open this address will appear'),2500);mpSendNow(true);};
+  w.onmessage=e=>{let m;try{m=JSON.parse(e.data);}catch(x){return;}if(!m||m.id===mp.id)return;if(m.t==='bye'){mpDrop(m.id);return;}
+    let pe=mp.peers[m.id];if(!pe){pe=mp.peers[m.id]={id:m.id,name:m.name||'Pilot',p:new V3(),tp:new V3(),last:0};toast('👥 '+(m.name||'Someone')+' joined',1800);}
+    pe.last=performance.now();pe.name=m.name;pe.c=m.c;pe.cp=m.cp;pe.col=m.col;if(m.p){pe.tp.set(m.p[0],m.p[1],m.p[2]);pe.tyaw=m.r[0];pe.tpitch=m.r[1];pe.troll=m.r[2];}
+    if(m.spec&&(!pe.mesh||JSON.stringify(m.spec)!==pe.specJ)){pe.specJ=JSON.stringify(m.spec);if(pe.mesh)scene.remove(pe.mesh.g);pe.mesh=buildDrone(sanitize(m.spec));scene.add(pe.mesh.g);if(!pe.tag)pe.tag=label(pe.name,0,0,0,2.2,'rgba(0,0,0,0.6)');pe.p.copy(pe.tp);}};
+  w.onclose=()=>{if(mp.ws===w){mp.ws=null;Object.keys(mp.peers).forEach(mpDrop);setTimeout(()=>{if(!mp.ws&&mp.want)mpConnect(mp.addr);},4000);}};
+}
+function mpDrop(id){const pe=mp.peers[id];if(!pe)return;if(pe.mesh)scene.remove(pe.mesh.g);if(pe.tag)scene.remove(pe.tag);delete mp.peers[id];}
+function mpSendNow(spec){if(!mp.ws||mp.ws.readyState!==1)return;const m={t:'s',id:mp.id,name:CFG.name,col:SPEC.colors.body,p:[+D.pos.x.toFixed(2),+D.pos.y.toFixed(2),+D.pos.z.toFixed(2)],r:[+D.yaw.toFixed(3),+D.pitch.toFixed(3),+D.roll.toFixed(3)],c:course?course.key:'',cp:cpI};
+  if(spec||performance.now()-mp.lastSpec>3000){m.spec={name:SPEC.name,size:SPEC.size,rotors:SPEC.rotors,guards:SPEC.guards,cam:SPEC.cam,mah:SPEC.mah,bat:SPEC.bat,colors:SPEC.colors};mp.lastSpec=performance.now();}try{mp.ws.send(JSON.stringify(m));}catch(e){}}
+function tickMP(dt){mp.t-=dt;if(mp.t<=0){mp.t=0.1;mpSendNow();}
+  for(const id in mp.peers){const pe=mp.peers[id];if(performance.now()-pe.last>6000){mpDrop(id);continue;}if(!pe.mesh)continue;pe.p.lerp(pe.tp,1-Math.exp(-dt*10));pe.mesh.g.position.copy(pe.p);pe.mesh.g.rotation.set(pe.tpitch||0,pe.tyaw||0,pe.troll||0,'YXZ');pe.mesh.props.forEach((P,k)=>P.g.rotation.y+=0.9*(k%2?1:-1));if(pe.tag)pe.tag.position.set(pe.p.x,pe.p.y+1.2,pe.p.z);}}
+function mpItems(){return[
+  mInfo(()=>mp.ws&&mp.ws.readyState===1?'✅ Connected · '+(Object.keys(mp.peers).length+1)+' pilots: you'+Object.values(mp.peers).map(p=>', '+p.name).join(''):'Not connected'),
+  mInfo('Everyone opens the address the DJI Phone Link window shows (same Wi-Fi). Phones, laptops, tablets — all fly together.'),
+  mItem(()=>'🎮 Use the DJI remote on this device: '+(CFG.useRemote===false?'off (touch / keys / controller)':'ON'),()=>{CFG.useRemote=CFG.useRemote===false;saveCfg();if(CFG.useRemote===false){try{ws&&ws.close();}catch(e){}dji.on=false;toast('🎮 This device ignores the remote — your friend can have it');}else{connectWifi();toast('🎮 Using the remote');}}),
+  mItem(()=>'✏️ Your name: '+CFG.name,()=>{const n=prompt('Your pilot name',CFG.name);if(n){CFG.name=n.slice(0,16);saveCfg();mpSendNow(true);}}),
+  mItem('🔗 Join another computer…',()=>{const a=prompt('Type the address from the other computer\'s black window\n(like 192.168.1.23 or 192.168.1.23:8765)',mp.addr||'');if(a){mp.want=true;LS.set('mpAddr',a.trim());mpConnect(a.trim());}}),
+  mItem('🔌 Leave multiplayer',()=>{mp.want=false;mpConnect(null);Object.keys(mp.peers).forEach(mpDrop);toast('👥 Left');}),
+  mItem('◀ Back',()=>menuBack()),
+];}
+addEventListener('beforeunload',()=>{try{mp.ws&&mp.ws.send(JSON.stringify({t:'bye',id:mp.id}));}catch(e){}});
+
+// ---------------------------------------------------------------- misc buttons
+function respawn(){
+  if(course&&cpI>0&&course.cps[cpI-1]){const cp=course.cps[cpI-1];const p=cp.c.clone().addScaledVector(cp.n,1.5);p.y=Math.max(p.y,H(p.x,p.z)+1.5);
+    resetDrone({x:p.x,z:p.z,yaw:Math.atan2(-cp.n.x,-cp.n.z)});D.pos.set(p.x,p.y,p.z);D.state='flying';D.armed=true;cPen+=3;toast('↩ Back at the last checkpoint (+3 s)');}
+  else{resetDrone(course?course.start:null);toast('🛬 Back on the pad');}
+}
+$('bMenu').onclick=()=>menuToggle(true);$('bCam').onclick=()=>nextCam();$('bShot').onclick=()=>{if(shotMode!=='gun')shutter(true);};$('bMode').onclick=()=>cycleShot();
+$('bTake').onclick=()=>takeoff();$('bRTH').onclick=()=>rthPress();$('bVR').onclick=()=>toggleVR();$('bDJI').onclick=()=>{connectDJI();djiStatus(true);};$('bFlip').onclick=()=>doFlip();$('bRC').onclick=()=>toggleRC();
+$('cSpd').onclick=()=>cycleSpeed(1);$('courseX').onclick=()=>startCourse('free');$('cMP').onclick=()=>{menuToggle(true);menuPush('👥 Multiplayer',mpItems());};
+$('bFire').addEventListener('pointerdown',e=>{e.preventDefault();shutter(true);});['pointerup','pointercancel','pointerleave'].forEach(ev=>$('bFire').addEventListener(ev,()=>shutter(false)));
+$('bShot').addEventListener('pointerdown',()=>{if(shotMode==='gun')shutter(true);});$('bShot').addEventListener('pointerup',()=>{if(shotMode==='gun')shutter(false);});
+function goFull(){const el=document.documentElement;if(document.fullscreenElement||document.webkitFullscreenElement){(document.exitFullscreen||document.webkitExitFullscreen).call(document);return;}
+  if(el.requestFullscreen)el.requestFullscreen().catch(()=>toast('iPhone: Share → Add to Home Screen, then open it from the icon for full screen',4500));else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();else toast('iPhone: Share → Add to Home Screen, then open it from the icon for full screen',4500);}
+$('bFS').onclick=goFull;
+addEventListener('resize',()=>{if(vr.on)renderer.setSize(innerWidth,innerHeight,false);else setPR();});
+let started=false;
+function startGame(k){$('start').style.display='none';started=true;startCourse(k);try{beep(1,0.01,0.0001);}catch(e){}}
+window.startGame=startGame;window.toggleVR=toggleVR;window.connectDJI=connectDJI;window.galClose=galClose;window.openBuilder=openBuilder;window.$=$;
+
+// ---------------------------------------------------------------- main loop
+rebuildDrone();resetDrone();chunkTick(true);
+let lastT=performance.now(),chunkT=0;
+function frame(now){
+  requestAnimationFrame(frame);
+  let dt=(now-lastT)/1000;lastT=now;if(dt>0.05)dt=0.05;if(dt<=0)return;const t=now/1000;
+  tickDjiButtons();
+  const inp=getInput(dt);
+  if(started&&$('gal').style.display!=='block')tickDrone(dt,inp);
+  placeDrone();updateCam(dt);
+  chunkT-=dt;if(chunkT<=0){chunkT=0.12;chunkTick(false);}
+  tickDeer(dt);tickBalloons(t);tickShots(dt);tickArena(t);tickGhost();tickMP(dt);
+  if(builder.prev){builder.prev.g.rotation.y+=dt*0.3;builder.prev.props.forEach((P,k)=>P.g.rotation.y+=dt*30*(k%2?1:-1));}
+  flames.forEach(f=>f.scale.set(1,0.8+Math.random()*0.5,1));
+  smoke.forEach(s=>{s.userData.t=(s.userData.t+dt*0.12)%1;const u=s.userData.t;s.position.set(smoke.base.x+Math.sin(u*9+t)*0.9*u,smoke.base.y+u*6,smoke.base.z+u*1.5);s.scale.setScalar(0.4+u*2.2);s.material.opacity=0.55*(1-u);});
+  const bl=Math.floor(t*1.5)%2;if(bl!==frame.bl){frame.bl=bl;blinkers.forEach(b=>b.visible=!!bl);}
+  if(vr.on)renderVR();else{renderer.render(scene,cam);drawRC();renderRCInset();}
+  if(wantShot){wantShot=false;grabPhoto();}
+  if(rec)composite();
+  drawHud(dt);
+}
+requestAnimationFrame(frame);
+updBadge();$('camName').textContent=CAMS[camI];$('bRC').style.display=CAMS[camI]==='PILOT'?'':'none';$('cSpd').textContent=D.speed;
+window.__wds={step:(inp,sec)=>{for(let t=0;t<sec;t+=1/60)tickDrone(1/60,Object.assign({lx:0,ly:0,rx:0,ry:0},inp));placeDrone();},D,get DR(){return DR;},get ST(){return ST;},get SPEC(){return SPEC;},dji,djiFeed,courses,get course(){return course;},get cpI(){return cpI;},startCourse,nextCam,menu,menuToggle,menuPush,vr,toggleVR,shutter,gallery,takeoff,getCam:()=>CAMS[camI],respawn,chunks,deer,balloons,repair,openRepair,jobAct,curJob,repairJobs,openBuilder,builder,useSpec,PRESETS,stats,mp,mpConnect,impact,setCam:n=>{camI=CAMS.indexOf(n);$('camName').textContent=n;},toggleRC,cycleShot,get shotMode(){return shotMode;},rthPress,get count(){return count;},hitTest,quickFix,armMotors,setRaw:a=>{rawIn=a;},get rcView(){return rcView;}};
+</script>
+</body>
+</html>

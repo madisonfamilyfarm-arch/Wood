@@ -1,0 +1,14 @@
+const H=require('./harness');
+H(async({mk})=>{const A=await mk('A','http://127.0.0.1:8765/woods-rc-sim.html');await A.waitForTimeout(2500);const ev=(f,x)=>A.evaluate(f,x);
+  await ev(()=>startGame('free'));await A.waitForTimeout(1200);
+  console.log(await ev(()=>{aiSet(6);return AIB.L.map(B=>B.name+':'+B.kind).join(' ');}));
+  const pos=()=>ev(()=>AIB.L.map(B=>B.kind[0]+'('+B.p.x.toFixed(0)+','+B.p.y.toFixed(0)+','+B.p.z.toFixed(0)+')').join(' '));
+  console.log('t0',await pos());await A.waitForTimeout(8000);console.log('t8',await pos());
+  console.log('switch',await ev(()=>{AIB.L.forEach(B=>B.swT=0);return 'ok';}));await A.waitForTimeout(1500);console.log('after switch',await ev(()=>AIB.L.map(B=>B.kind).join(',')),await pos());
+  await A.waitForTimeout(8000);console.log('t17',await pos());
+  console.log('claude apply',await ev(()=>{aiApply([{name:AIB.L[0].name.replace('🤖 ',''),vehicle:'boat',do:'place',place:'the lake',say:'Boat time!'},{name:AIB.L[1].name.replace('🤖 ',''),vehicle:'plane',do:'place',place:'fire tower'},{name:AIB.L[2].name.replace('🤖 ',''),vehicle:'car',do:'place',place:'campsite'}]);return AIB.L.slice(0,3).map(B=>B.kind+' wp '+JSON.stringify(B.wp)).join(' | ');}));
+  await A.waitForTimeout(6000);console.log('t23',await pos());
+  console.log('chat',await ev(()=>CHAT.slice(-8).map(c=>(c.who||'')+': '+c.txt).join(' / ')));
+  console.log('menu',await ev(()=>aiItems().map(i=>{try{return i.label()}catch(e){return '?'}}).slice(0,4).join(' | ')));
+  await ev(()=>{__wds.setCam('CHASE');D.pos.set(LAKE.x-30,H(LAKE.x-30,LAKE.z)+12,LAKE.z);D.yaw=-Math.PI/2;});await A.waitForTimeout(1500);await A.screenshot({path:'ai2.png'});
+});

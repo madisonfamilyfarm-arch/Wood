@@ -1,0 +1,38 @@
+r=open('rc.html').read()
+def rep(a,b,cnt=1):
+    global r
+    n=r.count(a)
+    if n!=cnt: raise SystemExit('count %d for %r'%(n,a[:100]))
+    r=r.replace(a,b)
+ces=open('ces_section.js').read()
+# CES state must exist before anything calls H(); keep the object at the top, the rest near the end
+head_line=ces[ces.index("const CES={"):ces.index("\n",ces.index("const CES={"))+1]
+ces=ces.replace(head_line,"")
+rep("  <h1>🌲 WOODS DRONE SIM</h1>","  <h1>🌲 WOODS RC SIM</h1><p style=\"font-size:13px;color:#9fd3ff\">Pick a map below: 🌳 realistic woods, 🌲 the classic woods, or 🌎 the real Earth from satellite photos. Multiplayer, Phone Link, your DJI remote or InterLink work on all of them.</p>")
+rep("const renderer=new THREE.WebGLRenderer({canvas,antialias:CFG.look!=='fast',powerPreference:'high-performance'});","const renderer=new THREE.WebGLRenderer({canvas,antialias:CFG.look!=='fast'||CFG.map==='earth',alpha:CFG.map==='earth',powerPreference:'high-performance',preserveDrawingBuffer:CFG.map==='earth'});")
+rep("function saveCfg(){LS.set('cfg',CFG);}\n","function saveCfg(){LS.set('cfg',CFG);}\n"+head_line)
+rep("function H(x,z){return fldFlat(x,z,H0(x,z));}","function H(x,z){return CES.on&&CES.ENU?cesH(x,z):fldFlat(x,z,H0(x,z));}")
+rep("const FLD_KEY='fld',FLD_DEF={on:true,x:-110,z:-68,yaw:0,len:100,w:12,","const FLD_KEY=CFG.map==='earth'?'fldReal':'fld',FLD_DEF={on:true,x:CFG.map==='earth'?0:-110,z:CFG.map==='earth'?0:-68,yaw:0,len:CFG.map==='earth'?110:100,w:12,")
+rep("function inWater(x,z){const p=pondOf(x,z);","function inWater(x,z){if(CES.on)return null;const p=pondOf(x,z);")
+rep("function chunkTick(all){\n","function chunkTick(all){if(CES.on)return;\n")
+rep("function camFar0(){return LOOK.on?2600:260;}","function camFar0(){return CES.on?9000:(LOOK.on?2600:260);}")
+rep("else{renderer.render(scene,cam);drawRC();renderRCInset();}","else{if(CES.on){cesSync();cesRender();}else renderer.render(scene,cam);drawRC();renderRCInset();}")
+rep("  cctx.drawImage(canvas,0,0,w,h);","  if(CES.on&&CES.viewer){try{cctx.drawImage(CES.viewer.scene.canvas,0,0,w,h);}catch(e){}}cctx.drawImage(canvas,0,0,w,h);")
+rep("  x.fillStyle='#4e7a32';x.fillRect(MEADOW","  if(!CES.on){x.fillStyle='#4e7a32';x.fillRect(MEADOW")
+rep("  if(MED.on)medDraw(x,s,dpr);","  }else{x.strokeStyle='rgba(255,255,255,0.25)';x.lineWidth=1/s*dpr;for(let g=Math.floor((cx-view*2)/50)*50;g<cx+view*2;g+=50){x.beginPath();x.moveTo(g,cz-view*2);x.lineTo(g,cz+view*2);x.stroke();}for(let g=Math.floor((cz-view*2)/50)*50;g<cz+view*2;g+=50){x.beginPath();x.moveTo(cx-view*2,g);x.lineTo(cx+view*2,g);x.stroke();}\n    OBJS.forEach(o=>{x.fillStyle='#ffd60a';x.beginPath();x.arc(o.x,o.z,Math.max(1,2/s*dpr),0,7);x.fill();});x.fillStyle='#ffd60a';x.beginPath();x.arc(0,0,2,0,7);x.fill();}\n  if(MED.on)medDraw(x,s,dpr);")
+# in the real world everything starts at the pad spot (no runway / lake / dirt track there)
+rep("function kindStart(){const k=vkind();","function kindStart(){const k=vkind();if(CES.on){const h=typeof mp!=='undefined'&&Object.keys(mp.peers).length?parseInt(hashStr(mp.id),36)%7:0,a=h/7*Math.PI*2;const s=FLD.on&&FU.g?fldStart(k):{x:0,z:0,yaw:0};if(h){const r=fldR();s.x+=(k==='plane'?r.px:Math.cos(a))*(k==='plane'?(h%2?3:-3):4);s.z+=(k==='plane'?r.pz:Math.sin(a))*(k==='plane'?(h%2?3:-3):4);}return s;}")
+# everyone flies at the same place
+rep("tod:CFG.tod,real:CFG.real!==false,fld:Object.assign({},FLD)};}","tod:CFG.tod,real:CFG.real!==false,map:curMap(),fld:Object.assign({},FLD),...(CES.on?{geo:{lat:+CES.origin.lat.toFixed(5),lon:+CES.origin.lon.toFixed(5),name:CES.origin.name}}:{})};}")
+rep("  if(w.tod!=null&&w.tod!==CFG.tod){CFG.tod=w.tod;saveCfg();applyTOD();}","  if(w.map&&MAPS[w.map]&&w.map!==curMap()){mapSet(w.map,'👥 Everyone is flying the map ');return;}\n  if(w.tod!=null&&w.tod!==CFG.tod){CFG.tod=w.tod;saveCfg();applyTOD();}\n  if(w.geo&&CES.on&&(Math.abs(w.geo.lat-CES.origin.lat)>1e-5||Math.abs(w.geo.lon-CES.origin.lon)>1e-5))cesSetOrigin(w.geo);")
+rep("L.push('the airport');return L.join(', ');}","L.push('the airport');if(b.geo&&(!a.geo||a.geo.lat!==b.geo.lat||a.geo.lon!==b.geo.lon))L.push('where we fly to '+b.geo.name);return L.join(', ');}")
+rep("  mItem(()=>'🌍 Real-world settings: '+","  mItem(()=>'🗺 Map: '+MAPS[curMap()].ic+' '+MAPS[curMap()].n+(CES.on?' ('+CES.origin.name+')':'')+' ▸',()=>menuPush('🗺 Map',mapItems())),\n  mItem(()=>'🌍 Real-world settings: '+")
+anchor="// ---------------------------------------------------------------- main loop"
+rep(anchor,ces+'\n'+open('sat_section.js').read()+'\n'+open('map_section.js').read()+'\n'+anchor)
+rep("requestAnimationFrame(frame);\n$('cBat')","requestAnimationFrame(frame);if(curMap()==='earth')cesLoad();\n$('cBat')")
+rep("#start{position:fixed;inset:0;z-index:70;","body.ces #gl{z-index:1;}#cesDiv .cesium-viewer-bottom,#cesDiv .cesium-widget-credits{display:none}#cesCredits{position:fixed;right:6px;bottom:calc(4px + env(safe-area-inset-bottom));z-index:16;font:10px system-ui;opacity:0.7;max-width:50vw;pointer-events:auto}#cesCredits img{height:14px;vertical-align:middle}#cesCredits *{color:#fff!important;font-size:10px!important}\n#start{position:fixed;inset:0;z-index:70;")
+rep("LS.get('objs',[])","LS.get('objsReal',[])")
+r=r.replace("LS.set('objs',OBJS)","LS.set('objsReal',OBJS)")
+rep("async function toggleVR(){\n  vr.on=!vr.on;","async function toggleVR(){\n  if(CES.on&&!vr.on){toast('🥽 VR goggles show the real world map only in the Woods RC Sim file for now — here you\\'ll see just the aircraft',4000);}\n  vr.on=!vr.on;")
+r=r.replace("SND.out.gain.setTargetAtTime(g,t,0.08);","if(!isFinite(g)||!isFinite(f))return;SND.out.gain.setTargetAtTime(g,t,0.08);",1)
+open('rc_real.html','w').write(r);print('ok',len(r))

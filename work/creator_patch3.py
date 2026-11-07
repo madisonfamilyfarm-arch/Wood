@@ -1,0 +1,55 @@
+r=open('rc.html').read()
+def rep(a,b,cnt=1):
+    global r
+    n=r.count(a)
+    if n!=cnt: raise SystemExit('count %d for %r'%(n,a[:100]))
+    r=r.replace(a,b)
+m=open('model_section.js').read()
+anchor="// ---------------------------------------------------------------- main loop"
+rep(anchor,m+'\n'+anchor)
+rep("  tickWind(dt);spaceRestore();","  tickMixers(dt);tickFlames(dt);\n  tickWind(dt);spaceRestore();")
+# tray: new categories
+rep("  ['Extras'],{t:'antenna',ic:'📡',n:'Antenna'}];",
+"""  ['Extras'],{t:'antenna',ic:'📡',n:'Antenna'},
+  ['Shapes'],{t:'shape',ic:'🟥',n:'Box',o:{style:'box'}},{t:'shape',ic:'⚪',n:'Ball',o:{style:'sphere',col:'#f2f2f2'}},{t:'shape',ic:'🥫',n:'Cylinder',o:{style:'cyl',col:'#0a84ff'}},{t:'shape',ic:'🔺',n:'Cone',o:{style:'cone',col:'#ff3030'}},{t:'shape',ic:'🛸',n:'Saucer',o:{style:'disc',w:40,len:40,d:10,col:'#9aa0a6',mat:'metal'}},{t:'shape',ic:'🍩',n:'Donut',o:{style:'torus',col:'#ff9f0a'}},{t:'shape',ic:'📐',n:'Wedge',o:{style:'wedge',col:'#34c759'}},{t:'shape',ic:'💊',n:'Capsule',o:{style:'capsule',col:'#bf5af2'}},{t:'shape',ic:'🔻',n:'Pyramid',o:{style:'pyramid',col:'#ffd60a'}},{t:'shape',ic:'⭕',n:'Ring',o:{style:'ring',col:'#64d2ff'}},{t:'shape',ic:'🔮',n:'Glass dome',o:{style:'sphere',mat:'glass',col:'#9fd3ff',w:14,len:14,d:10}},{t:'shape',ic:'💡',n:'Glowing light',o:{style:'sphere',mat:'glow',col:'#00ff88',w:4,len:4,d:4}},
+  ['Engines'],{t:'rocket',ic:'🚀',n:'Rocket engine'},{t:'jet',ic:'✈️',n:'Jet engine'},{t:'sprop',ic:'🌌',n:'Space propeller (works anywhere)',o:{blades:3}},{t:'hover',ic:'🛸',n:'Hover pad (anti-gravity)'},{t:'wprop',ic:'💧',n:'Water propeller'},
+  ['Wings + wheels'],{t:'wing',ic:'🪽',n:'Wing'},{t:'wing',ic:'🦈',n:'Tail fin',o:{w:14,len:10,d:1,rz:90}},{t:'wheel',ic:'🛞',n:'Wheel'},
+  ['Weapons'],{t:'gun',ic:'🎨',n:'Paintball gun',o:{style:'paint'}},{t:'gun',ic:'🔫',n:'Machine gun',o:{style:'mg'}},{t:'gun',ic:'🚀',n:'Rocket launcher',o:{style:'rocket'}},
+  ['Your own'],{t:'model',ic:'📦',n:'Import a 3D model (.glb)…',imp:true}];""")
+rep("const TDEF={body:{w:8,len:14,col:'#9aa0a6',style:'box'},","const TDEF={shape:{w:10,len:10,d:10,col:'#ff9f0a',style:'box',mat:'solid'},rocket:{w:3,len:14,pow:5,col:'#f2f2f2'},jet:{w:5,len:14,pow:5,col:'#9aa0a6'},wprop:{r:4,pow:5,col:'#c8a040'},sprop:{r:6,pow:6,col:'#64d2ff',blades:3},hover:{r:6,pow:5,col:'#3b3f45'},wing:{w:60,len:14,d:1.5,col:'#f2f2f2'},wheel:{r:4,w:2.5,col:'#ffd60a'},gun:{len:10,style:'mg',col:'#2b2b2b'},model:{sc:1,col:'#ffffff'},\n  body:{w:8,len:14,col:'#9aa0a6',style:'box'},")
+rep("const HALF={board:0.3,","const HALF={shape:3,rocket:1.5,jet:2.5,wprop:1,sprop:1,hover:1,wing:0.8,wheel:4,gun:1.6,model:5,board:0.3,")
+# dropping the "import" item opens a file picker instead
+rep("  let p;wsSave();\n  if(d.moved){","  if(d.item.imp){importModel((mid,name)=>{wsSave();const q=cleanPart({t:'model',mid,nm:name,sc:1,x:0,y:0,h:6});WS.parts.push(q);WS.sel=WS.parts.length-1;wsChanged();});return;}\n  let p;wsSave();\n  if(d.moved){")
+rep("function wsAddHighlighted(){const it=WSI[WS.tray],","function wsAddHighlighted(){if(WSI[WS.tray].imp){importModel((mid,name)=>{wsSave();WS.parts.push(cleanPart({t:'model',mid,nm:name,sc:1,x:0,y:0,h:6}));WS.sel=WS.parts.length-1;wsChanged();});return;}const it=WSI[WS.tray],")
+# sensible first spots
+rep("  return[(Math.random()-0.5)*6,(Math.random()-0.5)*6,HDEF[t]||0];\n}",
+"  if(t==='wing')return[0,0,1];if(t==='rocket'||t==='jet'){const n=WS.parts.filter(q=>q.t===t).length;return[(n%2?1:-1)*Math.ceil(n/2+0.5)*4,b.len/2+6,0];}if(t==='wheel'){const n=WS.parts.filter(q=>q.t==='wheel').length;return[[-1,1,1,-1][n%4]*(b.w/2+2),[-1,-1,1,1][n%4]*b.len*0.4,-4];}\n  if(t==='hover'){const n=WS.parts.filter(q=>q.t==='hover').length;return[[-1,1,1,-1][n%4]*b.w*0.4,[-1,-1,1,1][n%4]*b.len*0.4,-3];}if(t==='gun'){const n=WS.parts.filter(q=>q.t==='gun').length;return[(n%2?1:-1)*(b.w/2+2),-b.len*0.2,-2.5];}if(t==='wprop')return[0,b.len/2+3,-2];if(t==='shape'||t==='model')return[0,0,0];\n  return[(Math.random()-0.5)*6,(Math.random()-0.5)*6,HDEF[t]||0];\n}")
+# tools: sizes, styles, power, material, fly-as, waterproof
+rep("  else if(k==='long'||k==='short'){const d=k==='long'?1:-1;if(p.t==='motor'||p.t==='guard'||p.t==='pad')p.r=clamp(p.r+d*0.5,0.5,p.t==='guard'?16:15);else p.len=clamp(p.len+d,1,40);}\n  else if(k==='wide'||k==='thin'){p.w=clamp(p.w+(k==='wide'?0.5:-0.5),0.5,30);}",
+"  else if(k==='long'||k==='short'){const d=k==='long'?1:-1,big=!isReal();if(p.t==='model')p.sc=clamp(+(p.sc*(d>0?1.15:1/1.15)).toFixed(3),0.05,60);else if(['motor','guard','pad','sprop','wprop','hover','wheel'].includes(p.t))p.r=clamp(+(p.r+d*Math.max(0.5,p.r*0.08)).toFixed(1),0.5,big?200:(p.t==='guard'?16:p.t==='hover'||p.t==='wheel'?40:15));else p.len=clamp(+(p.len+d*Math.max(1,p.len*0.08)).toFixed(1),0.5,big?400:(['shape','wing'].includes(p.t)?200:40));}\n  else if(k==='wide'||k==='thin'){const d=k==='wide'?1:-1;p.w=clamp(+(p.w+d*Math.max(0.5,p.w*0.08)).toFixed(1),0.2,isReal()&&!['shape','wing'].includes(p.t)?30:400);}\n  else if(k==='tall'||k==='flat'){const d=k==='tall'?1:-1;if(['shape','wing'].includes(p.t))p.d=clamp(+(p.d+d*Math.max(0.5,p.d*0.08)).toFixed(1),0.2,400);else toast('↥↧ is for shapes and wings',1200);}\n  else if(k==='mat'){if(p.t==='shape'){p.mat=MATS[(MATS.indexOf(p.mat)+1)%MATS.length];toast({solid:'🧱 Solid',metal:'⚙️ Shiny metal',glass:'🔮 Glass (see-through)',glow:'💡 Glowing'}[p.mat],900);}else toast('🧪 Material is for shapes',1200);}")
+rep("    else if(p.t==='battery'){const L=['LiPo','HV LiPo','Li-ion'];p.bt=L[(L.indexOf(p.bt)+1)%3];toast('🔋 '+p.bt,900);}\n    else toast('🔁 This part only comes in one type',1200);}",
+"    else if(p.t==='battery'){const L=['LiPo','HV LiPo','Li-ion'];p.bt=L[(L.indexOf(p.bt)+1)%3];toast('🔋 '+p.bt,900);}\n    else if(p.t==='shape'){p.style=SHAPES[(SHAPES.indexOf(p.style)+1)%SHAPES.length];toast(SHAPEN[p.style],900);}\n    else if(p.t==='gun'){const L=['paint','mg','rocket'];p.style=L[(L.indexOf(p.style)+1)%3];toast(WTYPES[p.style].ic+' '+WTYPES[p.style].n,900);}\n    else if(p.t==='sprop'){p.blades=p.blades>=5?2:p.blades+1;toast('🌌 '+p.blades+' blades',900);}\n    else toast('🔁 This part only comes in one type',1200);}")
+rep("  else if(k==='power'){if(p.t==='motor'){p.pow=p.pow>=10?1:p.pow+1;toast('⚡ Motor power '+p.pow+'/10',900);}",
+"  else if(k==='power'){const mx=isReal()?10:50;if(['motor','sprop','rocket','jet','wprop','hover'].includes(p.t)){p.pow=p.pow>=mx?1:p.pow+(p.pow>=10?5:1);toast('⚡ Power '+p.pow+'/'+mx,900);}")
+rep("function wsTool(k){\n  const p=WS.parts[WS.sel];","function wsTool(k){\n  const p=WS.parts[WS.sel];\n  if(k==='flyas'){const L=['auto','drone','plane','car','boat'];WS.flyAs=L[(L.indexOf(WS.flyAs||'auto')+1)%L.length];wsChanged();const st=stats(wsSpec());toast('✈ Flies like: '+(WS.flyAs==='auto'?'auto → '+st.flyAs:WS.flyAs),1500);return;}\n  if(k==='water'){WS.waterproof=!WS.waterproof;wsChanged();toast(WS.waterproof?'💧 Waterproof — rain and ponds can\\'t hurt it':'💧 Not waterproof — keep it out of the rain',1600);return;}\n  if(k==='import'){importModel((mid,name)=>{wsSave();WS.parts.push(cleanPart({t:'model',mid,nm:name,sc:1,x:0,y:0,h:6}));WS.sel=WS.parts.length-1;wsChanged();});return;}")
+rep("  H('Size + place');B('➕ longer',()=>wsTool('long'));B('➖ shorter',()=>wsTool('short'));B('↔ wider',()=>wsTool('wide'));B('↕ thinner',()=>wsTool('thin'));B('⬆ raise',()=>wsTool('up'));B('⬇ lower',()=>wsTool('down'));",
+"  H('Size + place');B('➕ longer / bigger',()=>wsTool('long'));B('➖ shorter / smaller',()=>wsTool('short'));B('↔ wider',()=>wsTool('wide'));B('↕ thinner',()=>wsTool('thin'));B('↥ taller',()=>wsTool('tall'));B('↧ flatter',()=>wsTool('flat'));B('⬆ raise',()=>wsTool('up'));B('⬇ lower',()=>wsTool('down'));")
+rep("  H('Look');B('🎨 colour',()=>wsTool('color'));B('🔁 type',()=>wsTool('variant'),'','Prop blades, light mode, camera type, body shape');",
+"  H('Look');B('🎨 colour',()=>wsTool('color'));B('🔁 type / shape',()=>wsTool('variant'),'','Prop blades, light mode, camera type, shape, gun');B('🧪 material',()=>wsTool('mat'),'','solid / metal / glass / glowing');")
+rep("  H('Drone');B('💻 program it',","  H('What it is');B('✈ flies like…',()=>wsTool('flyas'),'wide','auto / drone / plane / car / boat');B('💧 waterproof',()=>wsTool('water'),'wide');B('📦 import 3D model',()=>wsTool('import'),'wide');B('💻 program it',")
+rep("const WS={wires:[],wireMode:false,","const WS={flyAs:'auto',waterproof:false,wires:[],wireMode:false,")
+rep("function wsSpec(){return sanitize({wires:WS.wires,name:WS.name,","function wsSpec(){return sanitize({flyAs:WS.flyAs||'auto',waterproof:!!WS.waterproof,weapons:WS.weapons||[],wires:WS.wires,name:WS.name,")
+rep("  WS.name=sp?sp.name+(sp.parts?'':' (custom)'):'My drone';WS.assist=sp?sp.assist:true;WS.fpvUp=sp?sp.fpvUp:15;",
+"  WS.name=sp?sp.name+(sp.parts?'':' (custom)'):'My build';WS.assist=sp?sp.assist!==false:true;WS.fpvUp=sp?sp.fpvUp||15:15;WS.flyAs=sp&&sp.flyAs||'auto';WS.waterproof=!!(sp&&sp.waterproof);WS.weapons=sp&&sp.weapons||[];")
+# workshop status line: how it flies
+rep("  $('wsStats').innerHTML='<b>'+WS.name+'</b> · ⚡ '+Math.round(st.top)+' m/s",
+"  const faTxt={drone:'🚁 hovers like a drone',plane:'✈️ flies like a plane',car:'🚙 drives like a car',boat:'🚤 floats like a boat'}[st.flyAs]||'';\n  $('wsStats').innerHTML='<b>'+WS.name+'</b> · '+faTxt+(WS.flyAs==='auto'?' (auto)':'')+(WS.waterproof?' · 💧':'')+(I.space?' · 🌌 works in space':'')+(!isReal()?' · 🌍 anything goes':'')+' · ⚡ '+Math.round(st.top)+' m/s")
+# wiring: space props are motors, shapes etc have no electronics
+rep("  if(['body','arm','leg','skid','pad','guard','antenna'].includes(o.t)){","  if(['body','arm','leg','skid','pad','guard','antenna','shape','wing','wheel','model'].includes(o.t)){")
+rep("  if(o.t==='motor'){const used=WS.wires.filter(w=>{const q=WS.parts.find(p=>p.id===(w[0]===bd.id?w[1]:w[0]));return q&&q.t==='motor'&&","  if(o.t==='motor'||o.t==='sprop'){const used=WS.wires.filter(w=>{const q=WS.parts.find(p=>p.id===(w[0]===bd.id?w[1]:w[0]));return q&&(q.t==='motor'||q.t==='sprop')&&")
+rep("onclick=\"startGame('free');setTimeout(()=>openWorkshop(true),200)\">🧩 Drone workshop</button>","onclick=\"startGame('free');setTimeout(()=>openWorkshop(true),200)\">🧩 Workshop — build anything</button>")
+rep("  mItem('🧩 Workshop: take apart my current drone',()=>openWorkshop(true)),\n  mItem('🧩 Workshop: start from scratch',()=>openWorkshop(false)),",
+"  mItem('🧩 Workshop: take apart what I\\'m flying',()=>openWorkshop(true)),\n  mItem('🧩 Workshop: start from scratch (build ANYTHING — UFOs, rockets, jets, boats…)',()=>openWorkshop(false)),")
+rep("mItem(()=>'🛠 Build your own '+KINDS[vkind()].n.toLowerCase()+' ▸',()=>{if(vkind()==='drone')menuPush('🛠 Build your own drone',buildItems());else openBuilder(vkind());}),",
+"mItem(()=>'🛠 Build your own '+KINDS[vkind()].n.toLowerCase()+' ▸',()=>{if(vkind()==='drone'||SPEC.parts)menuPush('🛠 Build your own',buildItems());else openBuilder(vkind());}),\n  mItem('🧩 Workshop — build anything (UFO, rocket, jet, boat…)',()=>{menuToggle(false);openWorkshop(!!SPEC.parts);}),")
+open('rc.html','w').write(r);print('ok')

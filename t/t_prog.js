@@ -1,0 +1,10 @@
+const H=require('./harness');
+H(async({mk})=>{const P=await mk('P','http://127.0.0.1:8765/woods-rc-sim.html');await P.waitForTimeout(3000);
+  await P.evaluate(()=>{startGame('free');aiSet(3);D.armed=true;D.state='flying';D.pos.y=H(D.pos.x,D.pos.z)+8;});await P.waitForTimeout(4000);
+  const pr=()=>P.evaluate(()=>renderer.info.programs.length);console.log('start',await pr());
+  await P.evaluate(()=>explode(D.pos.clone().add(new V3(15,0,0)),6,3,true,'me',mp.id));await P.waitForTimeout(1500);console.log('rocket boom',await pr());
+  await P.evaluate(()=>{TNT.kind='classic';TNT.throwD=0;tntDrop();});await P.waitForTimeout(4000);console.log('tnt',await pr());
+  await P.evaluate(()=>explode(D.pos.clone().add(new V3(60,0,0)),45,10,true,'me',mp.id));await P.waitForTimeout(2500);console.log('giant',await pr());
+  await P.evaluate(()=>{TNT.kind='freeze';tntDrop();});await P.waitForTimeout(3000);await P.evaluate(()=>{TNT.kind='party';tntDrop();});await P.waitForTimeout(3000);console.log('freeze+party',await pr());
+  await P.evaluate(()=>{for(let i=0;i<5;i++)explode(D.pos.clone().add(new V3(20+i*9,0,-10)),8,3,true,'me',mp.id);});await P.waitForTimeout(3000);console.log('5 more booms',await pr());
+});
