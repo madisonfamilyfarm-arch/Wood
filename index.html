@@ -4101,13 +4101,13 @@ function tickFxBits(dt){for(let i=FXB.length-1;i>=0;i--){const f=FXB[i];f.t+=dt;
   else if(f.fire){const s=f.r*(0.25+0.95*Math.min(1,u*3.2));f.m.scale.setScalar(s);f.m.material.opacity=Math.max(0,1-u);if(f.light){f.light.intensity=Math.max(0,3*(1-u*2.5));}}
   else if(f.tree){const k=Math.min(1,f.t/1.3);f.m.rotation.set(0,0,0);f.m.quaternion.setFromAxisAngle(f.ax,k*k*1.5);if(f.t>(f.stay||4))f.m.position.y-=dt*0.6;}
   else{f.m.position.y+=f.vy*dt;f.m.scale.setScalar(f.r*(1+u*f.grow*3));f.m.material.opacity=0.7*(1-u);}
-  if(f.t>=f.life){scene.remove(f.m);if(f.light)scene.remove(f.light);if(f.m.material&&f.m.material.dispose&&!f.keepMat)f.m.material.dispose();FXB.splice(i,1);}}}
+  if(f.t>=f.life){scene.remove(f.m);if(f.light&&performance.now()>=f.light.userData.until-60)f.light.intensity=0;FXB.splice(i,1);}}}
 function boomSound(dist,big){try{const A=beep.a||(beep.a=new (window.AudioContext||window.webkitAudioContext)());const len=A.sampleRate*(big?1.8:1.1),b=A.createBuffer(1,len,A.sampleRate),d=b.getChannelData(0);let x=0;for(let i=0;i<len;i++){x=x*0.9+(Math.random()*2-1)*0.1;d[i]=x*5*Math.pow(1-i/len,2);}
   const s=A.createBufferSource(),f=A.createBiquadFilter(),g=A.createGain();f.type='lowpass';f.frequency.value=big?500:900;g.gain.value=clamp(1.6/(1+dist*0.04),0.05,1.6)*CFG.vol/100;s.buffer=b;s.connect(f);f.connect(g);g.connect(A.destination);s.start(A.currentTime+Math.min(1.5,dist/340));}catch(e){}}
 function explode(p,r,dr,own,byName,byId){
   r=Math.max(0.5,r||4);const dist=cam.position.distanceTo(p);boomSound(dist,r>8);
   const fb=new THREE.Mesh(new THREE.SphereGeometry(1,16,12),new THREE.MeshBasicMaterial({color:0xffa030,transparent:true,opacity:1,depthWrite:false}));fb.position.copy(p);scene.add(fb);
-  const lt=new THREE.PointLight(0xffaa55,3,r*6);lt.position.copy(p);scene.add(lt);FXB.push({m:fb,t:0,life:0.7,fire:true,r,light:lt});
+  const lt=boomLight(p,r);FXB.push({m:fb,t:0,life:0.7,fire:true,r,light:lt});
   const core=new THREE.Mesh(new THREE.SphereGeometry(1,12,10),new THREE.MeshBasicMaterial({color:0xfff2b0,transparent:true,opacity:1,depthWrite:false}));core.position.copy(p);scene.add(core);FXB.push({m:core,t:0,life:0.35,fire:true,r:r*0.55});
   for(let k=0;k<Math.min(14,4+r);k++)puff(p.clone().add(new V3((Math.random()-0.5)*r,(Math.random()-0.2)*r*0.6,(Math.random()-0.5)*r)),k%3?0x444444:0x777777,r*0.18,1.6);
   for(let k=0;k<8;k++){const m=new THREE.Mesh(GEO.box,MAT.dark);m.position.copy(p);m.scale.setScalar(0.08+Math.random()*0.12);scene.add(m);FXB.push({m,t:0,life:3,v:new V3((Math.random()-0.5)*r*3,2+Math.random()*r*1.5,(Math.random()-0.5)*r*3),spin:8,r:0.1,keepMat:true});}
@@ -8839,8 +8839,8 @@ setTimeout(()=>{const b=document.createElement('button');b.id='chatTog';b.style.
   const st=document.createElement('style');st.textContent='body.chatHide #chatLog{display:none!important}body.pt #chatTog{left:calc(12px + env(safe-area-inset-left))!important;bottom:calc(240px + env(safe-area-inset-bottom))!important}#chatTog .n{display:inline-block;min-width:18px;padding:0 5px;margin-left:4px;border-radius:9px;background:#ff3b30;font:800 11px system-ui;line-height:18px}';document.head.appendChild(st);
   CHT.seen=CHAT.length;chtDraw();setInterval(chtDraw,700);},1700);
 function chtDraw(){const b=$('chatTog');if(!b)return;document.body.classList.toggle('chatHide',CHT.hide);if(!CHT.hide)CHT.seen=CHAT.length;
-  const n=Math.max(0,CHAT.length-CHT.seen);b.innerHTML=CHT.hide?'💬 Show chat'+(n?'<span class="n">'+(n>99?'99+':n)+'</span>':''):'🙈 Hide chat';
-  const cb=$('cbBtn');b.style.display=started&&cb&&cb.style.display!=='none'&&!menu.open?'':'none';}
+  const n=Math.max(0,CHAT.length-CHT.seen);const h=CHT.hide?'💬 Show chat'+(n?'<span class="n">'+(n>99?'99+':n)+'</span>':''):'🙈 Hide chat';if(b._h!==h){b._h=h;b.innerHTML=h;}
+  const cb=$('cbBtn');const dsp=started&&cb&&cb.style.display!=='none'&&!menu.open?'':'none';if(b.style.display!==dsp)b.style.display=dsp;}
 // the counter keeps working even after old messages scroll away
 {const p0=CHAT.push;CHAT.push=function(){const r=p0.apply(this,arguments);if(this.length>=40&&CHT.hide)CHT.seen--;return r;};}
 // ---------------------------------------------------------------- 🔍 menu search: type anything (TNT, armor, voice, room…) and jump straight to it
@@ -9036,6 +9036,16 @@ function tntThrowDist(){return(TNT.throwD||0)*(WALK.on?4:1);}
       if(T.air||T.cust){T.rest=false;}T.landed=!!(T.air||T.cust);}}catch(e){console.warn('throw',e);}return r;};}
 {const i0=tntTypeItems;tntTypeItems=function(){const L=i0();L.splice(1,0,mBig('🎯 Throw distance (where you face)',()=>TNT.throwD,v=>{TNT.throwD=v;saveTnt();},0,150,1,v=>v?v+' m'+(WALK.on?'  (×4 walking = '+v*4+' m)':'  (×4 when walking)'):'just drop it'));return L;};}
 {const i0=exItems;exItems=function(){const L=i0();L.splice(5,0,mBig('🎯 TNT throw distance (where you face)',()=>TNT.throwD,v=>{TNT.throwD=v;saveTnt();},0,150,1,v=>v?v+' m (×4 walking)':'just drop it'));return L;};}
+
+// ================================================================ v45: ⚡ NO MORE FREEZES — explosions used to add + remove a light, which made the phone rebuild every shader (the "ding" stutter). Now 3 lights are always there and just switch on/off.
+const BOOMLT=[];for(let i=0;i<3;i++){const l=new THREE.PointLight(0xffaa55,0,30);l.position.set(0,-500,0);l.userData.until=0;scene.add(l);BOOMLT.push(l);}
+function boomLight(p,r){const l=BOOMLT.reduce((a,b)=>a.userData.until<b.userData.until?a:b);l.position.copy(p);l.distance=Math.min(400,r*6);l.intensity=3;l.userData.until=performance.now()+700;return l;}
+// build the explosion / TNT / smoke shaders once at the start, so even the FIRST boom doesn't hitch
+function fxPrewarm(){try{const g=new THREE.Group();const add=m=>{const x=new THREE.Mesh(GEO.ball,m);g.add(x);};
+  add(new THREE.MeshBasicMaterial({color:0xff8a30,transparent:true,opacity:0.9,depthWrite:false}));add(new THREE.MeshBasicMaterial({color:0xff8a30,transparent:true,opacity:0.9,depthWrite:false,side:THREE.DoubleSide}));
+  add(new THREE.MeshLambertMaterial({color:0x444444}));add(new THREE.MeshLambertMaterial({color:0x444444,transparent:true,opacity:0.5}));add(BIGMAT(0x333333));try{g.add(tntMesh());}catch(e){}
+  g.position.copy(cam.position).add(new V3(0,0,-3).applyQuaternion(cam.quaternion));g.scale.setScalar(0.01);scene.add(g);renderer.compile(scene,cam);scene.remove(g);}catch(e){console.warn('prewarm',e);}}
+{const s0=startGame;startGame=function(){const r=s0.apply(this,arguments);setTimeout(fxPrewarm,1200);return r;};}
 
 // =====================================================================================
 // ===== 🌎 REAL WORLD MAP (CesiumJS): the real Earth from satellite photos + real hills, starting over the farm =====
