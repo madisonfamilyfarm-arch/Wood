@@ -208,4 +208,5 @@ rep("if(BIG.L.length>60){BIG.L.splice(0,30).forEach(f=>scene.remove(f.m));}","if
 rep("' g · 🌀 '+I.n+' motors · 🛡 '","' g'+(I.n?' · 🌀 '+I.n+' motors':'')+' · 🛡 '")
 rep("(I.topHeavy>4?' · <span style=\"color:#ff9f0a\">🏗 top-heavy — wobbly</span>':'')","(I.topHeavy>4&&I.n>0?' · <span style=\"color:#ff9f0a\">🏗 top-heavy — wobbly</span>':'')")
 rep("' · ⚡ '+Math.round(st.top)+' m/s","' · ⚡ '+Math.round(/tank/.test(faTxt)&&st.top>8?Math.max(3.5,Math.min(8,st.top*0.36)):st.top)+' m/s")
+rep("$('bTake').textContent=D.state==='landed'?'🛫 TAKE OFF':D.state==='down'||D.state==='tumble'?'🔧 FIX':'🛬 LAND';","{const gv=!WALK.on&&(vkind()==='car'||vkind()==='boat');$('bTake').textContent=D.state==='down'||D.state==='tumble'?'🔧 FIX':gv?(D.state==='landed'||!D.armed?'🚦 GO':'🛑 STOP'):D.state==='landed'?'🛫 TAKE OFF':'🛬 LAND';}")
 open('rc.html','w').write(r);print('ok',len(r))
