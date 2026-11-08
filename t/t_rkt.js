@@ -1,0 +1,11 @@
+const H0=require('./harness');
+H0(async({mk})=>{const P=await mk('P','http://127.0.0.1:8765/woods-rc-sim.html');P.on('pageerror',e=>console.log('PAGEERR',e.message));await P.waitForTimeout(3000);
+const S='/tmp/claude-0/-home-claude/45cffd64-7151-5ab5-acd7-339a16c71f6a/scratchpad/';
+console.log(await P.evaluate(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const o=[];startGame('free');await W(500);
+ const kd=c=>dispatchEvent(new KeyboardEvent('keydown',{code:c,key:c}));const ku=c=>dispatchEvent(new KeyboardEvent('keyup',{code:c,key:c}));
+ bsOpen('mix',null);bsClose();await W(300);WS.parts.push(cleanPart({t:'rocket',x:0,y:0,h:-4,w:3,len:12,pow:5,rx:90}));WS.flyAs='combo';wsChanged();const sp=wsSpec();closeWorkshop();useSpec(sp);await W(800);
+ o.push('combo '+ST.combo+' rUp '+(ST.info&&ST.info.rUp|0)+' rFwd '+(ST.info&&ST.info.rFwd|0));
+ {const f0=fall;fall=function(w){o.push('FALL '+w+' @'+new Error().stack.split('\n').slice(2,4).map(x=>x.trim().slice(0,60)).join('<'));return f0.apply(this,arguments);};}{const i0=impact;impact=function(v,w){o.push('IMPACT '+(+v).toFixed(1)+' '+w+' state '+D.state+' y '+D.pos.y.toFixed(1));return i0.apply(this,arguments);};}{let st=D.state;Object.defineProperty(D,'state',{get(){return st;},set(v){if(v==='tumble'&&st!=='tumble')o.push('TUMBLE@'+new Error().stack.split('\n').slice(2,5).map(x=>x.trim().slice(0,70)).join('<'));st=v;},configurable:true});}try{takeoff();}catch(e){}await W(1500);const y0=D.pos.y;kd('ArrowUp');await W(5000);o.push('state '+D.state+' kind '+vkind()+' armed '+D.armed);o.push('full throttle 5 s: climbed '+(D.pos.y-y0).toFixed(0)+' m, rq '+(CB.rq||0).toFixed(2)+' fuel '+CB.fuel.toFixed(2));ku('ArrowUp');
+ const y1=D.pos.y;await W(3000);o.push('throttle off 3 s: change '+(D.pos.y-y1).toFixed(0)+' m, smoke puffs '+SMK.length);
+ D.pos.y=2600;await W(1500);o.push('space bg '+scene.background.getHexString()+' stars '+(RKT.stars&&RKT.stars.visible));return o.join('\n');}));
+await P.screenshot({path:S+'space.png'});});
