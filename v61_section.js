@@ -15,3 +15,5 @@ function ttsSet(on){TTS.on=on;LS.set('aiTts',on);if(!on){try{speechSynthesis.can
 {const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
 // when your 🎤 voice chat is on, don't let the mic hear the AI's own voice and think YOU said it
 {const v0=voiceHeard;voiceHeard=function(t){try{if(TTS.on&&(performance.now()<(TTS.until||0)||performance.now()-TTS.last<700))return;}catch(e){}return v0.apply(this,arguments);};}
+// "what can you do?" → also mention the newest tricks
+{const s0=smartHear;smartHear=function(txt){const r=s0.apply(this,arguments);try{const s=nNorm(String(txt||''));if(/^ (what can you do|help|what can i say|what do you know|commands|help me out) $/.test(s)){const B=aiNear(1e9)[0];if(B)sbSay({B},'✨ Also try: "talk out loud" 🗣 · "take me to the lake" 🧭 · "what does enormous mean" 📚 · "tell me about yourself" 🎭 · "make the AI harder" 😈 · "how do I go underwater" 🐟',2600);}}catch(e){}return r;};}
