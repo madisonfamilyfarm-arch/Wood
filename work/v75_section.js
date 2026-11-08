@@ -1,0 +1,12 @@
+// v75: 📏 make ANY build giant — 1× / 10× / 100× size (keeps the same look, just huge; giant builds smash through trees like GIGA)
+{const z0=sanitize;sanitize=function(s){const o=z0.apply(this,arguments);try{if(s&&o&&+s.bigF>1)o.bigF=Math.min(100,+s.bigF);}catch(e){}return o;};}
+{const s0=stats;stats=function(sp){const st=s0.apply(this,arguments);try{const F=sp&&+sp.bigF;if(F>1&&st&&!st.airliner){st.rad*=F;st.L=Math.max(st.L,(st.rad*1.5-3.5)/6);st.legs*=F;st.top*=Math.min(4,Math.sqrt(F));st.vz=(st.vz||3)*Math.min(6,Math.sqrt(F));st.tough=10;st.mega=true;st.giga=true;st.bigF=F;}}catch(e){}return st;};}
+{const b0=buildDrone;buildDrone=function(sp,opt){const m=b0.apply(this,arguments);try{const F=sp&&+sp.bigF;if(F>1&&m&&m.g&&!m.g.userData.bigF&&!(opt&&opt.ghost)){m.g.userData.bigF=F;m.g.scale.multiplyScalar(F);try{(m.cams||[]).forEach(c=>{c.x*=F;c.y*=F;c.z*=F;});}catch(e){}}}catch(e){}return m;};}
+// builder: the size button
+{const s0=wsSpec;wsSpec=function(){const sp=s0.apply(this,arguments);try{if(WS.bigF>1)sp.bigF=WS.bigF;}catch(e){}return sp;};}
+{const o0=openWorkshop;openWorkshop=function(fromCurrent){const r=o0.apply(this,arguments);try{WS.bigF=fromCurrent&&SPEC&&SPEC.bigF?SPEC.bigF:1;}catch(e){}return r;};}
+{const u0=wsBuildUI;wsBuildUI=function(){const r=u0.apply(this,arguments);try{const T=$('wsTools');if(T&&!$('wsBig')){const b=document.createElement('button');b.id='wsBig';b.className='btn wide';const lab=()=>b.textContent='📏 Size in the world: '+(WS.bigF||1)+'× '+((WS.bigF||1)>=100?'🦖 GIANT':(WS.bigF||1)>=10?'🐘 huge':'(normal)');lab();
+  b.onclick=()=>{const L=[1,10,100];WS.bigF=L[(L.indexOf(WS.bigF||1)+1)%3];lab();toast('📏 When you fly it, it will be '+WS.bigF+'× bigger'+(WS.bigF>=100?' — it smashes through trees!':''),2500);};const ref=$('wsFixLoose');if(ref)ref.after(b);else T.appendChild(b);}}catch(e){}return r;};}
+// giant builds start out on open ground, and the camera backs off far enough to see them
+{const u0=updateCam;const _d=new THREE.Vector3();updateCam=function(dt){const r=u0.apply(this,arguments);try{if(ST&&ST.bigF>=10&&!WALK.on&&DR&&DR.g&&CAMX<0&&/CHASE|FOLLOW/.test(String(CAMS[camI]))){DR.g.getWorldDirection(_d);_d.y=0;if(_d.lengthSq()<1e-4)_d.set(0,0,1);_d.normalize();const k=(ST.rad||1)*3.2;
+  cam.position.copy(D.pos).addScaledVector(_d,k);cam.position.y=Math.max(D.pos.y+k*0.45,H(cam.position.x,cam.position.z)+3);cam.lookAt(D.pos);}}catch(e){}return r;};}
