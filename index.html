@@ -2726,7 +2726,7 @@ let pidN=0;function newPid(){return 'p'+Date.now().toString(36)+(pidN++).toStrin
 const HDEF={shape:0,rocket:0,jet:0,wprop:-2,sprop:1.4,hover:-3,wing:1,wheel:-6,gun:-3,model:0,board:3.4,rx:3.6,gps:3.8,sensor:0,buzzer:-1.5,battery:-3.2,camera:-1.75,light:-1.4,motor:1.4,guard:3,strip:-1.6,skid:-6,pad:-6,antenna:1.8};
 const BATC={LiPo:'#3b3b3b','HV LiPo':'#5a3b6b','Li-ion':'#2a5a8a'};
 function cleanPart(p){const n=(v,d)=>isFinite(+v)&&v!==null&&v!==''?+v:d,t=p.t,big=400;
-  const ST0={guard:'ring',body:p.t==='body'?'box':null,board:'f4',camera:'gimbal',shape:'box',gun:'paint',wheel:'wheel'},stOK={wheel:['wheel','tread'],guard:['ring','cage'],camera:['gimbal','fpv','action','box','pod'],body:['box','pod'],board:['f4','f7','any'],shape:SHAPES,gun:['paint','mg','rocket']};
+  const ST0={guard:'ring',body:p.t==='body'?'box':null,board:'f4',camera:'gimbal',shape:'box',gun:'paint',wheel:'wheel'},stOK={wheel:['wheel','tread'],guard:['ring','cage'],camera:['gimbal','fpv','action','box','pod'],body:['box','pod'],board:['f4','f7','any'],shape:SHAPES,gun:['paint','mg','rocket','barrel']};
   const style=stOK[t]&&stOK[t].includes(p.style)?p.style:(ST0[t]||(['gimbal','fpv','action','box','pod','f4','f7'].includes(p.style)?p.style:'gimbal'));
   return{t,x:clamp(n(p.x,0),-big,big),y:clamp(n(p.y,0),-big,big),h:clamp(n(p.h,HDEF[t]||0),-big,big),a:n(p.a,0),rx:n(p.rx,0),rz:n(p.rz,0),
   len:clamp(n(p.len,6),0.5,big),w:clamp(n(p.w,2),0.2,big),d:clamp(n(p.d,4),0.2,big),r:clamp(n(p.r,t==='pad'?1.5:6),0.3,200),pow:clamp(n(p.pow,5),1,50),col:String(p.col||'#9aa0a6').slice(0,9),bt:['LiPo','HV LiPo','Li-ion'].includes(p.bt)?p.bt:'LiPo',
@@ -4052,7 +4052,7 @@ function aimDir(origin){const c=camName(),v=new V3();
 function fire(){
   if(D.state!=='flying'&&D.state!=='takeoff'&&!(vkind()==='car'||vkind()==='boat')){if(!fire.warned){fire.warned=1;toast('Take off first');setTimeout(()=>fire.warned=0,1500);}firing=false;return;}
   const w=curWeapon(),now=performance.now(),rate=w==='mg'?1000/clamp(WPN.mgRate,1,60):w==='rocket'?650:130;if(now-(fire.last||0)<rate)return;fire.last=now;
-  const guns=((DR&&DR.guns)||[]).filter(g=>g.w===w),o=new V3();if(guns.length){fire.k=(fire.k||0)+1;guns[fire.k%guns.length].obj.getWorldPosition(o);}else mountPos(o);
+  const guns=((DR&&DR.guns)||[]).filter(g=>g.w===w||g.w==='barrel'),o=new V3();if(guns.length){fire.k=(fire.k||0)+1;guns[fire.k%guns.length].obj.getWorldPosition(o);}else mountPos(o);
   const T=WTYPES[w],dir=aimDir(o),spd=w==='rocket'?clamp(WPN.rspd,5,CFG.real!==false?120:600):T.spd;
   const v=dir.multiplyScalar(spd).add(D.vel),col=PBC[Math.floor(Math.random()*PBC.length)],sid=mp.id+'.'+(++shotN);
   spawnShot(w,o,v,col,true,sid,mp.id);mpSend({t:'shot',w,p:o.toArray().map(r2),v:v.toArray().map(r2),col,sid});
@@ -9148,7 +9148,7 @@ function sfxEngine(dt){const E=SFX.E,A=SFX.A,t=A.currentTime,k=WALK.on?'walk':vh
   let thr=0,f=120,lp=1500,ng=0.2,bg=0,am=0,amHz=0,o2k=1.007,g2=0.3,o3k=0.5,g3=0.3,vol=0.5,nf=900;
   const alive=!(D.state==='tumble'||D.state==='down')&&(fly||D.armed)&&started&&!menu.open&&CFG.engSnd!==false&&!(typeof DZ!=='undefined'&&DZ.dead);
   if(k==='walk'||!alive)thr=0;
-  else if(k==='drone'||k==='combo'){const I=WALK.inp||Z0;thr=fly?clamp(0.45+Math.abs(I.ly)*0.35+Math.hypot(I.rx,I.ry)*0.25,0,1):0.15;const sz=clamp((ST.L||0.3)/0.3,0.4,3);f=(150+300*thr)/Math.sqrt(sz);o2k=1.012;g2=0.45;o3k=2;g3=0.12;lp=1400+thr*4200;ng=0.22;nf=f*3;vol=0.5;}
+  else if(k==='drone'||k==='combo'){const I=WALK.inp||Z0;thr=fly?clamp(0.45+(I.ly||0)*0.38+Math.hypot(I.rx,I.ry)*0.2-(D.vel.y<-1.5&&(I.ly||0)<0.2?0.12:0),0.08,1):0.15;const sz=clamp((ST.L||0.3)/0.3,0.4,3);f=(150+300*thr)/Math.sqrt(sz);o2k=1.012;g2=0.45;o3k=2;g3=0.12;lp=1400+thr*4200;ng=0.22;nf=f*3;vol=0.5;}
   else if(k==='heli'){thr=fly?clamp(0.55+Math.abs(D.vel.y)*0.06+sp*0.01,0,1):0.3;f=55+thr*20;o2k=2.01;g2=0.15;o3k=22;g3=0.05;lp=380+thr*500;ng=0.1;nf=1200;bg=1.1;am=SPEC&&SPEC.style==='blimp'?0:0.85;amHz=(11+thr*5);vol=0.7;}
   else if(k==='plane'){thr=clamp(D.thr||0,0,1);const fir=38+thr*120;f=fir;o2k=2;g2=0.35;o3k=0.5;g3=0.4;lp=700+thr*2600;ng=0.12;nf=fir*6;am=0.35;amHz=fir/2;vol=0.7;}
   else if(k==='car'||k==='monster'){const rpm=D.armed?clamp(sfxGear(sp)+(Math.abs((WALK.inp||Z0).ly)>0.3?0.08:0),0.2,1.05):0;thr=rpm;f=45+rpm*175;o2k=2;g2=0.35;o3k=0.5;g3=0.35;lp=650+rpm*2600;ng=0.05;nf=f*4;am=0.3;amHz=f/2;vol=0.42;}
@@ -10604,6 +10604,34 @@ const AIRLCAM={on:0,p:new THREE.Vector3()};
 // chase / follow camera stays far enough back to see the whole jet
 {const u0=updateCam;const _d=new THREE.Vector3(),_t=new THREE.Vector3();updateCam=function(dt){const r=u0.apply(this,arguments);try{if(ST&&ST.airliner&&!WALK.on&&DR&&DR.g){const m=CAMS[camI];if(CAMX<0&&/CHASE|FOLLOW/.test(String(m))){DR.g.getWorldDirection(_d);_d.y=0;if(_d.lengthSq()<1e-4)_d.set(0,0,1);_d.normalize();
   _t.copy(D.pos).addScaledVector(_d,m==='FOLLOW'?48:62);_t.y=Math.max(D.pos.y+13,H(_t.x,_t.z)+4);if(!AIRLCAM.on||AIRLCAM.p.distanceTo(_t)>200)AIRLCAM.p.copy(_t);else AIRLCAM.p.lerp(_t,Math.min(1,(dt||0.016)*4));AIRLCAM.on=1;cam.position.copy(AIRLCAM.p);cam.lookAt(D.pos.x,D.pos.y+3,D.pos.z);}}}catch(e){}return r;};}
+
+// v69: 💾 save file opens the "where do you want to save it" box · 🪖 one tread = spin in circles · 🪖 tank barrel (fires whatever weapon is picked) · ✈️ airliner speed limit
+// ---------------------------------------------------------------- 💾 save: iPhone share sheet ("Save to Files" → pick a folder), the computer's Save As box, or a download
+saveDroneFile=function(sp){const json=JSON.stringify({type:'woods-drone',v:2,spec:sanitize(sp)},null,1);const name=((sp&&sp.name)||'my-drone').replace(/[^\w\- ]/g,'').trim().replace(/ +/g,'-')+'.drone.json';
+  const dl=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([json],{type:'application/json'}));a.download=name;document.body.appendChild(a);a.click();a.remove();toast('💾 Saved '+name+' (Downloads / Files)',2800);};
+  if(window.showSaveFilePicker){showSaveFilePicker({suggestedName:name,types:[{description:'Woods build',accept:{'application/json':['.json']}}]}).then(async h=>{const w=await h.createWritable();await w.write(json);await w.close();toast('💾 Saved '+name,2500);}).catch(e=>{if(e&&e.name!=='AbortError')dl();});return;}
+  try{const f=new File([json],name,{type:'application/json'});if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:name}).then(()=>toast('💾 Saved — pick "Save to Files" to choose the folder',2800)).catch(e=>{if(e&&e.name!=='AbortError')dl();});return;}}catch(e){}
+  dl();};
+// ---------------------------------------------------------------- 🪖 treads: only one side = it spins in circles; no wheels or treads at all = it can't drive
+function treadSides(){const P=(SPEC&&SPEC.parts)||[];if(treadSides.sp===SPEC)return treadSides.r;let L=0,R=0,W=0;P.forEach(p=>{if(p.t!=='wheel')return;if(p.style==='tread'){if((p.x||0)<-0.5)L++;else if((p.x||0)>0.5)R++;else{L++;R++;}}else W++;});treadSides.sp=SPEC;treadSides.r={L,R,W,built:P.length>0};return treadSides.r;}
+{const t0=tickCar;tickCar=function(dt,inp,prev){try{if(SPEC&&SPEC.parts&&SPEC.parts.length&&inp){const T=treadSides();
+  if(T.W===0&&(T.L>0)!==(T.R>0)){const thr=Math.abs(inp.ly)>Math.abs(inp.ry)?inp.ly:inp.ry;const st=Math.abs(inp.rx)>Math.abs(inp.lx)?inp.rx:inp.lx;
+    // the one tread pushes its own side forward, so the tank pivots around the dead side
+    const side=T.L>0?1:-1;inp=Object.assign({},inp,{ly:thr*0.3,ry:0,lx:0,rx:clamp(st*0.3+side*thr,-1,1)});}
+  else if(T.W===0&&T.L===0&&T.R===0&&ST&&ST.kind==='car'){inp=Object.assign({},inp,{ly:0,ry:0});}}}catch(e){}return t0.call(this,dt,inp,prev);};}
+// ---------------------------------------------------------------- 🪖 tank barrel: a big cannon that fires whatever weapon you have picked
+{const it={t:'gun',ic:'🪖',n:'Tank barrel (fires the picked weapon)',o:{style:'barrel',len:18}};const i1=WSC.findIndex(x=>x&&x.t==='gun'&&x.o&&x.o.style==='rocket'),i2=WSI.findIndex(x=>x&&x.t==='gun'&&x.o&&x.o.style==='rocket');
+  if(i1>=0&&i2>=0){WSC.splice(i1+1,0,it);WSI.splice(i2+1,0,it);}else{WSC.push(it);WSI.push(it);}
+  try{const i0=WSC0.findIndex(x=>x&&x.t==='gun'&&x.o&&x.o.style==='rocket');if(i0>=0&&!WSC0.includes(it))WSC0.splice(i0+1,0,it);}catch(e){}}
+{const g0=gunMesh;gunMesh=function(style,L){if(style!=='barrel')return g0.apply(this,arguments);const g=new THREE.Group();const m=new THREE.MeshPhongMaterial({color:0x4b5530,shininess:30}),d=new THREE.MeshPhongMaterial({color:0x2a2e22});
+  const r=Math.max(0.006,L*0.07);const b=new THREE.Mesh(new THREE.CylinderGeometry(r*0.8,r,L,14),m);b.rotation.x=Math.PI/2;g.add(b);
+  const brk=new THREE.Mesh(new THREE.CylinderGeometry(r*1.5,r*1.5,L*0.12,14),d);brk.rotation.x=Math.PI/2;brk.position.z=-L*0.5;g.add(brk);
+  const ev=new THREE.Mesh(new THREE.CylinderGeometry(r*1.3,r*1.3,L*0.18,14),d);ev.rotation.x=Math.PI/2;ev.position.z=-L*0.1;g.add(ev);
+  const mant=new THREE.Mesh(new THREE.BoxGeometry(r*4,r*3.4,L*0.16),m);mant.position.z=L*0.45;g.add(mant);return g;};}
+{const w0=weaponTypes;weaponTypes=function(){const L=w0.apply(this,arguments).filter(w=>w!=='barrel'&&WTYPES[w]);const hasBarrel=((DR&&DR.guns)||[]).some(g=>g.w==='barrel');
+  if(hasBarrel){['rocket','mg','paint'].forEach(w=>{if(!L.includes(w)&&!(typeof BATTLE!=='undefined'&&BATTLE.on&&BATTLE.mode==='paint'&&w!=='paint'))L.push(w);});}return L.length?L:['paint'];};}
+// ---------------------------------------------------------------- ✈️ the airliner tops out around real cruise speed (no more rocket-speed runaway)
+{let last=performance.now();const tk=()=>{const now=performance.now();last=now;try{if(ST&&ST.airliner&&D.vel){const v=D.vel.length(),mx=130;if(v>mx)D.vel.multiplyScalar(mx/v);}}catch(e){}requestAnimationFrame(tk);};requestAnimationFrame(tk);}
 
 // =====================================================================================
 // ===== 🌎 REAL WORLD MAP (CesiumJS): the real Earth from satellite photos + real hills, starting over the farm =====
