@@ -1,0 +1,12 @@
+const {chromium}=require('playwright');(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist','--allow-file-access-from-files']});
+const ctx=await b.newContext({viewport:{width:393,height:852},isMobile:true,hasTouch:true});const P=await ctx.newPage();const reqs={};
+await P.route('**/three.min.js',r=>r.fulfill({path:__dirname+'/node_modules/three/build/three.min.js',contentType:'text/javascript'}));
+P.on('request',r=>{const u=r.url();if(u.startsWith('file:')||u.startsWith('data:')||u.startsWith('blob:'))return;const k=u.replace(/\?.*/,'').slice(0,90);reqs[k]=(reqs[k]||0)+1;});
+P.on('websocket',w=>{reqs['WS '+w.url()]=(reqs['WS '+w.url()]||0)+1;});
+await P.goto('file:///mnt/user-data/outputs/Latest%20version.html',{waitUntil:'domcontentloaded'});await P.waitForTimeout(6000);
+console.log('LOAD',JSON.stringify(reqs));for(const k in reqs)delete reqs[k];
+await P.evaluate(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));startGame('free');aiSet(4);await W(3000);bsOpen('tank',null);bsClose();await W(500);
+ for(let i=0;i<30;i++){const it=WSI.filter(x=>!x.imp)[i%20];const xy=wsFreeSpot(it.t);const p=wsDefault(it,xy[0],xy[1],xy[2]);wsSnap(p);WS.parts.push(p);WS.sel=WS.parts.length-1;wsChanged();await W(700);}});
+console.log('BUILDER',JSON.stringify(reqs));for(const k in reqs)delete reqs[k];
+await P.evaluate(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));closeWorkshop();for(const t of ['hi ace','what does enormous mean','what rhymes with cat','quiz me'])chatSend(t);await W(15000);});
+console.log('PLAY',JSON.stringify(reqs));await b.close();})();

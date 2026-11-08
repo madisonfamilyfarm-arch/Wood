@@ -1,0 +1,7 @@
+// renders a parts list in the builder from a few angles; PARTS from env file
+const H=require('./harness');const fs=require('fs');const parts=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));const out=process.argv[3]||'jl';
+H(async({mk})=>{const P=await mk('P','http://127.0.0.1:8765/woods-rc-sim.html',{width:900,height:600});P.on('pageerror',e=>console.log('PAGEERR',e.message));await P.waitForTimeout(3000);
+await P.evaluate(async(parts)=>{const W=ms=>new Promise(r=>setTimeout(r,ms));startGame('free');await W(300);openWorkshop(false);WS.parts=parts.map(p=>cleanPart(Object.assign({x:0,y:0,h:0,a:0},p)));WS.flyAs='plane';wsChanged();await W(600);
+ const tl=document.querySelector('#wsTools');if(tl)tl.style.display='none';const tr=$('wsTray');if(tr)tr.style.display='none';$('wsMid').style.left='0';$('wsMid').style.right='0';window.dispatchEvent(new Event('resize'));},parts);
+for(const v of ['angle','top','side']){await P.evaluate(v=>{try{[...document.querySelectorAll('#wsTools button')].find(b=>b.textContent.includes(v==='angle'?'angle':v==='top'?'top':'side')).click();}catch(e){}},v);await P.waitForTimeout(900);await P.screenshot({path:'/tmp/claude-0/-home-claude/45cffd64-7151-5ab5-acd7-339a16c71f6a/scratchpad/'+out+'_'+v+'.png'});}
+console.log(await P.evaluate(()=>{const I=partsInfo({parts:WS.parts,wires:WS.wires});const st=stats(wsSpec());return 'loose '+I.loose.join(',')+' why '+st.why+' flyAs '+st.flyAs;}));});
