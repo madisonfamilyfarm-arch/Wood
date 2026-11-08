@@ -8753,7 +8753,7 @@ Object.assign(DMG,{
   turret:{n:'🎯 Turret jammed',fix:'🎯 Unjam the turret',hold:'HOLD to unjam the turret',msg:'🎯 Turret jammed — shooting is slower!'}});
 const VHP={tank:120,car:45,monster:60,boat:45,sub:55,plane:30,heli:30,drone:22,combo:40,walk:0};
 const VBREAK={tank:['cam','track','engine','turret','ant'],car:['tire','cam','engine','ant'],monster:['tire','cam','engine','ant'],boat:['leak','cam','engine'],sub:['leak','cam','engine'],plane:['wing','engine','cam'],heli:['motor','cam','frame','ant'],drone:['motor','cam','frame','ant','gps'],combo:['motor','cam','frame','engine']};
-function vhKind(){const k=vkind();if(k==='car'&&SPEC&&(SPEC.flyAs==='tank'||SPEC.kit==='tank'||(SPEC.parts||[]).filter(p=>p.style==='tread').length>=2))return'tank';if(k==='car'&&SPEC&&SPEC.kit==='monster')return'monster';if(SPEC&&SPEC.flyAs==='sub')return'sub';return VHP[k]?k:'drone';}
+function vhKind(){const k=vkind();if(k==='car'&&SPEC&&(SPEC.flyAs==='tank'||SPEC.kit==='tank'||SPEC.style==='tank'||(SPEC.parts||[]).filter(p=>p.style==='tread').length>=2))return'tank';if(k==='car'&&SPEC&&(SPEC.kit==='monster'||SPEC.style==='monster'))return'monster';if(SPEC&&(SPEC.flyAs==='sub'||(k==='boat'&&SPEC.style==='sub')))return'sub';return VHP[k]?k:'drone';}
 function vhArmor(){const a=SPEC&&SPEC.armor!=null?SPEC.armor:(vhKind()==='tank'?8:5);const plates=SPEC&&SPEC.parts?SPEC.parts.filter(p=>p.t==='shape'&&p.mat==='metal').length:0;return clamp(0.55+a*0.09+plates*0.05,0.6,2.2);}
 const VH={hp:0,max:0,sig:''};
 function vhReset(){VH.max=Math.round((VHP[vhKind()]||22)*vhArmor());VH.hp=VH.max;VH.sig=vhKind()+':'+(SPEC&&SPEC.name);vhBar();}
@@ -9215,7 +9215,7 @@ function sfxItems(){return[mInfo('🔊 Sound — every vehicle, weapon and place
 // ================================================================ v48: 📱 builder fits the iPhone for real — room for the notch side, small tidy top line, fold buttons at the bottom, tanks say "ready to drive"
 (function(){const st=document.createElement('style');st.textContent=`
 body.ph #wsTray{width:calc(80px + env(safe-area-inset-left))!important;padding-left:calc(3px + env(safe-area-inset-left))!important;padding-right:3px!important;overflow-x:hidden!important}
-body.ph #wsTray,body.ph #wsTools,body.ph #ezPanel{box-sizing:border-box!important}body.ph .wsPart{flex-shrink:0!important}
+#wsTray,#wsTools,#ezPanel{box-sizing:border-box!important}body.ph .wsPart{flex-shrink:0!important}
 body.ph #wsTray > *{min-width:0;max-width:100%;box-sizing:border-box}body.ph #wsTray > :first-child{font-size:8px!important;line-height:1.2;overflow:hidden}
 body.ph .wsPart{word-break:break-word;line-height:1.15;white-space:normal!important;width:auto!important;min-width:0!important;max-width:100%!important;overflow:hidden}body.ph #wsMid{overflow:hidden}
 body.ph #wsMid{left:calc(80px + env(safe-area-inset-left))!important;right:calc(186px + env(safe-area-inset-right))!important}
@@ -9482,6 +9482,26 @@ function nRun(c,base){const T=nTargets(c);const pre=T?T.map(nName).join(' and ')
     const r=s0.call(this,raw);if(r===false&&AIB.L.some(B=>!B.dead)&&!Object.keys(mp.peers).some(id=>!/^bot|~|^tg|^tst/.test(id))){const B=aiNear(1e9)[0];sbSay({B},PICK(['Hmm, I didn\'t quite get that 🤔 Try "follow me", "race me", "let\'s play tag" or "what can you do"!','Say that again? I want to get it right 👂','I\'m still learning that one 😅 Try "what can you do"!']));return true;}return r;}catch(e){console.warn('nlu',e);return s0.apply(this,arguments);}};}
 // games always find a pilot (switching one into a drone if needed)
 {const g0=gameStart;gameStart=function(kind,B){if(!B||!(B.kind==='drone'||B.kind==='heli')){const fl=aiNear(1e9,true)[0];if(fl)B=fl;else{const any=B||aiNear(1e9)[0];if(any){try{aiSwitch(any,'drone');}catch(e){}B=AIB.L.find(x=>x.name===any.name&&!x.dead)||any;B.kind='drone';}}}return g0.call(this,kind,B);};}
+
+// ================================================================ v53: 📱 builder with the phone UPRIGHT: picture on top, parts in a sideways row (slide = scroll, swipe up = grab), tools/sliders underneath
+(function(){const st=document.createElement('style');st.textContent=`
+body.pt #ws #wsMid{left:0!important;right:0!important;top:0!important;bottom:auto!important;height:46%!important}
+body.pt #ws #wsTray{top:46%!important;left:0!important;right:0!important;bottom:auto!important;width:auto!important;height:84px!important;flex-direction:row!important;overflow-x:auto!important;overflow-y:hidden!important;padding:4px calc(4px + env(safe-area-inset-right)) 4px calc(4px + env(safe-area-inset-left))!important;border-right:0!important;border-top:1px solid #2f4a37;border-bottom:1px solid #2f4a37;align-items:stretch;gap:4px!important}
+body.pt #ws #wsTray .wsPart{width:74px!important;min-width:74px!important;flex:0 0 74px!important;touch-action:pan-x!important;font-size:9.5px!important}
+body.pt #ws #wsTray .wsHead{writing-mode:vertical-rl;transform:rotate(180deg);flex:0 0 auto;margin:0!important;font-size:8px!important}
+body.pt #ws #wsTools,body.pt #ws #ezPanel{top:calc(46% + 84px)!important;left:0!important;right:0!important;bottom:0!important;width:auto!important;border-left:0!important;padding:6px calc(6px + env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) calc(6px + env(safe-area-inset-left))!important}
+body.pt #ws #wsTools{grid-template-columns:repeat(3,minmax(0,1fr))!important}body.pt #ws #wsTools,body.pt #ws #ezPanel,body.pt #ws #wsTray{background:#0f1913!important}body.pt #ws.ez #wsMid,body.ph.pt #ws.ez #wsMid,body.pt #ws.ez.noTools #wsMid{left:0!important;right:0!important}
+body.pt #ws.ez #wsTools{display:none!important}body.pt #ws.ez #wsTray{display:none!important}body.pt #ws.ez #ezPanel{top:46%!important}
+body.pt #ws .wsFold{display:none!important}body.pt #ws.noTray #wsTray{display:flex!important}body.pt #ws.noTools #wsTools{display:grid!important}`;document.head.appendChild(st);})();
+// upright: the parts row scrolls sideways, so a sideways slide = scroll and an upward swipe = grab the part
+(function(){let P=null;addEventListener('pointerdown',e=>{if(!WS.open||e.pointerType==='mouse'||!document.body.classList.contains('pt'))return;const t=e.target.closest&&e.target.closest('.wsPart');if(!t||!$('wsTray').contains(t))return;
+    e.stopImmediatePropagation();P={id:e.pointerId,x:e.clientX,y:e.clientY,i:+t.dataset.i,st:$('wsTray').scrollLeft,dec:null};},true);
+  const start=e=>{const it=WSI[P.i];if(!it)return;WS.tray=P.i;WS.drag={kind:'new',item:it,sx:P.x,sy:P.y,moved:false};const g=$('wsGhost');g.textContent=it.ic;g.style.left=e.clientX+'px';g.style.top=e.clientY+'px';try{wsHL();}catch(x){}};
+  addEventListener('pointermove',e=>{if(!P||e.pointerId!==P.id||P.dec)return;const dx=e.clientX-P.x,dy=e.clientY-P.y;if(Math.abs(dx)>9&&Math.abs(dx)>Math.abs(dy)*0.9){P.dec='scroll';return;}if(Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)*1.15){P.dec='drag';start(e);}},true);
+  addEventListener('pointerup',e=>{if(!P||e.pointerId!==P.id)return;const p=P;P=null;if(!p.dec&&Math.hypot(e.clientX-p.x,e.clientY-p.y)<10&&Math.abs($('wsTray').scrollLeft-p.st)<4){P=p;start(e);P=null;}},true);
+  addEventListener('pointercancel',e=>{if(P&&e.pointerId===P.id){if(P.dec!=='drag'){WS.drag=null;$('wsGhost').style.display='none';}P=null;}},true);})();
+// keep the 3D picture sized right when the phone turns
+addEventListener('resize',()=>{if(WS.open)setTimeout(()=>{try{window.dispatchEvent(new Event('wsresize'));}catch(e){}},60);});
 
 // =====================================================================================
 // ===== 🌎 REAL WORLD MAP (CesiumJS): the real Earth from satellite photos + real hills, starting over the farm =====
