@@ -1,6 +1,6 @@
 // ================================================================ v56: 🔧 fixes found by the overnight play-tests
 // 🥽 VR: the phone is inside a headset, so on-screen buttons (TNT, chat, tools, health bar…) just get in the way of the picture → hide every floating overlay except Exit VR + the respawn countdown
-const VRKEEP=new Set(['vrUI','dzCount']);
+const VRKEEP=new Set(['vrUI','dzCount','menu','repair','gal','prog','ws','wsGhost','start','mapEd','bsBox','djiStat','scrTurn']);
 function vrHideOverlays(){const on=document.body.classList.contains('vr');for(const el of document.body.children){if(el.tagName==='CANVAS'||el.tagName==='SCRIPT'||VRKEEP.has(el.id))continue;
     if(on){if(el.dataset.vrh)continue;const cs=getComputedStyle(el);if(cs.position==='fixed'||cs.position==='absolute'){el.dataset.vrh='1';el.classList.add('vrHid');}}else if(el.dataset.vrh){delete el.dataset.vrh;el.classList.remove('vrHid');}}}
 {const st=document.createElement('style');st.textContent='body.vr .vrHid{display:none!important}';document.head.appendChild(st);}
