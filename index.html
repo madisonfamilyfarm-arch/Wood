@@ -3484,8 +3484,8 @@ function tickCar(dt,inp,prev){
   if(!D.air){
     const top=S.top*CFG.speedPct/100;
     if(thr>0.02)vf+=thr*S.acc*(1-clamp(vf/top,0,1))*dt;else if(thr<-0.02){if(vf>0.4)vf+=thr*S.acc*1.6*dt;else vf=Math.max(-top*0.35,vf+thr*S.acc*0.6*dt);}
-    vf-=vf*(0.25+(Math.abs(thr)<0.02?0.6:0))*dt;
-    const sa=steer*S.steer/(1+Math.abs(vf)*0.05);const yr=S.skid?steer*1.7*(vf<-0.3?-1:1):vf*Math.tan(sa)/S.wb;D.yaw-=yr*dt;if(S.skid)vf*=1-Math.abs(steer)*0.6*dt;
+    vf-=vf*(0.25+(Math.abs(thr)<0.02?((SPEC&&(SPEC.style==='tank'||SPEC.kit==='tank'))?0.75:0.32):0))*dt;
+    const sa=steer*S.steer/(1+Math.abs(vf)*0.05);let yr=S.skid?steer*1.7*(vf<-0.3?-1:1):vf*Math.tan(sa)/S.wb;{const gM=(S.grip||6)*2.4/Math.max(2,Math.abs(vf));if(!S.skid&&Math.abs(yr)>gM){const ex=Math.abs(yr)-gM;yr=Math.sign(yr)*(gM+ex*0.2);}}D.yaw-=yr*dt;if(S.skid)vf*=1-Math.abs(steer)*0.6*dt;
     // tyres: sideways slip is fought by grip; too much = drift
     const gripMax=S.grip*dt*(1-Math.min(0.5,Math.abs(thr)*0.25*(SPEC.style==='rally'?1.4:0.6)));vs-=Math.sign(vs)*Math.min(Math.abs(vs),gripMax);
     D.drift=Math.abs(vs)>1.2;
