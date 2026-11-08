@@ -10281,6 +10281,12 @@ function isPrime(n){if(n<2||n%1)return false;for(let i=2;i*i<=n;i++)if(n%i===0)r
   if(/ how many (zeros|zeroes) (are )?in a (trillion) /.test(raw))return say('🔢 12 zeros!');
 }catch(e){}return s0.apply(this,arguments);};}
 {const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
+// replies to the player jump the chat queue (they used to wait behind battle chatter for 5-10 s, or get dropped)
+const REPLYT=new Set();let HEARING=0;
+{const s0=smartHear;smartHear=function(){HEARING++;try{return s0.apply(this,arguments);}finally{HEARING--;}};}
+const REPLYB={};
+{const s0=sbSay;sbSay=function(w,t,d){try{if((HEARING||(typeof PEERCTX!=='undefined'&&PEERCTX.on))&&w){const n=w.B?w.B.name.replace('🤖 ',''):w.C?w.C.name:'';if(n)REPLYB[n]=(REPLYB[n]||0)+1;}}catch(e){}return s0.apply(this,arguments);};}
+{const p0=SAYQ.push;SAYQ.push=function(m){try{if(m&&REPLYB[m[0]]>0&&aiSayAs.__raw){REPLYB[m[0]]--;aiSayAs.__raw(m[0],m[1]);return this.length;}}catch(e){}return p0.apply(this,arguments);};}
 
 // =====================================================================================
 // ===== 🌎 REAL WORLD MAP (CesiumJS): the real Earth from satellite photos + real hills, starting over the farm =====
