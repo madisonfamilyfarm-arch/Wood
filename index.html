@@ -9737,6 +9737,14 @@ let GEO_KEEP=null;function geoDisp(o){try{if(!o)return;if(!GEO_KEEP){GEO_KEEP=ne
 {const v0=document.onvisibilitychange;document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')PERF.t0=performance.now();});}
 // start screen on a phone: it was taller than the screen and centered, so the title + top got cut off and couldn't be scrolled to
 {const st=document.createElement('style');st.textContent='#start{justify-content:flex-start!important;padding-top:calc(20px + env(safe-area-inset-top))!important;padding-bottom:calc(24px + env(safe-area-inset-bottom))!important}#start>:first-child{margin-top:auto}#start>:last-child{margin-bottom:auto}';document.head.appendChild(st);}
+// 💧 DROP (fire bucket) button was off the top of the screen on a phone held sideways
+{const st=document.createElement('style');st.textContent='@media (max-height:500px){#dropB{bottom:auto!important;top:calc(122px + env(safe-area-inset-top))!important;right:calc(10px + env(safe-area-inset-right))!important;padding:8px 12px!important;font-size:14px!important}}';document.head.appendChild(st);}
+// sideways phone: chat lines sat on top of the mini-map → show them in the middle, above the Chat button
+{const st=document.createElement('style');st.textContent='@media (max-height:500px) and (orientation:landscape){#chatLog{left:calc(30% + env(safe-area-inset-left))!important;bottom:calc(98px + env(safe-area-inset-bottom))!important;max-width:40vw!important;font-size:12px!important}}';document.head.appendChild(st);}
+// 🎥 the follow camera could end up INSIDE a tree (screen full of leaves) → it slides in toward your drone until it's out of the tree
+{const _cp=new V3();const u0=updateCam;updateCam=function(dt){const r=u0.apply(this,arguments);try{const m=CAMS[camI];if(!/FOLLOW|CHASE|ORBIT|TPV|BEHIND/.test(String(m)))return r;
+  const t=WALK.on?WALK.pos.clone().add(new V3(0,1.2,0)):D.pos;if(!t||!hitTest(cam.position,0.35))return r;
+  for(let k=1;k<=12;k++){_cp.copy(cam.position).lerp(t,k/13);if(!hitTest(_cp,0.35)){cam.position.copy(_cp);break;}}}catch(e){}return r;};}
 
 // ================================================================ v57: 🧠 the AI pilots KNOW the game — real answers to "what's the fastest vehicle", "how do I get money", "make it night", "get in a sub", secrets…
 function gqTntList(){try{return Object.values(TNTK).map(k=>k.n).join(', ');}catch(e){return'lots';}}
