@@ -19,7 +19,7 @@ function aiwForms(w){w=w.toLowerCase();const f=[w];const add=x=>{if(x&&x.length>
   if(/ies$/.test(w))add(w.slice(0,-3)+'y');if(/ied$/.test(w))add(w.slice(0,-3)+'y');if(/es$/.test(w))add(w.slice(0,-2));if(/s$/.test(w))add(w.slice(0,-1));
   if(/ing$/.test(w)){add(w.slice(0,-3));add(w.slice(0,-3)+'e');if(/(.)\1ing$/.test(w))add(w.slice(0,-4));}if(/ed$/.test(w)){add(w.slice(0,-2));add(w.slice(0,-1));if(/(.)\1ed$/.test(w))add(w.slice(0,-3));}
   if(/er$/.test(w)){add(w.slice(0,-2));add(w.slice(0,-1));}if(/est$/.test(w)){add(w.slice(0,-3));add(w.slice(0,-2));}if(/ly$/.test(w))add(w.slice(0,-2));return f;}
-function aiwGet(w,dep){for(const x of aiwForms(w)){const d=AIW.d[aiwPre(x)];if(d&&d[x]!=null){if(d[x][0]==='@'){if((dep||0)<2){const r=aiwGet(d[x].slice(1),(dep||0)+1);if(r)return Object.assign({},r,{from:x});}continue;}const [g,s,a]=d[x].split('|');return{w:x,g,s:s?s.split(','):[],a:a?a.split(','):[]};}}return null;}
+function aiwGet(w,dep){for(const x of aiwForms(w)){const d=AIW.d[aiwPre(x)];if(d&&d[x]!=null){if(d[x][0]==='@'){if((dep||0)<2){const r=aiwGet(d[x].slice(1),(dep||0)+1);if(r)return Object.assign({},r,{from:x});}continue;}const [g,s,a,ex]=d[x].split('|');return{w:x,g,s:s?s.split(','):[],a:a?a.split(','):[],ex:ex||''};}}return null;}
 function aiwCount(){return 149827;}
 // a known command word for an unknown one (checks the word, its synonyms, and the synonyms' meanings)
 function aiwMap(w){const e=aiwGet(w);if(!e)return null;for(const x of [e.w,...e.s]){const k=nDecode(x);if(k)return k;}
