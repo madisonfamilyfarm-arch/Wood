@@ -31,3 +31,12 @@ BIM.forEach(([mid,ic,name,fn])=>{try{MODELS[mid]={name,builtin:true,gltf:{scene:
   const ins=(L,at)=>{if(at>=0)L.splice(at,0,...items);else L.push(...items);};ins(WSC,it0);ins(WSI,WSI.findIndex(x=>x&&x.t==='model'));try{ins(WSC0,WSC0.findIndex(x=>x&&x.t==='model'));}catch(e){}}
 // never ask the internet / other players for a built-in model
 {const l0=loadModel;loadModel=function(mid){if(String(mid).startsWith('bi_'))return;return l0.apply(this,arguments);};}
+// 📂 opening a saved build works on iPhone (no file-type filter) and keeps its wiring
+loadDroneFile=function(cb){const i=document.createElement('input');i.type='file';i.style.display='none';document.body.appendChild(i);
+  i.onchange=()=>{const f=i.files[0];i.remove();if(!f)return;f.text().then(t=>{let j;try{j=JSON.parse(t);}catch(e){toast('📂 That file isn\'t a build file (.drone.json)',3000);return;}const raw=j.spec||j;if(!raw||!(raw.parts||raw.rotors)){toast('📂 That file has no build in it',3000);return;}
+    const sp=sanitize(raw);try{if(raw.wires&&!sp.wires)sp.wires=raw.wires;}catch(e){}cb(sp);toast('📂 Loaded '+(raw.name||'build'),2200);}).catch(e=>toast('📂 Couldn\'t read that file: '+e.message,3000));};i.click();};
+// the 📦 import button also accepts a saved build (.json) and opens it in the builder
+{const m0=importModel;importModel=function(cb){const i=document.createElement('input');i.type='file';i.style.display='none';document.body.appendChild(i);
+  i.onchange=()=>{const f=i.files[0];i.remove();if(!f)return;if(/\.json$/i.test(f.name)){f.text().then(t=>{try{const j=JSON.parse(t),raw=j.spec||j,sp=sanitize(raw);WS.parts=(sp.parts||[]).map(cleanPart);WS.wires=raw.wires||sp.wires||[];WS.name=raw.name||WS.name;if(raw.flyAs)WS.flyAs=raw.flyAs;WS.sel=-1;wsChanged();toast('📂 Opened your build "'+(raw.name||'')+'"',2500);}catch(e){toast('📂 That .json isn\'t a build file',2500);}});return;}
+    if(!/\.(glb|gltf)$/i.test(f.name)){toast('📦 Pick a .glb / .gltf 3D model (or a .drone.json build)',3000);return;}if(f.size>25e6){toast('📦 That file is too big (max 25 MB)',2500);return;}
+    f.arrayBuffer().then(buf=>{const mid=midOf(buf,f.name),name=f.name.replace(/\.(glb|gltf)$/i,'').slice(0,30);MODELS[mid]={buf,name};try{idbPut(mid,{buf,name});}catch(e){}parseModel(mid);toast('📦 '+name+' added',2500);cb&&cb(mid,name);});};i.click();};}

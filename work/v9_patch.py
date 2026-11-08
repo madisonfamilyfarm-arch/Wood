@@ -231,4 +231,5 @@ rep("  if(V>0.01)_a.addScaledVector(va,-drag/m/V);\n","  if(V>0.01)_a.addScaledV
 rep("_a.set(0,-9.8,0).addScaledVector(_f,thrust/m).addScaledVector(_u,lift/m);","_a.set(0,-9.8,0).addScaledVector(_f,Math.min(thrust/m,ST.airliner?22:45)).addScaledVector(_u,clamp(lift/m,-60,60));")
 rep("  D.pos.addScaledVector(v,dt);\n  // ground\n","  {const vm=D.pos.y-gy>700?700:200,vl=v.length();if(vl>vm)v.multiplyScalar(vm/vl);}\n  D.pos.addScaledVector(v,dt);\n  // ground\n")
 r=r.replace("fun:'😊 Just for fun'","fun:'😊 Easy / friendly (they won\\'t shoot you)'")
+rep("WS.parts=(sp.parts?sp.parts:presetToParts(sp)).map(cleanPart);WS.name=sp.name;","WS.parts=(sp.parts?sp.parts:presetToParts(sp)).map(cleanPart);WS.wires=sp.wires||[];if(sp.flyAs)WS.flyAs=sp.flyAs;WS.name=sp.name;")
 open('rc.html','w').write(r);print('ok',len(r))
