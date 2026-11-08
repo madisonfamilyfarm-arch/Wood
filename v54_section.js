@@ -24,7 +24,7 @@ const PBL={
   banter:['Not if I get you first, {t}! 😤','Bring it, {t}! 💪','Ha! You can\'t catch me, {t}! 💨','{t}, I\'ve got your number 😏']};
 function pbLine(k,B,t){let s=PICK(PBL[k]);let place='the lake';try{const pl=aiPlaces().filter(p=>!/truck|fire$/.test(p.n));place=PICK(pl).n;}catch(e){}return s.replace(/\{me\}/g,meName()).replace(/\{t\}/g,t||'someone').replace(/\{place\}/g,place);}
 // someone listening to YOU right now doesn't make their own plans
-function pbBusy(B){const now=performance.now();return (B.cmdT&&now-B.cmdT<35000)||(GAME.on&&GAME.B===B)||B.holdT>now||B.orbT>now||B.bomb||(B.team==='me'&&B.hunt&&B.huntCmd);}
+function pbBusy(B){const now=performance.now();return B.fol||B.folPeer||(B.cmdT&&now-B.cmdT<35000)||(GAME.on&&GAME.B===B)||B.holdT>now||B.orbT>now||B.bomb||(B.team==='me'&&B.hunt&&B.huntCmd);}
 {const s0=sbSay;sbSay=function(w,t){try{if(w&&w.B&&performance.now()-AIC.lastChat<1500)w.B.cmdT=performance.now();}catch(e){}return s0.apply(this,arguments);};}
 // ---------------------------------------------------------------- 📊 scoreboard + reactions to kills
 {const b0=dzBotDie;dzBotDie=function(B,txt){const was=B&&B.dead;const r=b0.apply(this,arguments);try{if(B&&!was&&B.dead){const c=HIT.ctx;pbS(B.id,pbName(B)).d++;B.diedT=performance.now();

@@ -70,6 +70,6 @@ const GQS=[
       if(/^ (stop|stop it|stop that|freeze|halt|cut it out) $/.test(s)){const r=s0.apply(this,arguments);const L=W.filter(w=>w.B).map(w=>w.B);(L.length?L:pbAlive()).forEach((X,i)=>{X.fol=null;X.hunt=null;X.huntCmd=false;if(X.goal&&X.goal.kind!=='land')X.goal=null;X.holdT=performance.now()+8000;if(i<2)sbSay({B:X},PICK(['Okay, stopping! ✋','Stopped 🛑','Freezing! 🧊']),300+i*500);});return true;}}
   }catch(e){console.warn('gqs',e);}return s0.apply(this,arguments);};}
 // following another AI pilot: keep the goal on their tail
-setInterval(()=>{try{const now=performance.now();for(const X of AIB.L){if(!X.fol)continue;const T=AIB.L.find(Y=>Y.id===X.fol);if(!T||T.dead||now>X.folT){X.fol=null;continue;}
-  const back=new V3(Math.sin(T.yaw||0),0,Math.cos(T.yaw||0)).multiplyScalar(5+X.i*2);X.goal={x:T.p.x+back.x,z:T.p.z+back.z,h:Math.max(4,T.p.y-H(T.p.x,T.p.z)+1),kind:'go'};}}catch(e){}},400);
+setInterval(()=>{try{const now=performance.now();for(const X of AIB.L){if(!X.fol)continue;const T=AIB.L.find(Y=>Y.id===X.fol);if(!T||T.dead||now>X.folT){X.fol=null;continue;}X.hunt=null;
+  const back=new V3(Math.sin(T.yaw||0),0,Math.cos(T.yaw||0)).multiplyScalar(5+X.i*2);aiGoTo(X,T.p.x+back.x,T.p.z+back.z,Math.max(4,T.p.y-H(T.p.x,T.p.z)+1));}}catch(e){}},400);
 {const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
