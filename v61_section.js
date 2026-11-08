@@ -10,7 +10,7 @@ function ttsSay(name,text){if(!TTS.on||!ttsOk()||document.visibilityState!=='vis
 function ttsSet(on){TTS.on=on;LS.set('aiTts',on);if(!on){try{speechSynthesis.cancel();}catch(e){}}toast(on?'🗣 AI pilots will talk out loud!':'🤫 AI pilots are back to text only',1800);if(on)setTimeout(()=>ttsSay('🤖 Ace','Hey! Can you hear me now?'),300);}
 {const m0=mCatItems;mCatItems=function(k){const L=m0.apply(this,arguments);if(k==='ai'){try{L.splice(1,0,mItem(()=>'🗣 AI talks out loud: '+(TTS.on?'ON':'off')+(ttsOk()?'':' (not on this browser)'),()=>{ttsSet(!TTS.on);renderMenu();}));}catch(e){}}return L;};}
 {const s0=smartHear;smartHear=function(txt){try{const s=nNorm(String(txt||''));
-    if(/ (talk|speak) (out loud|outloud|aloud|with your voice|to me out loud)| use your (voice|voices)| turn on (ai )?(voice|voices|talking)| (can|could) you talk out loud /.test(s)){ttsSet(true);return true;}
+    if(/ (talk|speak) (out loud|outloud|aloud|with your voice|to me out loud)| use your (voice|voices)| turn on (the )?(ai voices?|ai talking|talking out loud)| (can|could) you talk out loud /.test(s)){ttsSet(true);return true;}
     if(/ (stop|no more|quit|turn off) (talking out loud|talking aloud|the voices?|your voice|ai voice)| (text|type) only /.test(s)){ttsSet(false);return true;}}catch(e){}return s0.apply(this,arguments);};}
 {const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
 // when your 🎤 voice chat is on, don't let the mic hear the AI's own voice and think YOU said it
