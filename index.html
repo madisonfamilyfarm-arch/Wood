@@ -10006,7 +10006,7 @@ function ttsClean(t){return String(t||'').replace(/<[^>]+>/g,'').replace(/[\u{1F
 function ttsSay(name,text){if(!TTS.on||!ttsOk()||document.visibilityState!=='visible')return;const t=ttsClean(text);if(!t||t.length<2)return;
   if(speechSynthesis.speaking&&TTS.q.length>1)return; // don't build up a long backlog
   try{const u=new SpeechSynthesisUtterance(t.slice(0,160));let h=0;for(const ch of String(name))h=(h*31+ch.charCodeAt(0))>>>0;u.pitch=0.7+(h%70)/100;u.rate=1.05+((h>>>8)%25)/100;u.volume=Math.min(1,(SFX&&SFX.set?SFX.set.master/100:1)||1);
-    const V=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));if(V.length)u.voice=V[h%V.length];speechSynthesis.speak(u);}catch(e){}}
+    const V=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));if(V.length)u.voice=V[h%V.length];TTS.until=performance.now()+1500+t.length*85;u.onend=u.onerror=()=>{TTS.until=0;TTS.last=performance.now();};speechSynthesis.speak(u);}catch(e){}}
 {const c0=chatAdd;chatAdd=function(who,txt){const r=c0.apply(this,arguments);try{if(TTS.on&&typeof who==='string'&&/^🤖 /.test(who))ttsSay(who,txt);}catch(e){}return r;};}
 function ttsSet(on){TTS.on=on;LS.set('aiTts',on);if(!on){try{speechSynthesis.cancel();}catch(e){}}toast(on?'🗣 AI pilots will talk out loud!':'🤫 AI pilots are back to text only',1800);if(on)setTimeout(()=>ttsSay('🤖 Ace','Hey! Can you hear me now?'),300);}
 {const m0=mCatItems;mCatItems=function(k){const L=m0.apply(this,arguments);if(k==='ai'){try{L.splice(1,0,mItem(()=>'🗣 AI talks out loud: '+(TTS.on?'ON':'off')+(ttsOk()?'':' (not on this browser)'),()=>{ttsSet(!TTS.on);renderMenu();}));}catch(e){}}return L;};}
@@ -10014,6 +10014,8 @@ function ttsSet(on){TTS.on=on;LS.set('aiTts',on);if(!on){try{speechSynthesis.can
     if(/ (talk|speak) (out loud|outloud|aloud|with your voice|to me out loud)| use your (voice|voices)| turn on (ai )?(voice|voices|talking)| (can|could) you talk out loud /.test(s)){ttsSet(true);return true;}
     if(/ (stop|no more|quit|turn off) (talking out loud|talking aloud|the voices?|your voice|ai voice)| (text|type) only /.test(s)){ttsSet(false);return true;}}catch(e){}return s0.apply(this,arguments);};}
 {const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
+// when your 🎤 voice chat is on, don't let the mic hear the AI's own voice and think YOU said it
+{const v0=voiceHeard;voiceHeard=function(t){try{if(TTS.on&&(performance.now()<(TTS.until||0)||performance.now()-TTS.last<700))return;}catch(e){}return v0.apply(this,arguments);};}
 
 // =====================================================================================
 // ===== 🌎 REAL WORLD MAP (CesiumJS): the real Earth from satellite photos + real hills, starting over the farm =====
