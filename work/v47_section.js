@@ -82,7 +82,7 @@ function sfxEngine(dt){const E=SFX.E,A=SFX.A,t=A.currentTime,k=WALK.on?'walk':vh
   let thr=0,f=120,lp=1500,ng=0.2,bg=0,am=0,amHz=0,o2k=1.007,g2=0.3,o3k=0.5,g3=0.3,vol=0.5,nf=900;
   const alive=!(D.state==='tumble'||D.state==='down')&&(fly||D.armed)&&started&&!menu.open&&CFG.engSnd!==false&&!(typeof DZ!=='undefined'&&DZ.dead);
   if(k==='walk'||!alive)thr=0;
-  else if(k==='drone'||k==='combo'){const I=WALK.inp||Z0;thr=fly?clamp(0.45+Math.abs(I.ly)*0.35+Math.hypot(I.rx,I.ry)*0.25,0,1):0.15;const sz=clamp((ST.L||0.3)/0.3,0.4,3);f=(150+300*thr)/Math.sqrt(sz);o2k=1.012;g2=0.45;o3k=2;g3=0.12;lp=1400+thr*4200;ng=0.22;nf=f*3;vol=0.5;}
+  else if(k==='drone'||k==='combo'){const I=WALK.inp||Z0;thr=fly?clamp(0.45+(I.ly||0)*0.38+Math.hypot(I.rx,I.ry)*0.2-(D.vel.y<-1.5&&(I.ly||0)<0.2?0.12:0),0.08,1):0.15;const sz=clamp((ST.L||0.3)/0.3,0.4,3);f=(150+300*thr)/Math.sqrt(sz);o2k=1.012;g2=0.45;o3k=2;g3=0.12;lp=1400+thr*4200;ng=0.22;nf=f*3;vol=0.5;}
   else if(k==='heli'){thr=fly?clamp(0.55+Math.abs(D.vel.y)*0.06+sp*0.01,0,1):0.3;f=55+thr*20;o2k=2.01;g2=0.15;o3k=22;g3=0.05;lp=380+thr*500;ng=0.1;nf=1200;bg=1.1;am=SPEC&&SPEC.style==='blimp'?0:0.85;amHz=(11+thr*5);vol=0.7;}
   else if(k==='plane'){thr=clamp(D.thr||0,0,1);const fir=38+thr*120;f=fir;o2k=2;g2=0.35;o3k=0.5;g3=0.4;lp=700+thr*2600;ng=0.12;nf=fir*6;am=0.35;amHz=fir/2;vol=0.7;}
   else if(k==='car'||k==='monster'){const rpm=D.armed?clamp(sfxGear(sp)+(Math.abs((WALK.inp||Z0).ly)>0.3?0.08:0),0.2,1.05):0;thr=rpm;f=45+rpm*175;o2k=2;g2=0.35;o3k=0.5;g3=0.35;lp=650+rpm*2600;ng=0.05;nf=f*4;am=0.3;amHz=f/2;vol=0.42;}
