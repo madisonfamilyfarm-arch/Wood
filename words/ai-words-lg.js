@@ -1,1 +1,1 @@
-AIW_ADD("lg",{"lgb":"noun: a smart bomb that seeks the laser light reflected off of the target and uses it to correct its descent","lgv":"noun: infectious disease caused by a species of chlamydia bacterium"});
+AIW_ADD("lg",{"lgb":"noun: a smart bomb that seeks the laser light reflected off of the target and uses it to correct its descent||","lgv":"noun: infectious disease caused by a species of chlamydia bacterium||"});

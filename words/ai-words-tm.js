@@ -1,1 +1,1 @@
-AIW_ADD("tm",{"tm":"noun: a soft silvery metallic element of the rare earth group","tmv":"noun: the widely studied plant virus that causes tobacco mosaic"});
+AIW_ADD("tm",{"tm":"noun: a soft silvery metallic element of the rare earth group||","tmv":"noun: the widely studied plant virus that causes tobacco mosaic||"});

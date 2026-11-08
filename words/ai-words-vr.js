@@ -1,1 +1,1 @@
-AIW_ADD("vr",{"vroom":"noun: the roaring sound made by a motor that is running at high speed ¦ verb: make a loud, roaring sound, as of a car engine, while moving"});
+AIW_ADD("vr",{"vroom":"noun: the roaring sound made by a motor that is running at high speed ¦ verb: make a loud, roaring sound, as of a car engine, while moving||"});

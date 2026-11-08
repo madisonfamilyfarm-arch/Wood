@@ -1,1 +1,1 @@
-AIW_ADD("lp",{"lp":"noun: a long-playing phonograph record|l-p","lpn":"noun: a nurse who has enough training to be licensed by a state to provide routine care for the sick"});
+AIW_ADD("lp",{"lp":"noun: a long-playing phonograph record|l-p|","lpn":"noun: a nurse who has enough training to be licensed by a state to provide routine care for the sick||"});

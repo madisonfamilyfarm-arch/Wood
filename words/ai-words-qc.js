@@ -1,1 +1,1 @@
-AIW_ADD("qc",{"qcd":"noun: a theory of strong interactions between elementary particles (including the interaction that binds protons…"});
+AIW_ADD("qc",{"qcd":"noun: a theory of strong interactions between elementary particles (including the interaction that binds protons…||"});

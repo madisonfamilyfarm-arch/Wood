@@ -1,1 +1,1 @@
-AIW_ADD("wn",{"wnw":"noun: the compass point midway between west and northwest"});
+AIW_ADD("wn",{"wnw":"noun: the compass point midway between west and northwest||"});

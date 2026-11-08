@@ -1,1 +1,1 @@
-AIW_ADD("bs",{"bs":"noun: a bachelor's degree in science|sb","bsarch":"noun: a bachelor's degree in architecture","bse":"noun: a fatal disease of cattle that affects the central nervous system"});
+AIW_ADD("bs",{"bs":"noun: a bachelor's degree in science|sb|","bsarch":"noun: a bachelor's degree in architecture||","bse":"noun: a fatal disease of cattle that affects the central nervous system||"});

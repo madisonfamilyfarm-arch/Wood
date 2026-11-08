@@ -1,1 +1,1 @@
-AIW_ADD("cj",{"cjd":"noun: rare (usually fatal) brain disease (usually in middle age) caused by an unidentified slow virus"});
+AIW_ADD("cj",{"cjd":"noun: rare (usually fatal) brain disease (usually in middle age) caused by an unidentified slow virus||"});

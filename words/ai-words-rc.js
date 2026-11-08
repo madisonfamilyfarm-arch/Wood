@@ -1,1 +1,1 @@
-AIW_ADD("rc",{"rcmp":"noun: the federal police force of Canada|mounties"});
+AIW_ADD("rc",{"rcmp":"noun: the federal police force of Canada|mounties|"});

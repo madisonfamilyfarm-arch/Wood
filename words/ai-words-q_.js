@@ -1,1 +1,1 @@
-AIW_ADD("q_",{"q fever":"noun: an acute disease resembling influenza"});
+AIW_ADD("q_",{"q fever":"noun: an acute disease resembling influenza||"});

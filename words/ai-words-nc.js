@@ -1,1 +1,1 @@
-AIW_ADD("nc",{"nc":"noun: a state in southeastern United States","ncdc":"noun: the part of NOAA that maintains the world's largest active archive of weather data"});
+AIW_ADD("nc",{"nc":"noun: a state in southeastern United States||","ncdc":"noun: the part of NOAA that maintains the world's largest active archive of weather data||"});

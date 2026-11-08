@@ -1,1 +1,1 @@
-AIW_ADD("zn",{"zn":"noun: a bluish-white lustrous metallic element|zinc"});
+AIW_ADD("zn",{"zn":"noun: a bluish-white lustrous metallic element|zinc|"});

@@ -1,1 +1,1 @@
-AIW_ADD("jr",{"jr":"noun: a son who has the same first name as his father|junior,jnr","jra":"noun: a terrorist group organized in 1970 to overthrow the Japanese government and monarchy and to foment world…"});
+AIW_ADD("jr",{"jr":"noun: a son who has the same first name as his father|junior,jnr|","jra":"noun: a terrorist group organized in 1970 to overthrow the Japanese government and monarchy and to foment world…||"});

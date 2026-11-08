@@ -1,1 +1,1 @@
-AIW_ADD("dl",{"dl":"noun: a metric unit of volume equal to one tenth of a liter","dle":"noun: a chronic skin disease occurring primarily in women between the ages of 20 and 40"});
+AIW_ADD("dl",{"dl":"noun: a metric unit of volume equal to one tenth of a liter||","dle":"noun: a chronic skin disease occurring primarily in women between the ages of 20 and 40||"});

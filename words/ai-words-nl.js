@@ -1,1 +1,1 @@
-AIW_ADD("nl",{"nlp":"noun: the branch of information science that deals with natural language information","nlrb":"noun: an independent agency of the United States government charged with mediating disputes between management…"});
+AIW_ADD("nl",{"nlp":"noun: the branch of information science that deals with natural language information||","nlrb":"noun: an independent agency of the United States government charged with mediating disputes between management…||"});

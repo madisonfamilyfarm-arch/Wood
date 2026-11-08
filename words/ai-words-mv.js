@@ -1,1 +1,1 @@
-AIW_ADD("mv",{"mv":"noun: a unit of potential equal to one thousandth of a volt|md","mvp":"noun: the player judged to be the most important to the sport"});
+AIW_ADD("mv",{"mv":"noun: a unit of potential equal to one thousandth of a volt|md|","mvp":"noun: the player judged to be the most important to the sport||"});

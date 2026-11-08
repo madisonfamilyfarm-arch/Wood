@@ -1,1 +1,1 @@
-AIW_ADD("hg",{"hg":"noun: a heavy silvery toxic univalent and bivalent metallic element|mercury,quicksilver"});
+AIW_ADD("hg",{"hg":"noun: a heavy silvery toxic univalent and bivalent metallic element|mercury,quicksilver|"});

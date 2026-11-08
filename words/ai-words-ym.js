@@ -1,1 +1,1 @@
-AIW_ADD("ym",{"ymir":"noun: (Norse mythology) the primeval giant slain by Odin and his brothers and from whose body they created the…"});
+AIW_ADD("ym",{"ymir":"noun: (Norse mythology) the primeval giant slain by Odin and his brothers and from whose body they created the…||"});

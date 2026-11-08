@@ -1,1 +1,1 @@
-AIW_ADD("fj",{"fjord":"noun: a long narrow inlet of the sea between steep cliffs"});
+AIW_ADD("fj",{"fjord":"noun: a long narrow inlet of the sea between steep cliffs||"});

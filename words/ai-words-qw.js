@@ -1,1 +1,1 @@
-AIW_ADD("qw",{"qwerty keyboard":"noun: the standard typewriter keyboard"});
+AIW_ADD("qw",{"qwerty keyboard":"noun: the standard typewriter keyboard||"});

@@ -1,1 +1,1 @@
-AIW_ADD("wt",{"wtc":"noun: twin skyscrapers 110 stories high in New York City","wto":"noun: an international organization based in Geneva that monitors and enforces rules governing global trade","wtv":"noun: a tumor virus transmitted by leafhoppers"});
+AIW_ADD("wt",{"wtc":"noun: twin skyscrapers 110 stories high in New York City||","wto":"noun: an international organization based in Geneva that monitors and enforces rules governing global trade||","wtv":"noun: a tumor virus transmitted by leafhoppers||"});

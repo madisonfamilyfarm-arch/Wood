@@ -9663,7 +9663,7 @@ function aiwForms(w){w=w.toLowerCase();const f=[w];const add=x=>{if(x&&x.length>
   if(/ies$/.test(w))add(w.slice(0,-3)+'y');if(/ied$/.test(w))add(w.slice(0,-3)+'y');if(/es$/.test(w))add(w.slice(0,-2));if(/s$/.test(w))add(w.slice(0,-1));
   if(/ing$/.test(w)){add(w.slice(0,-3));add(w.slice(0,-3)+'e');if(/(.)\1ing$/.test(w))add(w.slice(0,-4));}if(/ed$/.test(w)){add(w.slice(0,-2));add(w.slice(0,-1));if(/(.)\1ed$/.test(w))add(w.slice(0,-3));}
   if(/er$/.test(w)){add(w.slice(0,-2));add(w.slice(0,-1));}if(/est$/.test(w)){add(w.slice(0,-3));add(w.slice(0,-2));}if(/ly$/.test(w))add(w.slice(0,-2));return f;}
-function aiwGet(w,dep){for(const x of aiwForms(w)){const d=AIW.d[aiwPre(x)];if(d&&d[x]!=null){if(d[x][0]==='@'){if((dep||0)<2){const r=aiwGet(d[x].slice(1),(dep||0)+1);if(r)return Object.assign({},r,{from:x});}continue;}const [g,s,a]=d[x].split('|');return{w:x,g,s:s?s.split(','):[],a:a?a.split(','):[]};}}return null;}
+function aiwGet(w,dep){for(const x of aiwForms(w)){const d=AIW.d[aiwPre(x)];if(d&&d[x]!=null){if(d[x][0]==='@'){if((dep||0)<2){const r=aiwGet(d[x].slice(1),(dep||0)+1);if(r)return Object.assign({},r,{from:x});}continue;}const [g,s,a,ex]=d[x].split('|');return{w:x,g,s:s?s.split(','):[],a:a?a.split(','):[],ex:ex||''};}}return null;}
 function aiwCount(){return 149827;}
 // a known command word for an unknown one (checks the word, its synonyms, and the synonyms' meanings)
 function aiwMap(w){const e=aiwGet(w);if(!e)return null;for(const x of [e.w,...e.s]){const k=nDecode(x);if(k)return k;}
@@ -10114,6 +10114,9 @@ const FEEL=[[/ i(?: am|m)? (?:so |really |super |very )?(tired|sleepy|exhausted)
  [/ i(?: am|m)? (?:so |really |super |very )?(excited|pumped|hyped) /,['Woo! Let\'s do something EPIC! 🚀','Me too!! Battle? Race? You pick! 🎉']],[/ i(?: am|m)? (?:so |really |super |very )?(scared|afraid|nervous) /,['Don\'t worry, I\'ve got your back! 🛡','It\'s okay! Stick with me 🤝']],
  [/ i(?: am|m)? (?:so |really |super |very )?(lonely|alone) /,['You\'re not alone — I\'m right here! 😊 Want to play tag?','I\'m here! Let\'s fly together ✈️']]];
 {const s0=smartHear;smartHear=function(txt){try{const s=nNorm(String(txt||''));const B=(nWho(s).find(w=>w.B)||{}).B||aiNear(1e9)[0];if(B)for(const [re,L] of FEEL)if(re.test(s)&&!(GAME.on&&/ (i quit|i give up) /.test(s))){sbSay({B},PICK(L));return true;}}catch(e){}return s0.apply(this,arguments);};}
+// ✍️ "use enormous in a sentence" / "give me an example of brave"
+{const s0=smartHear;smartHear=function(txt){try{const s=nNorm(String(txt||''));const B=(nWho(s).find(w=>w.B)||{}).B||aiNear(1e9)[0];const m=s.match(/ (?:use|put) ([a-z'-]{2,20}(?: [a-z'-]{2,20})?) in a sentence /)||s.match(/ (?:give me )?an? example (?:sentence )?(?:of|for|with) (?:the word )?([a-z'-]{2,20}) /);
+    if(B&&m){const w=m[1];aiwLoad(w,()=>{const e=aiwGet(w);if(e&&e.ex)sbSay({B},'✍️ "'+e.ex[0].toUpperCase()+e.ex.slice(1)+(/[.!?]$/.test(e.ex)?'':'.')+'"');else if(e){const pos=(e.g.match(/^(noun|verb|adj|adv)/)||[])[1];const T={noun:['I saw a '+w+' by the lake!','My drone flew right over the '+w+'.'],verb:['Watch me '+w+' over the trees!','I love to '+w+' with my friends.'],adj:['That jump was so '+w+'!','The woods look '+w+' today.'],adv:['The drone flew '+w+' over the lake.']}[pos]||['"'+w+'" — '+e.g.split(' ¦ ')[0]];sbSay({B},'✍️ "'+PICK(T)+'"');}else sbSay({B},'Hmm, I don\'t know "'+w+'" yet 🤔');});return true;}}catch(e){}return s0.apply(this,arguments);};}
 
 // =====================================================================================
 // ===== 🌎 REAL WORLD MAP (CesiumJS): the real Earth from satellite photos + real hills, starting over the farm =====

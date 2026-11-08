@@ -1,1 +1,1 @@
-AIW_ADD("bc",{"bc":"adv: before the Christian era|b.c.","bce":"adv: of the period before the Common Era|b.c.e."});
+AIW_ADD("bc",{"bc":"adv: before the Christian era|b.c.||in 200 BC","bce":"adv: of the period before the Common Era|b.c.e.||in 200 BCE"});

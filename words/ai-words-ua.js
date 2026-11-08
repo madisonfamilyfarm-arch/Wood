@@ -1,1 +1,1 @@
-AIW_ADD("ua",{"uakari":"noun: medium-sized tree-dwelling monkey of the Amazon basin"});
+AIW_ADD("ua",{"uakari":"noun: medium-sized tree-dwelling monkey of the Amazon basin||"});

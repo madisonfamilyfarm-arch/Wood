@@ -1,1 +1,1 @@
-AIW_ADD("hc",{"hcfc":"noun: a fluorocarbon that is replacing chlorofluorocarbon as a refrigerant and propellant in aerosol cans","hcg":"noun: hormone produced early in pregnancy by the placenta"});
+AIW_ADD("hc",{"hcfc":"noun: a fluorocarbon that is replacing chlorofluorocarbon as a refrigerant and propellant in aerosol cans||","hcg":"noun: hormone produced early in pregnancy by the placenta||"});

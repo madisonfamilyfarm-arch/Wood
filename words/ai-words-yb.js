@@ -1,1 +1,1 @@
-AIW_ADD("yb",{"yb":"noun: a soft silvery metallic element","ybit":"noun: a unit of information equal to 1000 zettabits or 10^24 bits|yb"});
+AIW_ADD("yb",{"yb":"noun: a soft silvery metallic element||","ybit":"noun: a unit of information equal to 1000 zettabits or 10^24 bits|yb|"});

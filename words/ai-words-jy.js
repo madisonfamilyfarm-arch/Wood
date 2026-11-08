@@ -1,1 +1,1 @@
-AIW_ADD("jy",{"jyaistha":"noun: the third month of the Hindu calendar","jylland":"noun: peninsula in northern Europe that forms the continental part of Denmark and a northern part of Germany|jutland","jynx":"noun: wrynecks"});
+AIW_ADD("jy",{"jyaistha":"noun: the third month of the Hindu calendar||","jylland":"noun: peninsula in northern Europe that forms the continental part of Denmark and a northern part of Germany|jutland|","jynx":"noun: wrynecks||"});

@@ -1,1 +1,1 @@
-AIW_ADD("gd",{"gd":"noun: a nerve agent easily absorbed into the body|gadolinium","gdansk":"noun: a port city of northern Poland near the mouth of the Vistula River on a gulf of the Baltic Sea|danzig","gdp":"noun: the measure of an economy adopted by the United States in 1991"});
+AIW_ADD("gd",{"gd":"noun: a nerve agent easily absorbed into the body|gadolinium|","gdansk":"noun: a port city of northern Poland near the mouth of the Vistula River on a gulf of the Baltic Sea|danzig|","gdp":"noun: the measure of an economy adopted by the United States in 1991||"});

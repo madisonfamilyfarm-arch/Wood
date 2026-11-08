@@ -1,1 +1,1 @@
-AIW_ADD("y_",{"y-axis":"noun: the vertical axis in a plane coordinate system","y-linked gene":"noun: a gene located on a Y chromosome","y chromosome":"noun: the sex chromosome that is carried by men","y-shaped":"adj: shaped in the form of the letter Y|formed"});
+AIW_ADD("y_",{"y-axis":"noun: the vertical axis in a plane coordinate system||","y-linked gene":"noun: a gene located on a Y chromosome||","y chromosome":"noun: the sex chromosome that is carried by men||","y-shaped":"adj: shaped in the form of the letter Y|formed|"});

@@ -1,1 +1,1 @@
-AIW_ADD("tb",{"tb":"noun: a metallic element of the rare earth group|tuberculosis,t.b.,terabyte,tib","tbilisi":"noun: the capital and largest city of Georgia on the Kura river","tbit":"noun: a unit of information equal to 1000 gigabits or 10^12 (1,000,000,000,000) bits|tb"});
+AIW_ADD("tb",{"tb":"noun: a metallic element of the rare earth group|tuberculosis,t.b.,terabyte,tib|","tbilisi":"noun: the capital and largest city of Georgia on the Kura river||","tbit":"noun: a unit of information equal to 1000 gigabits or 10^12 (1,000,000,000,000) bits|tb|"});

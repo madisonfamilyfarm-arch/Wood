@@ -1,1 +1,1 @@
-AIW_ADD("lv",{"lv":"adj: being five more than fifty|55,fifty-five,cardinal","lvi":"adj: being six more than fifty|56,fifty-six,cardinal","lvii":"adj: being seven more than fifty|57,fifty-seven,cardinal","lviii":"adj: being eight more than fifty|58,fifty-eight,cardinal"});
+AIW_ADD("lv",{"lv":"adj: being five more than fifty|55,fifty-five,cardinal|","lvi":"adj: being six more than fifty|56,fifty-six,cardinal|","lvii":"adj: being seven more than fifty|57,fifty-seven,cardinal|","lviii":"adj: being eight more than fifty|58,fifty-eight,cardinal|"});

@@ -1,1 +1,1 @@
-AIW_ADD("uf",{"ufa":"noun: a city in the European part of Russia","ufo":"noun: an (apparently) flying object whose nature is unknown"});
+AIW_ADD("uf",{"ufa":"noun: a city in the European part of Russia||","ufo":"noun: an (apparently) flying object whose nature is unknown||"});

@@ -1,1 +1,1 @@
-AIW_ADD("hq",{"hq":"noun: the military installation from which a commander performs the functions of command|headquarters"});
+AIW_ADD("hq",{"hq":"noun: the military installation from which a commander performs the functions of command|headquarters|"});

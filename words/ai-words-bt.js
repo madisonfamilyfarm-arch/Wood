@@ -1,1 +1,1 @@
-AIW_ADD("bt",{"btu":"noun: a unit of heat equal to the amount of heat required to raise one pound of water one degree Fahrenheit at…"});
+AIW_ADD("bt",{"btu":"noun: a unit of heat equal to the amount of heat required to raise one pound of water one degree Fahrenheit at…||"});

@@ -1,1 +1,1 @@
-AIW_ADD("ie",{"ie":"noun: a commercial browser ¦ adv: that is to say|explorer,i.e.","ied":"noun: an explosive device that is improvised","ieoh ming pei":"noun: United States architect (born in China in 1917)|pei"});
+AIW_ADD("ie",{"ie":"noun: a commercial browser ¦ adv: that is to say|explorer,i.e.|","ied":"noun: an explosive device that is improvised||","ieoh ming pei":"noun: United States architect (born in China in 1917)|pei|"});

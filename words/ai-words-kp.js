@@ -1,1 +1,1 @@
-AIW_ADD("kp",{"kp":"noun: an enlisted person who is assigned to assist the cooks","kph":"noun: the ratio of the distance traveled (in kilometers) to the time spent traveling (in hours)|km/h"});
+AIW_ADD("kp",{"kp":"noun: an enlisted person who is assigned to assist the cooks||","kph":"noun: the ratio of the distance traveled (in kilometers) to the time spent traveling (in hours)|km/h|"});

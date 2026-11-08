@@ -1,1 +1,1 @@
-AIW_ADD("hb",{"hb":"noun: a hemoprotein composed of globin and heme that gives red blood cells their characteristic color|hemoglobin,haemoglobin"});
+AIW_ADD("hb",{"hb":"noun: a hemoprotein composed of globin and heme that gives red blood cells their characteristic color|hemoglobin,haemoglobin|"});

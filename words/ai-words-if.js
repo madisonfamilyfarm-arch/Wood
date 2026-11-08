@@ -1,1 +1,1 @@
-AIW_ADD("if",{"ifc":"noun: a United Nations agency that invests directly in companies and guarantees loans to private investors","iffy":"adj: subject to accident or chance or change|uncertain","if not":"adv: perhaps"});
+AIW_ADD("if",{"ifc":"noun: a United Nations agency that invests directly in companies and guarantees loans to private investors||","iffy":"adj: subject to accident or chance or change|uncertain|","if not":"adv: perhaps||"});

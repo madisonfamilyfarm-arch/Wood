@@ -1,1 +1,1 @@
-AIW_ADD("yv",{"yves tanguy":"noun: United States surrealist painter (born in France) (1900-1955)"});
+AIW_ADD("yv",{"yves tanguy":"noun: United States surrealist painter (born in France) (1900-1955)||"});

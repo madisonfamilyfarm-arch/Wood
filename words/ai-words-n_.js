@@ -1,1 +1,1 @@
-AIW_ADD("n_",{"n'djamena":"noun: the capital and largest city of Chad|fort-lamy","n-type semiconductor":"noun: a semiconductor in which electrical conduction is due chiefly to the movement of electrons","n-th":"adj: last or greatest in an indefinitely large series|nth,ordinal"});
+AIW_ADD("n_",{"n'djamena":"noun: the capital and largest city of Chad|fort-lamy|","n-type semiconductor":"noun: a semiconductor in which electrical conduction is due chiefly to the movement of electrons||","n-th":"adj: last or greatest in an indefinitely large series|nth,ordinal|"});

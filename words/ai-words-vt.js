@@ -1,1 +1,1 @@
-AIW_ADD("vt",{"vt":"noun: a state in New England|vermont"});
+AIW_ADD("vt",{"vt":"noun: a state in New England|vermont|"});

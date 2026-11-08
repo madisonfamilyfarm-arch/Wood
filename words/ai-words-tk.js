@@ -1,1 +1,1 @@
-AIW_ADD("tk",{"tko":"noun: a knockout declared by the referee who judges one boxer unable to continue"});
+AIW_ADD("tk",{"tko":"noun: a knockout declared by the referee who judges one boxer unable to continue||"});

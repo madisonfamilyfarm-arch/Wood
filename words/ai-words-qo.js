@@ -1,1 +1,1 @@
-AIW_ADD("qo",{"qoph":"noun: the 19th letter of the Hebrew alphabet"});
+AIW_ADD("qo",{"qoph":"noun: the 19th letter of the Hebrew alphabet||"});

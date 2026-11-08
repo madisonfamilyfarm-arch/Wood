@@ -1,1 +1,1 @@
-AIW_ADD("fn",{"fnma":"noun: a federally chartered corporation that purchases mortgages"});
+AIW_ADD("fn",{"fnma":"noun: a federally chartered corporation that purchases mortgages||"});

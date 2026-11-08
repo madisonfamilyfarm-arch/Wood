@@ -1,1 +1,1 @@
-AIW_ADD("sf",{"sfax":"noun: the second largest city in Tunisia","sforzando":"noun: an accented chord"});
+AIW_ADD("sf",{"sfax":"noun: the second largest city in Tunisia||","sforzando":"noun: an accented chord||"});

@@ -1,1 +1,1 @@
-AIW_ADD("yq",{"yquem":"noun: a sweet white French wine"});
+AIW_ADD("yq",{"yquem":"noun: a sweet white French wine||"});

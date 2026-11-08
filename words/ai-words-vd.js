@@ -1,1 +1,1 @@
-AIW_ADD("vd",{"vd":"noun: a communicable infection transmitted by sexual intercourse or genital contact|dose,std","vdu":"noun: (British) British term for video display"});
+AIW_ADD("vd",{"vd":"noun: a communicable infection transmitted by sexual intercourse or genital contact|dose,std|","vdu":"noun: (British) British term for video display||"});

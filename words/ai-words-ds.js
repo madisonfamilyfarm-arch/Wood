@@ -1,1 +1,1 @@
-AIW_ADD("ds",{"ds":"noun: a radioactive transuranic element|scd","dscdna":"noun: double-stranded cDNA","dsl":"noun: a generic name for digital lines that are provided by telephone companies to their local subscribers and…"});
+AIW_ADD("ds",{"ds":"noun: a radioactive transuranic element|scd|","dscdna":"noun: double-stranded cDNA||","dsl":"noun: a generic name for digital lines that are provided by telephone companies to their local subscribers and…||"});

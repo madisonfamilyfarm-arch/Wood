@@ -1,1 +1,1 @@
-AIW_ADD("hf",{"hf":"noun: a grey tetravalent metallic element that resembles zirconium chemically and is found in zirconium minerals","hfc":"noun: a fluorocarbon emitted as a by-product of industrial manufacturing"});
+AIW_ADD("hf",{"hf":"noun: a grey tetravalent metallic element that resembles zirconium chemically and is found in zirconium minerals||","hfc":"noun: a fluorocarbon emitted as a by-product of industrial manufacturing||"});

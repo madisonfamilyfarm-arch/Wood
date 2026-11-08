@@ -1,1 +1,1 @@
-AIW_ADD("pv",{"pva":"noun: a vinyl polymer used especially in paints or adhesives","pvc":"noun: a polymer of vinyl chloride used instead of rubber in electric cables"});
+AIW_ADD("pv",{"pva":"noun: a vinyl polymer used especially in paints or adhesives||","pvc":"noun: a polymer of vinyl chloride used instead of rubber in electric cables||"});

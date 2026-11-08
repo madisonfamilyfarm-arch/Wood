@@ -1,1 +1,1 @@
-AIW_ADD("wm",{"wmd":"noun: a weapon that kills or injures civilian as well as military personnel (nuclear and chemical and biological…","wmo":"noun: the United Nations agency concerned with the international collection of meteorological data"});
+AIW_ADD("wm",{"wmd":"noun: a weapon that kills or injures civilian as well as military personnel (nuclear and chemical and biological…||","wmo":"noun: the United Nations agency concerned with the international collection of meteorological data||"});

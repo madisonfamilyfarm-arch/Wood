@@ -1,1 +1,1 @@
-AIW_ADD("zr",{"zr":"noun: a lustrous grey strong metallic element resembling titanium|zirconium"});
+AIW_ADD("zr",{"zr":"noun: a lustrous grey strong metallic element resembling titanium|zirconium|"});

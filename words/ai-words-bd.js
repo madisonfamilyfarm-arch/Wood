@@ -1,1 +1,1 @@
-AIW_ADD("bd",{"bd":"noun: a bachelor's degree in religion","bdellium":"noun: aromatic gum resin"});
+AIW_ADD("bd",{"bd":"noun: a bachelor's degree in religion||","bdellium":"noun: aromatic gum resin||"});

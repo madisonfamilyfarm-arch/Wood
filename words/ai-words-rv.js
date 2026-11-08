@@ -1,1 +1,1 @@
-AIW_ADD("rv",{"rv":"noun: a motorized wheeled vehicle used for camping or other recreational activities|r.v."});
+AIW_ADD("rv",{"rv":"noun: a motorized wheeled vehicle used for camping or other recreational activities|r.v.|"});

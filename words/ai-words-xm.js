@@ -1,1 +1,1 @@
-AIW_ADD("xm",{"xmas":"noun: a Christian holiday celebrating the birth of Christ|christmas"});
+AIW_ADD("xm",{"xmas":"noun: a Christian holiday celebrating the birth of Christ|christmas|"});

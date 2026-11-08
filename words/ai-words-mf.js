@@ -1,1 +1,1 @@
-AIW_ADD("mf",{"mf":"noun: 300 to 3000 kilohertz","mfa":"noun: a master's degree in fine arts","mflop":"noun: (computer science) a unit for measuring the speed of a computer system"});
+AIW_ADD("mf",{"mf":"noun: 300 to 3000 kilohertz||","mfa":"noun: a master's degree in fine arts||","mflop":"noun: (computer science) a unit for measuring the speed of a computer system||"});

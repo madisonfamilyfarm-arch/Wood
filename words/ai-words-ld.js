@@ -1,1 +1,1 @@
-AIW_ADD("ld",{"ldl":"noun: a lipoprotein that transports cholesterol in the blood|beta-lipoprotein","ldl cholesterol":"noun: the cholesterol in low-density lipoproteins"});
+AIW_ADD("ld",{"ldl":"noun: a lipoprotein that transports cholesterol in the blood|beta-lipoprotein|","ldl cholesterol":"noun: the cholesterol in low-density lipoproteins||"});

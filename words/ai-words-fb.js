@@ -1,1 +1,1 @@
-AIW_ADD("fb",{"fbi":"noun: a federal law enforcement agency that is the principal investigative arm of the Department of Justice","fbi agent":"noun: a special law-enforcement agent of the Federal Bureau of Investigation|g-man"});
+AIW_ADD("fb",{"fbi":"noun: a federal law enforcement agency that is the principal investigative arm of the Department of Justice||","fbi agent":"noun: a special law-enforcement agent of the Federal Bureau of Investigation|g-man|"});

@@ -1,1 +1,1 @@
-AIW_ADD("fs",{"fsb":"noun: the internal counterintelligence agency of the Russian Federation and successor to the Soviet KGB","fsh":"noun: a gonadotropic hormone that is secreted by the anterior pituitary and stimulates growth of Graafian…"});
+AIW_ADD("fs",{"fsb":"noun: the internal counterintelligence agency of the Russian Federation and successor to the Soviet KGB||","fsh":"noun: a gonadotropic hormone that is secreted by the anterior pituitary and stimulates growth of Graafian…||"});

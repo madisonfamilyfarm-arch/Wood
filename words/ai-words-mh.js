@@ -1,1 +1,1 @@
-AIW_ADD("mh",{"mho":"noun: a unit of conductance equal to the reciprocal of an ohm|s,siemens","mhz":"noun: one million periods per second|mc,megahertz"});
+AIW_ADD("mh",{"mho":"noun: a unit of conductance equal to the reciprocal of an ohm|s,siemens|","mhz":"noun: one million periods per second|mc,megahertz|"});

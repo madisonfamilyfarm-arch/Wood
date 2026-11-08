@@ -1,1 +1,1 @@
-AIW_ADD("gb",{"gb":"noun: a highly toxic chemical nerve agent that inhibits the activity of cholinesterase|sarin,gilbert,gi,gigabit,g,gigabyte","gbit":"noun: a unit of information equal to 1000 megabits or 10^9 (1,000,000,000) bits|gb,gigabit"});
+AIW_ADD("gb",{"gb":"noun: a highly toxic chemical nerve agent that inhibits the activity of cholinesterase|sarin,gilbert,gi,gigabit,g,gigabyte|","gbit":"noun: a unit of information equal to 1000 megabits or 10^9 (1,000,000,000) bits|gb,gigabit|"});

@@ -1,1 +1,1 @@
-AIW_ADD("qe",{"qed":"noun: a relativistic quantum theory of the electromagnetic interactions of photons and electrons and muons","qepiq":"noun: 100 qepiq equal 1 manat in Azerbaijan"});
+AIW_ADD("qe",{"qed":"noun: a relativistic quantum theory of the electromagnetic interactions of photons and electrons and muons||","qepiq":"noun: 100 qepiq equal 1 manat in Azerbaijan||"});

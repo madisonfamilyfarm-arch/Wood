@@ -1,1 +1,1 @@
-AIW_ADD("td",{"tdt":"noun: (astronomy) a measure of time defined by Earth's orbital motion|tt"});
+AIW_ADD("td",{"tdt":"noun: (astronomy) a measure of time defined by Earth's orbital motion|tt|"});

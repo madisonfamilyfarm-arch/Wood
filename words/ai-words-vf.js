@@ -1,1 +1,1 @@
-AIW_ADD("vf",{"vfw":"noun: an organization of United States war veterans"});
+AIW_ADD("vf",{"vfw":"noun: an organization of United States war veterans||"});

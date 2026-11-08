@@ -1,1 +1,1 @@
-AIW_ADD("gm",{"gm":"noun: a metric unit of weight equal to one thousandth of a kilogram|g,gram","gmt":"noun: the local time at the 0 meridian passing through Greenwich, England|ut"});
+AIW_ADD("gm",{"gm":"noun: a metric unit of weight equal to one thousandth of a kilogram|g,gram|","gmt":"noun: the local time at the 0 meridian passing through Greenwich, England|ut|"});

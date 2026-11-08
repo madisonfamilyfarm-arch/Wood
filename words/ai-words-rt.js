@@ -1,1 +1,1 @@
-AIW_ADD("rt",{"rtlt":"noun: the elapsed time it takes for a signal to travel from Earth to a spacecraft (or other body) and back to…"});
+AIW_ADD("rt",{"rtlt":"noun: the elapsed time it takes for a signal to travel from Earth to a spacecraft (or other body) and back to…||"});

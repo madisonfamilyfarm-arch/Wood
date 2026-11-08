@@ -1,1 +1,1 @@
-AIW_ADD("nb",{"nb":"noun: a soft grey ductile metallic element used in alloys|niobium,n.b.","nbe":"noun: the compass point that is one point east (clockwise) of due north","nbw":"noun: the compass point that is one point west of due north"});
+AIW_ADD("nb",{"nb":"noun: a soft grey ductile metallic element used in alloys|niobium,n.b.||the margins of his book were generously supplied with pencilled NBs","nbe":"noun: the compass point that is one point east (clockwise) of due north||","nbw":"noun: the compass point that is one point west of due north||"});

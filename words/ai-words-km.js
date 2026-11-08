@@ -1,1 +1,1 @@
-AIW_ADD("km",{"km":"noun: a metric unit of length equal to 1000 meters (or 0.621371 miles)|kilometre,kilometer"});
+AIW_ADD("km",{"km":"noun: a metric unit of length equal to 1000 meters (or 0.621371 miles)|kilometre,kilometer|"});

@@ -1,1 +1,1 @@
-AIW_ADD("eh",{"ehadhamen":"noun: city in Tunisia","ehf":"noun: 30 to 300 gigahertz","ehrenberg":"noun: Russian novelist (1891-1967)","ehrlich":"noun: German bacteriologist who found a `magic bullet' to cure syphilis and was a pioneer in the study of…"});
+AIW_ADD("eh",{"ehadhamen":"noun: city in Tunisia||","ehf":"noun: 30 to 300 gigahertz||","ehrenberg":"noun: Russian novelist (1891-1967)||","ehrlich":"noun: German bacteriologist who found a `magic bullet' to cure syphilis and was a pioneer in the study of…||"});

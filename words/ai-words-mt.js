@@ -1,1 +1,1 @@
-AIW_ADD("mt",{"mt":"noun: a radioactive transuranic element|t,tonne,montana","mt etna":"noun: an inactive volcano in Sicily|etna","mt orizaba":"noun: an extinct volcano in southern Mexico between Mexico City and Veracruz"});
+AIW_ADD("mt",{"mt":"noun: a radioactive transuranic element|t,tonne,montana|","mt etna":"noun: an inactive volcano in Sicily|etna|","mt orizaba":"noun: an extinct volcano in southern Mexico between Mexico City and Veracruz||"});

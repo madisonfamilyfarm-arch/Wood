@@ -1,1 +1,1 @@
-AIW_ADD("dz",{"dziggetai":"noun: Mongolian wild ass"});
+AIW_ADD("dz",{"dziggetai":"noun: Mongolian wild ass||"});

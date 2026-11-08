@@ -1,1 +1,1 @@
-AIW_ADD("uh",{"uhf":"noun: 300 to 3000 megahertz","uhland":"noun: German romantic poet (1787-1862)"});
+AIW_ADD("uh",{"uhf":"noun: 300 to 3000 megahertz||","uhland":"noun: German romantic poet (1787-1862)||"});

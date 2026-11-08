@@ -1,1 +1,1 @@
-AIW_ADD("hz",{"hz":"noun: the unit of frequency|cycle,cycles/second,cps,hertz"});
+AIW_ADD("hz",{"hz":"noun: the unit of frequency|cycle,cycles/second,cps,hertz|"});

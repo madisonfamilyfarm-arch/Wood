@@ -1,1 +1,1 @@
-AIW_ADD("lw",{"lwei":"noun: 100 lwei equal 1 kwanza in Angola"});
+AIW_ADD("lw",{"lwei":"noun: 100 lwei equal 1 kwanza in Angola||"});

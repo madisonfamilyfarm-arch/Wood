@@ -1,1 +1,1 @@
-AIW_ADD("uc",{"uca":"noun: fiddler crabs"});
+AIW_ADD("uc",{"uca":"noun: fiddler crabs||"});

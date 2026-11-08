@@ -1,1 +1,1 @@
-AIW_ADD("rp",{"rpa-abb":"noun: an urban hit squad and guerrilla group of the Communist Party in the Philippines|abb","rpm":"noun: rate of revolution of a motor|rev"});
+AIW_ADD("rp",{"rpa-abb":"noun: an urban hit squad and guerrilla group of the Communist Party in the Philippines|abb|","rpm":"noun: rate of revolution of a motor|rev|"});

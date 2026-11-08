@@ -1,1 +1,1 @@
-AIW_ADD("ks",{"ks":"noun: a state in midwestern United States|kansas","kshatriya":"noun: a member of the royal or warrior Hindu caste"});
+AIW_ADD("ks",{"ks":"noun: a state in midwestern United States|kansas|","kshatriya":"noun: a member of the royal or warrior Hindu caste||"});

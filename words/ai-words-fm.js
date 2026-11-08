@@ -1,1 +1,1 @@
-AIW_ADD("fm",{"fm":"noun: modulation of the frequency of the (radio) carrier wave","fmri":"noun: a form of magnetic resonance imaging of the brain that registers blood flow to functioning areas of the brain"});
+AIW_ADD("fm",{"fm":"noun: modulation of the frequency of the (radio) carrier wave||","fmri":"noun: a form of magnetic resonance imaging of the brain that registers blood flow to functioning areas of the brain||"});

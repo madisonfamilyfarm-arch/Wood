@@ -1,1 +1,1 @@
-AIW_ADD("yt",{"ytterbite":"noun: a mineral that is a source of rare earths","ytterbium":"noun: a soft silvery metallic element|yb","yttrium":"noun: a silvery metallic element that is common in rare-earth minerals|y"});
+AIW_ADD("yt",{"ytterbite":"noun: a mineral that is a source of rare earths||","ytterbium":"noun: a soft silvery metallic element|yb|","yttrium":"noun: a silvery metallic element that is common in rare-earth minerals|y|"});

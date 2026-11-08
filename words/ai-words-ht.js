@@ -1,1 +1,1 @@
-AIW_ADD("ht",{"html":"noun: a set of tags and rules (conforming to SGML) for using them in developing hypertext documents","http":"noun: a protocol (utilizing TCP) to transfer hypertext requests and information between servers and browsers"});
+AIW_ADD("ht",{"html":"noun: a set of tags and rules (conforming to SGML) for using them in developing hypertext documents||","http":"noun: a protocol (utilizing TCP) to transfer hypertext requests and information between servers and browsers||"});

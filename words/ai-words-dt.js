@@ -1,1 +1,1 @@
-AIW_ADD("dt",{"dtic":"noun: the agency in the Department of Defense that provides scientific and technical information to federal…","dts":"noun: acute delirium caused by alcohol poisoning"});
+AIW_ADD("dt",{"dtic":"noun: the agency in the Department of Defense that provides scientific and technical information to federal…||","dts":"noun: acute delirium caused by alcohol poisoning||"});

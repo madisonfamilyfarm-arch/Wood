@@ -1,1 +1,1 @@
-AIW_ADD("yp",{"ypres":"noun: battle in World War I (1917)"});
+AIW_ADD("yp",{"ypres":"noun: battle in World War I (1917)||"});

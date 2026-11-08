@@ -1,1 +1,1 @@
-AIW_ADD("dk",{"dkg":"noun: 10 grams|dag","dkl":"noun: a metric unit of volume or capacity equal to 10 liters|dal","dkm":"noun: a metric unit of length equal to ten meters|dam"});
+AIW_ADD("dk",{"dkg":"noun: 10 grams|dag|","dkl":"noun: a metric unit of volume or capacity equal to 10 liters|dal|","dkm":"noun: a metric unit of length equal to ten meters|dam|"});

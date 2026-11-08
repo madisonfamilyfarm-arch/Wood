@@ -1,1 +1,1 @@
-AIW_ADD("nj",{"nj":"noun: a Mid-Atlantic state on the Atlantic|jersey","njord":"noun: (Norse mythology) chief of the Vanir","njorth":"noun: (Norse mythology) chief of the Vanir"});
+AIW_ADD("nj",{"nj":"noun: a Mid-Atlantic state on the Atlantic|jersey|","njord":"noun: (Norse mythology) chief of the Vanir||","njorth":"noun: (Norse mythology) chief of the Vanir||"});

@@ -1,1 +1,1 @@
-AIW_ADD("xh",{"xhosa":"noun: a member of the Negroid people of southern South Africa"});
+AIW_ADD("xh",{"xhosa":"noun: a member of the Negroid people of southern South Africa||"});

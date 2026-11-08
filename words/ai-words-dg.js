@@ -1,1 +1,1 @@
-AIW_ADD("dg",{"dg":"noun: 1/10 gram"});
+AIW_ADD("dg",{"dg":"noun: 1/10 gram||"});

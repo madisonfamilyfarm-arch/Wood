@@ -1,1 +1,1 @@
-AIW_ADD("hh",{"hhs":"noun: the United States federal department that administers all federal programs dealing with health and welfare"});
+AIW_ADD("hh",{"hhs":"noun: the United States federal department that administers all federal programs dealing with health and welfare||"});

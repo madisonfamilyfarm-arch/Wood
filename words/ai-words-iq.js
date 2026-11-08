@@ -1,1 +1,1 @@
-AIW_ADD("iq",{"iq":"noun: a measure of a person's intelligence as indicated by an intelligence test|i.q.","iq test":"noun: a psychometric test of intelligence"});
+AIW_ADD("iq",{"iq":"noun: a measure of a person's intelligence as indicated by an intelligence test|i.q.|","iq test":"noun: a psychometric test of intelligence||"});
