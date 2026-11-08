@@ -54,3 +54,5 @@ try{Object.assign(SLANG,COOLD);}catch(e){}
 {const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
 // more "meaning" words the AI understands as commands
 {const M={home:'retreat withdraw homeward regroup',takeoff:'airborne liftoff launch ascend',land:'disembark',hover:'stationary motionless',follow:'shadowing tailing'};for(const k in M){NSYN[k]=NSYN[k]||[];for(const w of M[k].split(' '))if(!NSYN[k].includes(w))NSYN[k].push(w);}}
+// (outermost) on a phone with NO AI pilots, a message to someone else's AI goes to THEM — local campers stay quiet
+{const s0=smartHear;smartHear=function(txt){try{if(!AIB.L.length&&mpOpen()){const s=nNorm(String(txt||''));const remote=Object.values(mp.peers).some(pe=>pe.name&&/^🤖 /.test(pe.name)&&s.indexOf(' '+pe.name.replace(/^🤖 /,'').replace(/ \(.*\)$/,'').toLowerCase()+' ')>=0);if(remote)return true;}}catch(e){}return s0.apply(this,arguments);};}

@@ -25,3 +25,8 @@ setInterval(()=>{try{const now=performance.now();for(const B of AIB.L){if(!B.fol
 // a friend joins the room → one of my AI pilots says hi to them (and goodbye when they leave)
 {const c0=chatSys;chatSys=function(t){const r=c0.apply(this,arguments);try{const s=String(t||'');let m=s.match(/^👥 (.+) joined$/);if(m&&AIB.L.length&&!/^🤖/.test(m[1])){const nm=m[1];setTimeout(()=>{const B=pbAlive()[Math.floor(Math.random()*pbAlive().length)];if(B)pbSay(B,PICK(['Welcome, '+nm+'! 👋','Hey '+nm+'! Wanna battle? 😎','Yo '+nm+'! Race you! 🏁']),true);},2500);}
   m=s.match(/^👋 (.+) left/);if(m&&AIB.L.length&&!/^🤖/.test(m[1])){const nm=m[1];setTimeout(()=>{const B=pbAlive()[0];if(B)pbSay(B,PICK(['Bye '+nm+'! 👋','See ya, '+nm+'!']),true);},1500);}}catch(e){}return r;};}
+// 🧼 family-friendly chat: rude words from other players get hidden as ★★★ (on by default · Menu → 🌐 Multiplayer)
+const CLEAN={on:LS.get('cleanChat',true),re:/\b(f+u+c+k+\w*|sh+i+t+\w*|b+i+t+c+h+\w*|a+s+s+h+o+l+e+s?|bastards?|damn\w*|crap\w*|dick\w*|piss\w*|cunt\w*|whore\w*|slut\w*|fag\w*|retard\w*|nigg\w*|wtf|stfu|kys)\b/gi};
+function cleanTxt(t){return CLEAN.on?String(t).replace(CLEAN.re,m=>'★'.repeat(Math.min(5,m.length))):t;}
+{const h0=MPH.chat;MPH.chat=function(m,pe){if(m&&m.txt)m.txt=cleanTxt(m.txt);return h0.apply(this,arguments);};}
+{const m0=mCatItems;mCatItems=function(k){const L=m0.apply(this,arguments);if(k==='mp'){try{L.splice(1,0,mItem(()=>'🧼 Clean chat (hide rude words): '+(CLEAN.on?'ON':'off'),()=>{CLEAN.on=!CLEAN.on;LS.set('cleanChat',CLEAN.on);renderMenu();}));}catch(e){}}return L;};}
