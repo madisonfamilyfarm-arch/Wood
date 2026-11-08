@@ -3422,8 +3422,8 @@ function tickPlane(dt,inp,prev){
   let pr,rr,yr;
   if(D.man){D.man.t+=dt;if(D.man.k==='loop'){ele=1;ail=0;}else{ail=D.man.dir;ele=0.15;}D.thr=Math.max(D.thr,0.85);rud=0;if(D.man.t>D.man.T||onG)D.man=null;}
   if(SPEC.assist&&!onG&&!rth&&!D.autoTO&&!D.man){ // SAFE: stick = bank / climb angle, lets go = levels out
-    const tb=ail*0.8,tp=ele*0.55;rr=clamp((tb-bank)*3.2,-S.roll,S.roll);pr=clamp((tp-pitchA)*2.6+Math.abs(bank)*0.9*(1-Math.abs(ail)*0.3),-S.pitch,S.pitch);yr=rud*0.8+Math.sin(bank)*0.5;}
-  else{rr=ail*S.roll;pr=ele*S.pitch;yr=rud*1.1;}
+    const tb=ail*0.8,tp=ele*0.55+clamp((V-S.stall*1.8)/Math.max(1,S.stall)*0.35,-0.45,0)*(1-Math.max(0,ele)*0.7)-clamp(v.y*0.012,-0.15,0.15)*(1-Math.abs(ele));rr=clamp((tb-bank)*3.2,-S.roll,S.roll);pr=clamp((tp-pitchA)*2.6+Math.abs(bank)*0.9*(1-Math.abs(ail)*0.3),-S.pitch,S.pitch);yr=rud*0.8+Math.sin(bank)*0.5;}
+  else{rr=ail*S.roll;pr=ele*S.pitch-(onG?0:clamp((S.stall*1.5-V)*0.06,0,0.45));yr=rud*1.1;}
   if(onG){rr=0;yr=rud*clamp(1.6-V*0.04,0.4,1.6)+(D.thr>0.3?0:0);}
   pr*=auth;rr*=auth;yr*=Math.max(auth,onG?1:0);
   csSet(ail,ele,rud,dt);if(fl&&!onG&&!SPEC.assist)pr+=fl*0.12*auth;
@@ -3431,7 +3431,7 @@ function tickPlane(dt,inp,prev){
   if(CFG.realPhys!==false){
     if(!SPEC.assist&&!rth&&!D.autoTO&&SPEC.wing!=='jet'){const slow=clamp(1-V/(S.stall*1.4),0,1);yr-=D.thr*0.32*slow*(onG?1:0.5);if(!onG)rr-=D.thr*0.22*slow;}
     if(stalled&&Math.abs(rud)>0.4&&!SPEC.assist){yr+=rud*2.2;rr+=rud*4;pr-=0.4;} // full stall + rudder = spin
-    const tau=0.045+S.m*0.035,k=1-Math.exp(-dt/tau);D.avp=(D.avp||0)+(pr-(D.avp||0))*k;D.avr=(D.avr||0)+(rr-(D.avr||0))*k;D.avy=(D.avy||0)+(yr-(D.avy||0))*k;pr=D.avp;rr=D.avr;yr=D.avy;}
+    const tau=(0.045+S.m*0.035)*(S.airliner?5:1),k=1-Math.exp(-dt/tau);D.avp=(D.avp||0)+(pr-(D.avp||0))*k;D.avr=(D.avr||0)+(rr-(D.avr||0))*k;D.avy=(D.avy||0)+(yr-(D.avy||0))*k;pr=D.avp;rr=D.avr;yr=D.avy;}
   _q.setFromEuler(_ve.set(pr*dt,-yr*dt,-rr*dt,'XYZ'));P.multiply(_q);
   // the nose follows the airflow (weathervane)
   if(V>2&&!onG){_a.copy(va).normalize();const ax=new V3().crossVectors(_f,_a),ang=Math.asin(clamp(ax.length(),-1,1));if(ang>1e-4){ax.normalize();_q2.setFromAxisAngle(ax,ang*Math.min(1,dt*4.5*Math.min(1,V/S.stall)*Math.min(1,0.15+D.airT)));P.premultiply(_q2);}}
@@ -3439,11 +3439,14 @@ function tickPlane(dt,inp,prev){
   // forces
   const vu=va.dot(_u),alpha=(D.pos.y<planeG(D.pos.x,D.pos.z)+S.legs+0.3)?Math.max(0,Math.atan2(-vu,Math.max(0.5,Vf))):Math.atan2(-vu,Math.max(0.5,Vf)),cl=stalled?clamp(alpha*2,-0.5,0.5):clamp(0.25+fl*0.35+alpha*4.6,-S.clmax,S.clmax+fl*0.45);
   const lift=0.6*S.S*cl*Vf*Math.abs(Vf)*(1+0.3*Math.exp(-Math.max(0,D.pos.y-gy-S.legs)/(S.L*1.2+0.3))),drag=S.kd*V*V*(1+fl*0.9)+Math.abs(lift)*0.04;
-  const thrust=D.thr*S.Tm*(1-clamp(Vf/(S.top*1.25),0,1)*0.75);
+  const thrust=D.thr*S.Tm*(1-clamp(Vf/(S.top*1.25),0,1)*0.92);
   _a.set(0,-9.8,0).addScaledVector(_f,thrust/m).addScaledVector(_u,lift/m);
   if(V>0.01)_a.addScaledVector(va,-drag/m/V);
+  if(V>S.top*1.35)_a.addScaledVector(va,-(V-S.top*1.35)*1.5/V);
+  {const vmax=D.pos.y-gy>700?700:180;if(V>vmax)_a.addScaledVector(va,-(V-vmax)*4/V);}
   _a.addScaledVector(_r,-va.dot(_r)*0.7); // side-slip damping (against the air: crosswind makes it crab like a real plane)
   v.addScaledVector(_a,dt);
+  if(!onG&&CFG.turb!==false){const tt=performance.now()/1000,tk=(S.airliner?0.55:0.8)*clamp(V/Math.max(4,S.stall*4),0,1.3)*(1+(typeof weather!=='undefined'&&weather&&weather!=='clear'?0.8:0));v.y+=(Math.sin(tt*1.7+D.pos.x*0.011)*0.6+Math.sin(tt*4.1+D.pos.z*0.023)*0.4)*tk*dt*2.4;D.avr=(D.avr||0)+Math.sin(tt*2.3+D.pos.z*0.013)*tk*0.3*dt*5;D.avp=(D.avp||0)+Math.sin(tt*1.3+D.pos.x*0.017)*tk*0.12*dt*5;}
   for(const th of THERMALS){const d=Math.hypot(D.pos.x-th.x,D.pos.z-th.z);if(d<th.r&&D.pos.y<H(th.x,th.z)+120)v.y+=(1-d/th.r)*3.2*dt;}
   D.pos.addScaledVector(v,dt);
   // ground
@@ -10588,7 +10591,7 @@ function airlTick(G,dt){if(!G)return;const t=performance.now()/1000;const thr=(t
   const gr=G.userData.gear;if(gr){let up=false;try{up=D.state==='flying'&&D.pos.y-H(D.pos.x,D.pos.z)>12;}catch(e){}gr.userData.k=THREE.MathUtils.lerp(gr.userData.k||0,up?1:0,Math.min(1,dt*1.5));gr.scale.y=1-gr.userData.k*0.92;gr.position.y=gr.userData.k*1.2;gr.visible=gr.userData.k<0.97;}}
 {const z0=sanitize;sanitize=function(s){const o=z0.apply(this,arguments);try{if(s&&s.airliner&&o)o.airliner=true;}catch(e){}return o;};}
 // ---- the flying version: the RC passenger-jet kit is the "skeleton" (for physics), the real-size model is what you see
-{const s0=stats;stats=function(sp){const st=s0.apply(this,arguments);try{if(sp&&sp.airliner&&st){st.tough=10;st.airliner=true;st.top*=1.3;st.Tm*=1.2;}}catch(e){}return st;};}
+{const s0=stats;stats=function(sp){const st=s0.apply(this,arguments);try{if(sp&&sp.airliner&&st){st.tough=10;st.airliner=true;st.roll=(st.roll||2)*0.45;st.pitch=(st.pitch||2)*0.55;st.S*=0.04;st.kd*=0.04;st.stall*=5;st.top=Math.max(st.top*3,120);st.Tm*=14;}}catch(e){}return st;};}
 {const b0=buildDrone;buildDrone=function(sp,opt){const m=b0.apply(this,arguments);try{if(sp&&sp.airliner&&m&&m.g&&!m.g.userData.airl){m.g.userData.airl=1;
   m.g.updateMatrixWorld(true);const bb=new THREE.Box3().setFromObject(m.g);const sc0=m.g.scale.x||1;const low=(bb.min.y-m.g.position.y)/sc0;m.g.children.forEach(c=>{c.visible=false;});
   m.g.scale.multiplyScalar(AIRL_F);const A=makeAirliner();const k=1/m.g.scale.x;A.scale.setScalar(k);let legs=0.2;try{legs=stats(sp).legs||0.2;}catch(e){}A.position.y=(-legs)*k-A.userData.groundY*k;m.g.add(A);m.g.userData.airliner=A;try{(m.cams||[]).forEach(c=>{c.x*=AIRL_F;c.y*=AIRL_F;c.z*=AIRL_F;});}catch(e){}}}catch(e){console.warn('airliner',e);}return m;};}
@@ -10657,6 +10660,8 @@ function rocketParts(){try{return DR&&DR.g?(DR.g.userData.rkParts||(DR.g.userDat
   requestAnimationFrame(tk);};requestAnimationFrame(tk);}
 // a new build = find its rocket engines again
 {const r0=rebuildDrone;rebuildDrone=function(){const r=r0.apply(this,arguments);try{if(DR&&DR.g)DR.g.userData.rkParts=null;}catch(e){}return r;};}
+// rockets (and the airliner) aren't held down by the 120 m drone height limit — keep going up and you reach space
+{const t0=tickDrone;tickDrone=function(){const keep=CFG.maxH;let up=false;try{up=!!(ST&&(ST.airliner||(ST.info&&ST.info.space&&(SPEC.parts||[]).some(p=>p.t==='rocket'))));}catch(e){}if(up)CFG.maxH=Math.max(keep,20000);try{return t0.apply(this,arguments);}finally{if(up)CFG.maxH=keep;}};}
 
 // v71: lots more things to build — RC classics + crazy inventions that never really worked (they do here!)
 Object.assign(KITS,{
@@ -10698,6 +10703,48 @@ body.shortL #mapBtns{left:80px!important;transform:scale(0.8);transform-origin:t
     if(short&&stl&&mb){document.body.classList.add('shortL');const a=mb.getBoundingClientRect(),b=stl.getBoundingClientRect();if(b.height&&a.bottom>b.top-4){const room=b.top-4-a.top;const s=Math.max(44,Math.min(66,room));mb.style.setProperty('width',s+'px','important');mb.style.setProperty('height',s+'px','important');}}
     else{document.body.classList.remove('shortL');if(mb){mb.style.removeProperty('width');mb.style.removeProperty('height');}}}catch(e){}};
   addEventListener('resize',()=>setTimeout(fit,120));setInterval(fit,2000);setTimeout(fit,1500);})();
+
+// v72: the AI understands "DON'T…" — don't blow up Ace, leave Blaze alone, don't shoot me, quit shooting, don't follow me
+const PROT={};   // pilot name -> protected until (ms)
+{const f0=dzBotFire;dzBotFire=function(B,tg){try{const now=performance.now();for(const n in PROT){if(PROT[n]<now){delete PROT[n];continue;}const X=AIB.L.find(b=>pbName(b).toLowerCase()===n);if(X&&tg&&X.p&&tg.distanceTo(X.p)<4)return;}if(PROT.me>now&&tg&&tg.distanceTo(D.pos)<4)return;}catch(e){}return f0.apply(this,arguments);};}
+{const s0=smartHear;smartHear=function(txt){try{const s=nNorm(String(txt||''));
+  const NEG=/ (don t|dont|do not|never|stop|quit|no more|please don t|please dont|pls dont|cease|leave) /;
+  const ACT=/(blow(ing)? (up|me up)|blow \w+ up|shoot(ing)?|attack(ing)?|kill(ing)?|hurt(ing)?|bomb(ing)?|chas(e|ing)|hunt(ing)?|target(ing)?|hit(ting)?|destroy(ing)?|fight(ing)?|nuk(e|ing)|rocket(ing)?|tnt|explod(e|ing)|blast(ing)?|go(ing)? after|alone)/;
+  if(NEG.test(s)&&ACT.test(s)&&!/ (start|let s|lets|go) (shoot|attack|fight)/.test(s)){
+    const names=AIB.L.map(b=>pbName(b).toLowerCase());const tgtN=names.filter(n=>new RegExp(' '+n+' ').test(s.replace(/^ \w+ (don t|dont|do not)/,' ')));
+    // who is being told (first word a pilot name = the speaker's addressee) vs who is being protected
+    const first=(s.trim().split(' ')[0]||'');const speaker=names.includes(first)?first:null;const prot=tgtN.filter(n=>n!==speaker||/ (blow up|shoot|attack|kill|hurt|leave) \w+ $/.test(s)&&s.trim().endsWith(n));
+    const meT=/ (me|us|my drone|my plane|my tank|my car|myself) /.test(s)||(!prot.length);
+    const now=performance.now();const B=(speaker&&AIB.L.find(b=>pbName(b).toLowerCase()===speaker))||aiNear(1e9)[0];
+    if(prot.length){prot.forEach(n=>{PROT[n]=now+180000;const X=AIB.L.find(b=>pbName(b).toLowerCase()===n);AIB.L.forEach(b=>{try{if(b.hunt&&(b.hunt===X||b.hunt.B===X||b.hunt.name===(X&&X.name)||b.hunt.id===(X&&X.id))){b.hunt=null;b.huntCmd=false;}if(b.goal&&b.goal.kind==='chase'&&b.goal.B===X)b.goal=null;}catch(e){}});});
+      if(B)sbSay({B},PICK(['Okay! Nobody blows up '+prot.map(n=>n[0].toUpperCase()+n.slice(1)).join(' or ')+' 🤝','Got it — '+prot.map(n=>n[0].toUpperCase()+n.slice(1)).join(' and ')+' is safe 🛡','Fine, I\'ll leave '+prot.map(n=>n[0].toUpperCase()+n.slice(1)).join(' and ')+' alone 😇']));return true;}
+    if(meT){PROT.me=now+180000;if(/ (follow|chas)/.test(s)&&!/ (shoot|blow|attack|kill|bomb)/.test(s))return s0.call(this,'stop following me');try{s0.call(this,'stop shooting me');}catch(e){}return true;}}
+  if(/^ (don t|dont|do not|stop|quit) (follow(ing)?|chasing) me $/.test(s))return s0.call(this,'stop');
+}catch(e){}return s0.apply(this,arguments);};}
+{const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
+{const s0=smartHear;smartHear=function(){HEARING++;try{return s0.apply(this,arguments);}finally{HEARING--;}};}
+
+// v73: 🪖🛸 ready-made FLYING TANK — drives like a tank, tap 🛸 FLY to take off, 🪖 DRIVE to land and roll again
+function ftankSpec(mode){openKit('ftank');const sp=wsSpec();closeWorkshop();sp.name='🪖🛸 Flying tank';sp.flyAs=mode==='fly'?'combo':'tank';sp.ftank=true;return sp;}
+{const z0=sanitize;sanitize=function(s){const o=z0.apply(this,arguments);try{if(s&&s.ftank&&o)o.ftank=true;}catch(e){}return o;};}
+function ftankGo(){try{if(menu.open)menuToggle(false);}catch(e){}try{if(WALK.on)walkToggle(false);}catch(e){}useSpec(ftankSpec('drive'));toast('🪖 Flying tank ready! Drive it like a tank — tap 🛸 FLY to take off',3500);ftankBtn();}
+const FTK={landing:false};
+function ftankToTank(){const p=D.pos.clone(),yaw=D.yaw;const sp=JSON.parse(JSON.stringify(SPEC));sp.flyAs='tank';sp.ftank=true;useSpec(sp);try{D.pos.copy(p);D.pos.y=H(p.x,p.z)+(ST.legs||0.2);D.yaw=yaw;D.vel.set(0,0,0);D.state='landed';}catch(e){}FTK.landing=false;toast('🪖 Landed — chute packed away. DRIVE mode!',2200);ftankBtn();}
+function ftankSwitch(){if(!SPEC||!SPEC.ftank)return;const flying=SPEC.flyAs==='combo';
+  if(!flying){const p=D.pos.clone(),yaw=D.yaw;const sp=JSON.parse(JSON.stringify(SPEC));sp.flyAs='combo';sp.ftank=true;useSpec(sp);try{D.pos.copy(p);D.yaw=yaw;}catch(e){}
+    setTimeout(()=>{try{takeoff();}catch(e){}},150);toast('🛸 FLY mode — taking off like a drone. Left stick up = climb, Shift / 🚀 = jet boost. Tap 🪂 LAND to come down.',3500);ftankBtn();return;}
+  // 🪂 LAND: motors off, the parachute pops out, it floats down, then the chute folds away and it's a tank again
+  if(FTK.landing)return;const h=D.pos.y-H(D.pos.x,D.pos.z);if(h<2.5){ftankToTank();return;}
+  FTK.landing=true;try{D.thrCut=true;}catch(e){}const c0=chuteCan;chuteCan=()=>true;try{if(!CHUTE.on)chuteToggle();}finally{chuteCan=c0;}toast('🪂 Parachute out — gliding down…',2500);ftankBtn();}
+setInterval(()=>{try{if(FTK.landing&&SPEC&&SPEC.ftank){if(D.vel.y>-2.5&&D.pos.y-H(D.pos.x,D.pos.z)>1)D.vel.y=Math.min(D.vel.y,-2.5);const h=D.pos.y-H(D.pos.x,D.pos.z);if(h<1.2||D.state==='landed'||D.state==='down'||D.state==='tumble'&&h<2){try{chuteOff();}catch(e){}try{D.thrCut=false;}catch(e){}ftankToTank();}}}catch(e){}},150);
+function ftankBtn(){let b=$('ftFly');const on=!!(SPEC&&SPEC.ftank)&&started&&!WALK.on;if(!b){b=document.createElement('button');b.id='ftFly';b.className='btn';b.style.cssText='position:fixed;right:calc(12px + env(safe-area-inset-right));top:calc(50% - 30px);z-index:15;font:900 17px system-ui,sans-serif;padding:12px 16px;border-radius:16px;border:2px solid #fff;background:#0a84ff;color:#fff;touch-action:manipulation;box-shadow:0 4px 14px #0006';
+    b.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();ftankSwitch();});document.body.appendChild(b);}
+  b.style.display=on&&!(menu&&menu.open)&&!(WS&&WS.open)?'':'none';if(on){const flying=SPEC.flyAs==='combo';b.textContent=FTK.landing?'🪂 landing…':flying?'🪂 LAND':'🛸 FLY';b.style.background=flying?'#ff9f0a':'#0a84ff';}}
+setInterval(ftankBtn,700);
+{const m0=mainItems;mainItems=function(){const L=m0();const i=L.findIndex(it=>{try{return /Real-size airliner/.test(it.label());}catch(e){return false;}});L.splice(i+1,0,mItem('🪖🛸 Flying tank (ready to go)',()=>ftankGo()));return L;};}
+{const b0=buildItems;buildItems=function(){const L=b0();try{L.splice(1,0,mItem('🪖🛸 Flying tank — ready to drive + FLY',()=>{menuToggle(false);ftankGo();}));}catch(e){}return L;};}
+try{for(const c of MCAT){if(c[0]==='games'){const g0=window['mCatItems'];}}}catch(e){}
+{const g0=mCatItems;mCatItems=function(k){const L=g0.apply(this,arguments);try{if(k==='games'||k==='fly'){L.splice(1,0,mItem('🪖🛸 Flying tank (ready to go)',()=>ftankGo()));if(k==='games')L.splice(2,0,mItem('✈️ Real-size airliner',()=>airlinerGo()));}}catch(e){}return L;};}
 
 // =====================================================================================
 // ===== 🌎 REAL WORLD MAP (CesiumJS): the real Earth from satellite photos + real hills, starting over the farm =====
