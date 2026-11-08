@@ -6062,7 +6062,7 @@ function comboTick(dt,inp){const I=ST.info||{},W=Math.max(30,I.W||300),st=D.stat
   else CB.u=Math.max(0,CB.u-dt*2.5);
   if(st==='landed'&&!CB.held&&CB.fuel<1)CB.fuel=Math.min(1,CB.fuel+dt/4);
   const top=clamp(12+Math.max(0,I.rFwd)/W*26,12,120),upV=I.rUp>0?clamp(14+Math.max(0,I.rUp)/W*45,0,160):0;
-  _cf.set(fx*top*CB.u,st==='landed'?0:upV*CB.u,fz*top*CB.u);CB.bv.lerp(_cf,Math.min(1,dt*(CB.u>0?2.2:1.2)));
+  {const tq=Math.max(CB.u,(hasR&&st==='flying'&&CB.fuel>0)?clamp((((inp&&inp.ly)||0)-0.3)/0.7,0,1):0);CB.rq=tq;const q=DR.g.quaternion,rf=(window.__rf||(window.__rf=new THREE.Vector3())).set(0,0,-1).applyQuaternion(q),ru=(window.__ru||(window.__ru=new THREE.Vector3())).set(0,1,0).applyQuaternion(q);_cf.set(0,0,0).addScaledVector(rf,top*tq);if(st!=='landed')_cf.addScaledVector(ru,upV*tq);if(tq>0.05&&!can&&K.rocket&&!K.jet)CB.fuel=Math.max(0,CB.fuel-dt/14);}CB.bv.lerp(_cf,Math.min(1,dt*(CB.u>0?2.2:1.2)));
   // 🛞 wheels on the ground / 🚤 water props on the pond (right stick: push = go, sideways = steer)
   const onWater=inWater(D.pos.x,D.pos.z),drive=st==='landed'&&((I.wheels&&I.wheels.length>=2&&!onWater)||(I.wp>0&&onWater));
   if(drive){const wTop=onWater?clamp(3+I.wp/W*14,3,14):clamp(ST.top*0.55,5,16);CB.wv+=(inp.ry*wTop-CB.wv)*Math.min(1,dt*(Math.abs(inp.ry)>0.05?1.6:2.5));
@@ -10632,6 +10632,31 @@ function treadSides(){const P=(SPEC&&SPEC.parts)||[];if(treadSides.sp===SPEC)ret
   if(hasBarrel){['rocket','mg','paint'].forEach(w=>{if(!L.includes(w)&&!(typeof BATTLE!=='undefined'&&BATTLE.on&&BATTLE.mode==='paint'&&w!=='paint'))L.push(w);});}return L.length?L:['paint'];};}
 // ---------------------------------------------------------------- ✈️ the airliner tops out around real cruise speed (no more rocket-speed runaway)
 {let last=performance.now();const tk=()=>{const now=performance.now();last=now;try{if(ST&&ST.airliner&&D.vel){const v=D.vel.length(),mx=130;if(v>mx)D.vel.multiplyScalar(mx/v);}}catch(e){}requestAnimationFrame(tk);};requestAnimationFrame(tk);}
+
+// v70: 🚀 rockets push the way the nose points (throttle = how hard) · smoke + fuel trail · 🌌 fly high enough and you reach SPACE
+// ---------------------------------------------------------------- smoke trail behind rocket engines (fire when burning, grey smoke while it coasts/falls)
+const RKT={last:0,burnT:0,spaceSaid:false,base:null,stars:null};
+function rocketParts(){try{return DR&&DR.g?(DR.g.userData.rkParts||(DR.g.userData.rkParts=(()=>{const L=[];DR.g.traverse(o=>{if(o.userData&&o.userData.part&&o.userData.part.t==='rocket')L.push(o);});return L;})())):[];}catch(e){return [];}}
+{let last=performance.now();const _p=new THREE.Vector3(),_b=new THREE.Vector3();const tk=()=>{const now=performance.now(),dt=Math.min(0.1,(now-last)/1000);last=now;
+  try{if(started&&ST&&ST.combo&&DR&&DR.g&&!WALK.on){const burn=Math.max(CB.u||0,CB.rq||0),R=(ST.info&&ST.info.rFwd>0||ST.info&&ST.info.rUp>0);
+    if(R&&D.state==='flying'){if(burn>0.1)RKT.burnT=now;const coast=now-RKT.burnT<12000&&D.vel.y<-2;RKT.last-=dt;
+      if((burn>0.1||coast)&&RKT.last<=0){RKT.last=burn>0.1?0.04:0.09;_b.set(0,0,1).applyQuaternion(DR.g.quaternion);
+        const L=rocketParts();const src=L.length?L[Math.floor(Math.random()*L.length)]:null;if(src)src.getWorldPosition(_p);else _p.copy(D.pos);_p.addScaledVector(_b,(ST.rad||0.3)*0.6);
+        if(burn>0.1){puff(_p,Math.random()<0.5?0xffa020:0xff5010,0.12+burn*0.12,2.2);if(Math.random()<0.6)smokeAt(_p.clone().addScaledVector(_b,0.3),0xbfbfbf);}else smokeAt(_p,0x8a8a8a);}}}}catch(e){}
+  // 🌌 space: the sky goes black and the stars come out up high
+  try{const a=started&&!WALK.on?D.pos.y:0,k=clamp((a-700)/1300,0,1);
+    if(k<=0){if(RKT.base){scene.background.copy(RKT.base.bg);scene.fog.color.copy(RKT.base.fog);scene.fog.far=RKT.base.far;RKT.base=null;if(RKT.stars)RKT.stars.visible=false;}}
+    else{if(!RKT.base)RKT.base={bg:scene.background.clone(),fog:scene.fog.color.clone(),far:scene.fog.far};
+      const blk=new THREE.Color(0x02030a);scene.background.copy(RKT.base.bg).lerp(blk,k);scene.fog.color.copy(RKT.base.fog).lerp(blk,k);scene.fog.far=RKT.base.far+k*20000;
+      if(window.skyM&&skyM.uniforms){try{skyM.uniforms.top.value.lerp(blk,k*0.2);skyM.uniforms.hor.value.lerp(blk,k*0.2);}catch(e){}}
+      if(!RKT.stars){const N=1500,pos=new Float32Array(N*3);for(let i=0;i<N;i++){const u=Math.random()*2-1,t=Math.random()*6.283,r=Math.sqrt(1-u*u);pos[i*3]=r*Math.cos(t)*900;pos[i*3+1]=Math.abs(u)*900;pos[i*3+2]=r*Math.sin(t)*900;}
+        const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));RKT.stars=new THREE.Points(g,new THREE.PointsMaterial({color:0xffffff,size:2.2,sizeAttenuation:false,transparent:true,depthWrite:false,fog:false}));RKT.stars.frustumCulled=false;scene.add(RKT.stars);}
+      RKT.stars.visible=true;RKT.stars.material.opacity=k;RKT.stars.position.copy(cam.position);
+      if(k>0.6&&!RKT.spaceSaid){RKT.spaceSaid=true;toast('🌌 You made it to SPACE! '+Math.round(a)+' m up',3500);try{if(typeof chatSys==='function')chatSys('🌌 '+(CFG.name||'You')+' reached space!');}catch(e){}}
+      if(k<0.2)RKT.spaceSaid=false;}}catch(e){}
+  requestAnimationFrame(tk);};requestAnimationFrame(tk);}
+// a new build = find its rocket engines again
+{const r0=rebuildDrone;rebuildDrone=function(){const r=r0.apply(this,arguments);try{if(DR&&DR.g)DR.g.userData.rkParts=null;}catch(e){}return r;};}
 
 // =====================================================================================
 // ===== 🌎 REAL WORLD MAP (CesiumJS): the real Earth from satellite photos + real hills, starting over the farm =====
