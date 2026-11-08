@@ -68,3 +68,15 @@ const PBPEND={};{const p0=pbLine;pbLine=function(k,B,t){const r=p0.apply(this,ar
     if(/ how many (kills|blow ups|blowups|points) (do you have|have you got|you got|did you get) | are you winning | whats your score | what is your score /.test(s)){const L=W.filter(w=>w.B).map(w=>w.B);const who=L.length?L:[(fresh?PBLAST.B:null)||aiNear(1e9)[0]];who.forEach((B,i)=>{const sc=PB.score[B.id]||{k:0,d:0};sbSay({B},'I\'ve got '+sc.k+' blow-up'+(sc.k===1?'':'s')+' and got blown up '+sc.d+' time'+(sc.d===1?'':'s')+(sc.k>sc.d?' 😎':sc.k<sc.d?' 😅':' 🤷'),400+i*600);});return true;}
   }catch(e){console.warn('pbfollow',e);}return s0.apply(this,arguments);};}
 {const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
+// ---------------------------------------------------------------- 🧭 "what's around me?", "what's the closest place?", "where is the sea?", "take me to …" = the AI leads you
+function dirTxt(dx,dz){const a=Math.atan2(dx,-dz);const N=['north','north-east','east','south-east','south','south-west','west','north-west'];return N[(Math.round(a/(Math.PI/4))+8)%8];}
+{const s0=smartHear;smartHear=function(txt){try{const s=nNorm(String(txt||''));const W=nWho(s);const B=(W.find(w=>w.B)||{}).B||aiNear(1e9)[0];const me=dzMe()||D.pos;
+    if(B&&/ (whats|what is|what s) (around|near|nearby|close to) (me|here|us) | (closest|nearest) (place|thing|spot) | what can i (see|visit) (near|around) here /.test(s)){
+      const L=aiPlaces().map(p=>({n:p.n,d:Math.hypot(p.x-me.x,p.z-me.z),dir:dirTxt(p.x-me.x,p.z-me.z)})).filter(p=>p.d>8).sort((a,b)=>a.d-b.d).slice(0,3);sbSay({B},'🧭 Closest: '+L.map(p=>p.n+' ('+Math.round(p.d)+' m '+p.dir+')').join(', '));return true;}
+    if(B&&/ (whats|what is|what s) that (tower|building|thing|house|place) /.test(s)){const L=aiPlaces().map(p=>({n:p.n,d:Math.hypot(p.x-me.x,p.z-me.z)})).sort((a,b)=>a.d-b.d);const t=/tower/.test(s)?L.find(p=>/tower/.test(p.n))||L[0]:L[0];sbSay({B},'That\'s probably '+t.n+' — '+Math.round(t.d)+' m away 🧭');return true;}
+    if(B&&/ (where is|wheres|how do i get to|how do you get to|find) (the )?(sea|ocean) /.test(s)){sbSay({B},'🌊 The sea is a secret world UNDER the lake! Dive a 🐟 sub to the bottom and go through the glowing ring ✨');return true;}
+    const lead=s.match(/ (take me|show me the way|lead me|guide me|bring me|show me how to get) (to|there to|over to) (the )?([a-z ]+?) $/);
+    if(B&&lead){const pl=aiPlaces().find(p=>p.n.toLowerCase().indexOf(lead[4].trim())>=0||lead[4].trim().indexOf(p.n.toLowerCase().replace(/^the /,''))>=0);
+      if(pl){sbPilotGo(B,pl);B.cmdT=performance.now();sbSay({B},PICK(['Follow me! 🧭 I\'ll lead you to '+pl.n,'This way to '+pl.n+'! Stay close ✈️']));return true;}}
+  }catch(e){console.warn('nav',e);}return s0.apply(this,arguments);};}
+{const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
