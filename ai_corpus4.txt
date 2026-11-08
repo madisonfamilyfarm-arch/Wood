@@ -1,0 +1,59 @@
+# GARBLED voice-typing held-out (homophones, missing words, run-ons, misspellings)
+witch team are you on || whichteam
+wich teem r u on || whichteam
+help meet || helpme
+help me plays || helpme
+somebody help me there shooting me || helpme
+gee gee || gg
+good gaim || gg
+re match || rematch
+we match please || rematch
+are you okay ace || health
+who's wedding || score
+who is winning the bottle || score
+nice shoot || niceshot
+nice shut blaze || niceshot
+who should I blow up next || advice
+who should I glow up next || advice
+who should I go after next || advice
+go after blades || hunt
+attack gizmo's || hunt
+ace a tack gizmo || hunt
+fall oh me || follow
+follow me fast || follow
+come on follow me guys || follow
+be on my teem || team
+team up with me plays || team
+let's bottle || attack
+let's battle you guys || attack
+start a bottle || attack
+stop fighting guys || peace
+lets race to the leak || race
+lets play tack || tag
+hyde and seek || hide
+dropped tnt on blaze || tnt
+drop d and d on gizmo || tnt
+throw the t n t || tnt
+do a flep || flip
+do a back flip || flip
+where is every one || where
+where are you ace || where
+come hear || come
+land now || land
+take of || takeoff
+go hire || higher
+go up higher || higher
+fly lower please || lower
+go faster || faster
+slow down || slower
+hay ace || greet
+hello every body || greet
+how are you || howareyou
+thank you || thanks
+thanks you guys || thanks
+by guys || bye
+bye bye || bye
+be quite || quiet
+shush || quiet
+tell me a joke please || joke
+what's 5 plus 7 || math

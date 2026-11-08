@@ -78,7 +78,8 @@ setInterval(()=>{try{if(!started||!AIB.L.length||menu.open)return;const now=perf
     if(/ (nice shot|good shot|great shot|nice one|good one) /.test(s)){sbSay({B},PICK(['Thanks! 😎','I\'ve been practicing 🎯','You saw that?! 😄']));return true;}
     if(/ (lol|lmao|haha+|hehe+|rofl) /.test(s)){sbSay({B},PICK(['😂','haha 😆','lol 🤣']));return true;}
     if(/ (you missed|missed me|ha missed) /.test(s)){sbSay({B},PICK(['Next one won\'t miss 😤','Lucky dodge! 😠','Hold still then! 😆']));return true;}
-    if(/ (i will get you|im coming for you|you are going down|youre going down|watch out) /.test(s)){sbSay({B},PICK(['Bring it! 😤','Try me! 😜','Ooh, scary 😆']));return true;}
+    if(!W.length&&/ (get|kill|blast|blow up|shoot|attack|go after|take out) (him|her|them|em|that guy|that one) /.test(s)){const me=dzMe()||D.pos;const prev=pbAlive().find(X=>X.huntCmd&&X.hunt&&X.hunt!=='me');const T=(prev&&AIB.L.find(X=>X.id===prev.hunt&&!X.dead))||pbAlive().filter(X=>X.team!=='me').sort((a,b)=>a.p.distanceTo(me)-b.p.distanceTo(me))[0];if(T){DZ.on=true;DZ.ai=true;const H=pbAlive().filter(X=>X!==T).slice(0,2);H.forEach((X,i)=>{X.hunt=T.id;X.huntCmd=true;X.cmdT=now;sbSay({B:X},PICK(['Going after '+pbName(T)+'! 🎯','On it — '+pbName(T)+' is going down 🚀']),400+i*600);});return true;}}
+    if(/ (i will get you|i am coming for you|im coming for you|you are going down|youre going down|watch out) /.test(s)){sbSay({B},PICK(['Bring it! 😤','Try me! 😜','Ooh, scary 😆']));return true;}
   }catch(e){console.warn('pb hear',e);}return s0.apply(this,arguments);};}
 // the scoreboard in the battle menu
 {const i0=typeof dzItems==='function'?dzItems:null;if(i0)dzItems=function(){const L=i0();try{const T=Object.values(PB.score).filter(x=>x.k||x.d).sort((a,b)=>b.k-a.k).slice(0,6);if(T.length)L.splice(1,0,mInfo('🏆 '+T.map(x=>x.n+' '+x.k+'💥/'+x.d+'💀').join(' · ')));}catch(e){}return L;};}
@@ -87,3 +88,20 @@ setInterval(()=>{try{if(!started||!AIB.L.length||menu.open)return;const now=perf
 const SAYLOW=new Set();
 {SAYQ.push=function(m){Array.prototype.push.call(this,m);while(this.length>6){let i=this.findIndex(x=>SAYLOW.has(x[1]));if(i<0)i=0;this.splice(i,1);}return this.length;};
  setInterval(()=>{if(SAYQ.length>2){const i=SAYQ.findIndex(x=>!SAYLOW.has(x[1]));const m=SAYQ.splice(i<0?0:i,1)[0];if(m){SAYLOW.delete(m[1]);try{aiSayAs.__raw?aiSayAs.__raw(m[0],m[1]):null;}catch(e){}}}},1300);}
+// ---------------------------------------------------------------- 🎙 voice-typing fixes for game words (homophones the phone gets wrong), applied before ANY AI handler sees it
+const VFIX=[[/\b(witch|wich|whitch)( te+a?m)/g,'which team'],[/\bteem\b/g,'team'],[/\bhelp meet\b/g,'help me'],[/\b(plays|pleas|pls|plz)$/g,'please'],[/^(gee gee|g g|gigi|g\.g\.?|gg+)( |$)/g,'gg$2'],[/\b(gaim|gam|gane|gayme)\b/g,'game'],
+  [/\b(re|we|ree|wee) match\b/g,'rematch'],[/\bwho('?s| is) (wedding|weening|winnin|whining|wining)\b/g,'who is winning'],[/\bnice (shoot|shut|shop|shirt|shat|shots)\b/g,'nice shot'],[/\b(glow|blow-|below|slow) up\b/g,'blow up'],
+  [/\ba (tack|tak|tac)\b/g,'attack'],[/\b(fall oh|fallow|fall low|follo|folow)( me| us)\b/g,'follow$2'],[/\bbottle\b/g,'battle'],[/\b(play|playing|wanna play|it|you'?re it) (tack|tagg|tug)\b/g,'$1 tag'],[/\btagg\b/g,'tag'],[/\bhyde\b/g,'hide'],[/\bt n t\b/g,'tnt'],[/\bevery (one|body)\b/g,'every$1'],
+  [/\btake of$/g,'take off'],[/\bcome (hear|heer|hare)\b/g,'come here'],[/\bover hear\b/g,'over here'],[/\b(go|fly|get) hire\b/g,'$1 higher'],[/^(hay|hey ya|hae)\b/g,'hey'],[/^by( guys| everyone| everybody| y'?all|$)/g,'bye$1'],[/^bye bye$/g,'bye'],[/\bbe (quite|quit|quiate)\b/g,'be quiet'],[/^(shush|shh+|hush|sh+)$/g,'be quiet'],[/\bwhose winning\b/g,'who is winning']];
+function vFix(t){let s=String(t||'').trim();const low=s.toLowerCase();let o=low;for(const [r,v] of VFIX)o=o.replace(r,v);
+  // a misheard pilot name right after an action word ("go after blades" → Blaze, "attack gizmos" → Gizmo)
+  try{const N=AIB.L.map(B=>pbName(B).toLowerCase()).concat((CAMPERS.L||[]).map(C=>String(C.name).toLowerCase()));const w=o.split(' ');
+    for(let i=0;i<w.length;i++){const x=w[i];if(x.length<3||N.includes(x))continue;const prev=w[i-1]||'',st=x.replace(/('s|s|es)$/,'');
+      const n=N.find(n=>st===n)||(/^(after|attack|at|on|chase|get|hit|follow|to|and|hey|hi|with|is|are|shoot|bomb)$/.test(prev)||(i===0&&!SPEECH_KEEP.has(x))?N.find(n=>n.length>=3&&n[0]===x[0]&&levD(st,n)<=Math.min(2,n.length-2)):null);if(n)w[i]=n;}o=w.join(' ');}catch(e){}
+  return o===low?s:o;}
+{const s0=smartHear;smartHear=function(txt){return s0.call(this,vFix(txt));};}
+// the phone's spell-fixer must not "fix" game words first (gaim→aim, tack→track)
+{const c0=cleanSpeech;cleanSpeech=function(t){const f=vFix(t);const r=c0.call(this,f);try{if(f!==t&&r&&typeof r==='object')r.changed=true;}catch(e){}return r;};}
+// "attack Gizmo" / "go after Blaze" said to everyone = the others go after that pilot
+{const s0=smartHear;smartHear=function(txt){try{const s=nNorm(String(txt||''));const m=s.match(/^ (?:lets |let us |everyone |guys |you guys )?(attack|go after|get|shoot|blow up|kill|take out|hunt|chase|bomb) ([a-z0-9-]+) (?:now |guys |everyone |please )?$/);
+  if(m){const T=AIB.L.find(B=>!B.dead&&pbName(B).toLowerCase()===m[2]);if(T){DZ.on=true;DZ.ai=true;const now=performance.now();const H=pbAlive().filter(X=>X!==T).slice(0,3);H.forEach((X,i)=>{X.hunt=T.id;X.huntCmd=true;X.cmdT=now;if(m[1]==='bomb'){try{X.bomb=T.id;}catch(e){}}if(i<2)sbSay({B:X},PICK(['Going after '+pbName(T)+'! 🎯','On it! '+pbName(T)+' is going down 🚀','Get '+pbName(T)+'! 💥']),400+i*600);});setTimeout(()=>pbSay(T,PICK(['Uh oh… everyone\'s after me 😬','You\'ll never catch me! 💨','Hey! No fair! 😤']),true),1800);NLU.lastWho=[{B:T}];NLU.lastT=now;return true;}}}catch(e){}return s0.apply(this,arguments);};}
