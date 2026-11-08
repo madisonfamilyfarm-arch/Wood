@@ -9961,6 +9961,11 @@ function dirTxt(dx,dz){const a=Math.atan2(dx,-dz);const N=['north','north-east',
       if(pl){sbPilotGo(B,pl);B.cmdT=performance.now();sbSay({B},PICK(['Follow me! 🧭 I\'ll lead you to '+pl.n,'This way to '+pl.n+'! Stay close ✈️']));return true;}}
   }catch(e){console.warn('nav',e);}return s0.apply(this,arguments);};}
 {const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
+// 😴 you've been sitting still for a couple of minutes → an AI pilot checks on you (once)
+const IDLE={p:null,t:0,told:false};
+setInterval(()=>{try{if(!started||menu.open||!AIB.L.length||AIC.quiet)return;const me=dzMe();if(!me)return;const now=performance.now();
+  if(!IDLE.p||IDLE.p.distanceTo(me)>1.5||now-AIC.lastChat<5000){IDLE.p=me.clone();IDLE.t=now;IDLE.told=false;return;}
+  if(!IDLE.told&&now-IDLE.t>150000){IDLE.told=true;const B=pbAlive().sort((a,b)=>a.p.distanceTo(me)-b.p.distanceTo(me))[0];if(B)pbSay(B,PICK(['Hello? Are you still there? 👀','Did you fall asleep? 😴','I\'m bored… wanna race? 🏁','Earth to '+meName()+'! 📡']),true);}}catch(e){}},5000);
 
 // ================================================================ v60: 🧑‍🏫 the AI pilots can explain how to play (and change settings for you): driving, diving, walking, battle on/off, more/fewer/harder AI, night…
 const AIDIFF={k:LS.get('aiDiff',1)};
