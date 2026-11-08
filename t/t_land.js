@@ -1,0 +1,7 @@
+const H0=require('./harness');
+H0(async({b})=>{const ctx=await b.newContext({viewport:{width:+(process.env.VW||852),height:+(process.env.VH||393)},isMobile:true,hasTouch:true,deviceScaleFactor:1});const P=await ctx.newPage();
+ for(const f of ['three.min.js','GLTFLoader.js','SkeletonUtils.js','GLTFExporter.js'])await P.route('**/'+f,r=>r.fulfill({path:__dirname+'/node_modules/three/'+(f==='three.min.js'?'build/':f==='GLTFLoader.js'?'examples/js/loaders/':f==='SkeletonUtils.js'?'examples/js/utils/':'examples/js/exporters/')+f,contentType:'text/javascript'}));
+ await P.goto('http://127.0.0.1:8765/woods-rc-sim.html',{waitUntil:'domcontentloaded',timeout:150000});await P.waitForTimeout(3000);
+ await P.evaluate(async()=>{startGame('free');await new Promise(r=>setTimeout(r,800));bsOpen('tank',null);bsClose();const sp=wsSpec();closeWorkshop();useSpec(sp);try{dzSet(true);}catch(e){}});await P.waitForTimeout(2500);
+ await P.screenshot({timeout:120000,path:'/tmp/claude-0/-home-claude/45cffd64-7151-5ab5-acd7-339a16c71f6a/scratchpad/land_tank.png'});
+ console.log(await P.evaluate(()=>{const r=id=>{const e=$(id);if(!e)return id+':none';const b=e.getBoundingClientRect();return id+':'+[b.x,b.y,b.width,b.height].map(Math.round)+(getComputedStyle(e).display==='none'?' hidden':'');};return ['mapBox','stL','stR','mapBtns','tntBtn','chatTog','chatBtn','bFire','vhBar','elevB'].map(r).join('\n')+'\nbody '+document.body.className;}));});
