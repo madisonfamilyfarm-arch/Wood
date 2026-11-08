@@ -10309,6 +10309,25 @@ const REPLYT=new Set();let HEARING=0;
 const REPLYB={};
 {const s0=sbSay;sbSay=function(w,t,d){try{if((HEARING||(typeof PEERCTX!=='undefined'&&PEERCTX.on))&&w){const n=w.B?w.B.name.replace('🤖 ',''):w.C?w.C.name:'';if(n)REPLYB[n]=(REPLYB[n]||0)+1;}}catch(e){}return s0.apply(this,arguments);};}
 {const p0=SAYQ.push;SAYQ.push=function(m){try{if(m&&REPLYB[m[0]]>0&&aiSayAs.__raw){REPLYB[m[0]]--;aiSayAs.__raw(m[0],m[1]);return this.length;}}catch(e){}return p0.apply(this,arguments);};}
+// trivia quiz: "quiz me" / "trivia" — the AI asks, you answer
+const QZQ=[['What is the biggest planet?',/jupiter/,'Jupiter'],['How many legs does a spider have?',/\b(8|eight)\b/,'8'],['What is the fastest land animal?',/cheetah/,'the cheetah'],['How many continents are there?',/\b(7|seven)\b/,'7'],['What do bees make?',/honey/,'honey'],['Which planet is called the Red Planet?',/mars/,'Mars'],['What is the tallest animal?',/giraffe/,'the giraffe'],['How many days are in a week?',/\b(7|seven)\b/,'7'],['What gas do plants give us to breathe?',/oxygen/,'oxygen'],['What is frozen water called?',/\bice\b/,'ice'],
+ ['What is the biggest ocean?',/pacific/,'the Pacific'],['Who was the first person on the moon?',/armstrong|neil/,'Neil Armstrong'],['How many sides does a triangle have?',/\b(3|three)\b/,'3'],['What color do blue and yellow make?',/green/,'green'],['What is the capital of France?',/paris/,'Paris'],['Can penguins fly?',/\b(no|nope|nah)\b/,'no'],['What is 7 times 8?',/\b(56|fifty six)\b/,'56'],['What is the closest star to Earth?',/\bsun\b/,'the sun'],['What animal says moo?',/\bcows?\b/,'a cow'],['How many hours are in a day?',/\b(24|twenty four)\b/,'24'],
+ ['Which is bigger, the sun or the moon?',/\bsun\b/,'the sun'],['What do caterpillars turn into?',/butterfl|moth/,'butterflies (or moths)'],['How many wheels does a car usually have?',/\b(4|four)\b/,'4'],['What is the hottest planet?',/venus/,'Venus'],['How many letters are in the alphabet?',/\b(26|twenty six)\b/,'26'],['What do you call a baby dog?',/pupp/,'a puppy'],['What do you call a baby cat?',/kitt/,'a kitten'],['What is the largest animal ever?',/blue whale|whale/,'the blue whale'],['How many planets are in our solar system?',/\b(8|eight)\b/,'8'],['What do we call a scientist who studies dinosaurs?',/paleontolog/,'a paleontologist']];
+const QZ={on:false,B:null,q:null,t:0,n:0,ok:0,used:[]};
+function qzAsk(B){let L=QZQ.filter((x,i)=>!QZ.used.includes(i));if(!L.length){QZ.used=[];L=QZQ;}const q=PICK(L);QZ.used.push(QZQ.indexOf(q));QZ.q=q;QZ.B=B;QZ.t=performance.now();QZ.n++;sbSay({B},'❓ Q'+QZ.n+': '+q[0]);}
+{const s0=smartHear;smartHear=function(txt){try{const s=nNorm(String(txt||''));const B=(nWho(s).find(w=>w.B)||{}).B||aiNear(1e9)[0];if(!B)return s0.apply(this,arguments);
+  if(/ (quiz me|trivia|ask me (a |some )?(trivia |quiz )?questions?|lets play (a )?(quiz|trivia)|play (a )?(quiz|trivia)( game)?|give me a quiz) /.test(s)){QZ.on=true;QZ.n=0;QZ.ok=0;sbSay({B},'🧠 Trivia time! Say "stop quiz" to end.');qzAsk(B);return true;}
+  if(QZ.on){if(performance.now()-QZ.t>120000){QZ.on=false;}
+    else if(/ (stop|end|quit|no more|enough)( the)? (quiz|trivia|questions)? $/.test(s)||/ (stop quiz|end quiz|quit quiz) /.test(s)){QZ.on=false;sbSay({B:QZ.B||B},'🏁 Quiz over! You got '+QZ.ok+' out of '+Math.max(0,QZ.n-(QZ.q?1:0))+' 🎉');QZ.q=null;return true;}
+    else if(QZ.q){const q=QZ.q,b=QZ.B||B;const words=s.trim().split(/\s+/).length;
+      if(/ (i don t know|idk|dunno|i give up|skip|pass|tell me) /.test(s)){QZ.q=null;sbSay({B:b},'💡 It was '+q[2]+'!');setTimeout(()=>{if(QZ.on)qzAsk(b);},2500);return true;}
+      if(q[1].test(s)){QZ.ok++;QZ.q=null;sbSay({B:b},PICK(['✅ Correct!','✅ Yes! Nice one!','✅ You got it! 🎉','✅ Smart pilot! 🧠'])+' ('+QZ.ok+'/'+QZ.n+')');setTimeout(()=>{if(QZ.on)qzAsk(b);},2500);return true;}
+      if(words<=4&&!/ (follow|come|land|race|tag|attack|shoot|fly|go|help|hide|seek|take off|switch|battle|menu) /.test(s)){QZ.q=null;sbSay({B:b},'❌ Not quite — it was '+q[2]+'! ('+QZ.ok+'/'+QZ.n+')');setTimeout(()=>{if(QZ.on)qzAsk(b);},2500);return true;}}}
+  if(/ (what do you know about|tell me (something|a fact|facts) about) (space|planets|stars) /.test(s)){const L=KB.filter(([re])=>/planet|moon|sun|star|mars|jupiter|galax|comet|space|saturn/.test(re.source)).map(x=>x[1]).filter(a=>a!=='ANIMSAY');sbSay({B},PICK(L));return true;}
+  if(/ (what do you know about|tell me (something|a fact|facts) about) (animals|dinosaurs|nature) /.test(s)){const L=KB.filter(([re])=>/dinosaur|whale|cheetah|dog|cat|bird|penguin|bee|turtle|octopus|elephant|giraffe|snake|bat|raccoon/.test(re.source)).map(x=>x[1]).filter(a=>a!=='ANIMSAY');sbSay({B},PICK(L));return true;}
+}catch(e){}return s0.apply(this,arguments);};}
+{const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
+{const s0=smartHear;smartHear=function(){HEARING++;try{return s0.apply(this,arguments);}finally{HEARING--;}};}
 
 // =====================================================================================
 // ===== 🌎 REAL WORLD MAP (CesiumJS): the real Earth from satellite photos + real hills, starting over the farm =====
