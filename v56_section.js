@@ -27,3 +27,6 @@ let GEO_KEEP=null;function geoDisp(o){try{if(!o)return;if(!GEO_KEEP){GEO_KEEP=ne
  setInterval(()=>{try{const w=$('ws');document.body.classList.toggle('wsOn',!!(w&&getComputedStyle(w).display!=='none'));}catch(e){}},400);}
 // 🪖 a tank you BUILT drove 60 km/h (like a race car!) — real RC tanks crawl. Same feel as the ready-made tank now.
 {const u0=useSpec;useSpec=function(){const r=u0.apply(this,arguments);try{if(vhKind()==='tank'&&ST&&ST.top>8){ST.top=clamp(ST.top*0.36,3.5,8);ST.acc=Math.min(ST.acc,11);}}catch(e){}return r;};}
+// auto-smooth: don't judge the speed in the first seconds after starting (the phone is still warming up the graphics) — it was turning the picture down for no reason
+{const s0=startGame;startGame=function(){PERF.t0=performance.now();return s0.apply(this,arguments);};}
+{const v0=document.onvisibilitychange;document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')PERF.t0=performance.now();});}
