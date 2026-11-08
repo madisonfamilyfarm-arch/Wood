@@ -1,0 +1,36 @@
+# HELD-OUT #9: thesaurus words for commands
+ace accompany me || follow
+blaze trail behind me || follow
+everyone retreat home || home
+return to base || home
+withdraw || home
+gizmo touch down || land
+set down over there || land
+ace elevate || higher
+rise up || higher
+sink lower || lower
+dive down || lower
+blaze rotate || spin
+twirl around || spin
+pirouette || spin
+ace somersault || flip
+do a backflip || flip
+everyone groove || dance
+boogie || dance
+ace remain here || hover
+stay put || hover
+freeze || hover
+hasten || faster
+zoom zoom || faster
+dawdle || slower
+take it easy || slower
+assault blaze || hunt
+ambush gizmo || hunt
+pulverize ace || hunt
+make peace || peace
+cease fire everyone || peace
+lift off || takeoff
+launch || takeoff
+get airborne || takeoff
+explore the lake || go
+venture to the airfield || go

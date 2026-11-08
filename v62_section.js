@@ -52,3 +52,5 @@ try{Object.assign(SLANG,COOLD);}catch(e){}
     if((m=s.match(/ count to (\d+) /))&&+m[1]>10){const n=Math.min(+m[1],30);sbSay({B},Array.from({length:n},(_,i)=>i+1).join('… ')+(+m[1]>30?'… (okay that\'s enough counting 😅)':' 🎉'));return true;}
   }catch(e){}return s0.apply(this,arguments);};}
 {const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
+// more "meaning" words the AI understands as commands
+{const M={home:'retreat withdraw homeward regroup',takeoff:'airborne liftoff launch ascend',land:'disembark',hover:'stationary motionless',follow:'shadowing tailing'};for(const k in M){NSYN[k]=NSYN[k]||[];for(const w of M[k].split(' '))if(!NSYN[k].includes(w))NSYN[k].push(w);}}
