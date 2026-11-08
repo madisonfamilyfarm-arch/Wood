@@ -10068,6 +10068,9 @@ const RHSTART=['fly','cat','drone','tree','car','boat','fire','sky','fast','race
       if(w&&performance.now()-RHG.t<600000&&nWords(s).length===1){sbSay({B:RHG.B||B},'❌ Hmm, "'+w+'" doesn\'t rhyme with "'+RHG.w+'"… try again! ('+(R[0]?'hint: like "'+R[Math.floor(Math.random()*Math.min(4,R.length))]+'"':'any rhyme!')+')');return true;}}
   }catch(e){console.warn('rhyme',e);}return s0.apply(this,arguments);};}
 {const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
+// greetings to a pilot always get an answer (even if that pilot is blown up right now)
+{const s0=smartHear;smartHear=function(txt){try{const s=nNorm(String(txt||''));const m=s.match(/^ (hi|hey|hello|yo|sup|hiya|heya|howdy|hay) ([a-z0-9-]+) $/);
+    if(m){const B=AIB.L.find(X=>pbName(X).toLowerCase()===m[2]);if(B){if(B.dead){const o=pbAlive()[0];if(o)sbSay({B:o},pbName(B)+' got blown up — back soon! 💥 Hi from me though 👋');else toast('💥 '+pbName(B)+' is respawning…',1500);return true;}sbSay({B},rb('hi',B));return true;}}}catch(e){}return s0.apply(this,arguments);};}
 
 // =====================================================================================
 // ===== 🌎 REAL WORLD MAP (CesiumJS): the real Earth from satellite photos + real hills, starting over the farm =====
