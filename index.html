@@ -8813,7 +8813,7 @@ const PERF={light:false,fps:60,low:0,pr:null,told:false};
 setInterval(()=>{PERF.light=!!(PHONE||LS.get('devMode','auto')==='phone'||LS.get('perfLight',false));},1000);
 (function(){let last=performance.now(),n=0,acc=0;(function loop(){const now=performance.now(),dt=now-last;last=now;if(dt<500){acc+=dt;n++;}
   if(acc>2000){PERF.fps=n*1000/acc;acc=0;n=0;
-    if(typeof started!=='undefined'&&started&&!menu.open&&document.visibilityState==='visible'&&LS.get('autoSmooth',true)){
+    if(typeof started!=='undefined'&&started&&!menu.open&&document.visibilityState==='visible'&&LS.get('autoSmooth',true)&&performance.now()-(PERF.t0||0)>12000&&!(typeof $==='function'&&$('ws')&&getComputedStyle($('ws')).display!=='none')){
       if(PERF.fps<26){PERF.low++;}else PERF.low=Math.max(0,PERF.low-1);
       if(PERF.low>=3){PERF.low=0;const cur=renderer.getPixelRatio(),nx=cur>1?1:cur>0.75?0.75:cur;if(nx<cur){renderer.setPixelRatio(nx);renderer.setSize(innerWidth,innerHeight,false);if(!PERF.told){PERF.told=true;toast('⚡ It was getting laggy — made the picture a little lighter so it runs smoother (Menu → 🔍 search "smooth" to change)',4500);}}
         // lots of leftover smoke / fire? clear the oldest
@@ -9732,6 +9732,9 @@ let GEO_KEEP=null;function geoDisp(o){try{if(!o)return;if(!GEO_KEEP){GEO_KEEP=ne
  setInterval(()=>{try{const w=$('ws');document.body.classList.toggle('wsOn',!!(w&&getComputedStyle(w).display!=='none'));}catch(e){}},400);}
 // 🪖 a tank you BUILT drove 60 km/h (like a race car!) — real RC tanks crawl. Same feel as the ready-made tank now.
 {const u0=useSpec;useSpec=function(){const r=u0.apply(this,arguments);try{if(vhKind()==='tank'&&ST&&ST.top>8){ST.top=clamp(ST.top*0.36,3.5,8);ST.acc=Math.min(ST.acc,11);}}catch(e){}return r;};}
+// auto-smooth: don't judge the speed in the first seconds after starting (the phone is still warming up the graphics) — it was turning the picture down for no reason
+{const s0=startGame;startGame=function(){PERF.t0=performance.now();return s0.apply(this,arguments);};}
+{const v0=document.onvisibilitychange;document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')PERF.t0=performance.now();});}
 
 // ================================================================ v57: 🧠 the AI pilots KNOW the game — real answers to "what's the fastest vehicle", "how do I get money", "make it night", "get in a sub", secrets…
 function gqTntList(){try{return Object.values(TNTK).map(k=>k.n).join(', ');}catch(e){return'lots';}}
