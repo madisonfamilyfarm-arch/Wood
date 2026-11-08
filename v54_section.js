@@ -50,7 +50,7 @@ setInterval(()=>{try{if(!started||!AIB.L.length||menu.open)return;const now=perf
         for(const X of pbAlive())if(X!==B&&!(B.team==='me'&&X.team==='me'))C.push({id:X.id,p:X.p,hp:X.hpMax?X.hp/X.hpMax:1,n:pbName(X)});
         if(C.length){C.forEach(c=>{c.sc=c.p.distanceTo(B.p)+c.hp*60-(PB.grudge[B.id]===(c.id==='me'?mp.id:c.id)?80:0)+Math.random()*40;});C.sort((a,b)=>a.sc-b.sc);const t=C[0];
           B.hunt=t.id==='me'?'me':t.id;B.huntCmd=false;if((B.kind==='drone'||B.kind==='heli')&&Math.random()<0.18*pp.brave&&!(B.bombCd>now)){B.bomb=t.id==='me'?'me':t.id;if(Math.random()<0.7)pbSay(B,PICK(['💣 Bombs away on '+t.n+'!','Special delivery for '+t.n+' 💣','TNT time 😈']),true);}if(Math.random()<pp.chat*0.6){if(t.id==='me')pbSay(B,pbLine('huntMe',B));else{if(pbSay(B,pbLine('hunt',B,t.n))){const T=AIB.L.find(x=>x.id===t.id);if(T&&Math.random()<0.6)setTimeout(()=>{if(!T.dead)pbSay(T,pbLine('banter',T,pbName(B)),true);},2600);}}}}}}
-    else{B.hunt=B.huntCmd?B.hunt:null;
+    else{B.hunt=B.huntCmd?B.hunt:null;if(GAME.on)continue;
       // calm time: sometimes wander, follow you, show off, or invite you to play
       if(!(B.planT>now)){B.planT=now+25000+Math.random()*30000;const r=Math.random();
         if(r<0.3){const P=aiPlaces().filter(p=>!/truck|fire$/.test(p.n));const pl=PICK(P);sbPilotGo(B,pl);if(Math.random()<pp.chat*0.5)pbSay(B,'I\'m gonna check out '+pl.n+' 🧭');}
