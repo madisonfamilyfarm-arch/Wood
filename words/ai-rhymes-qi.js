@@ -1,0 +1,1 @@
+AIR_ADD("qi",{"qi":"be,he,we,me,she,see,three,free,de,tv","qin":"been,within,win,skin,begin,thin,min,berlin,spin,sin","qing":"thing,bring,king,spring,ring,wing,sing,string,swing,beijing"});

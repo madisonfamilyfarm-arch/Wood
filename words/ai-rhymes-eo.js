@@ -1,0 +1,1 @@
+AIR_ADD("eo",{"eocene":"magazine,protein,gasoline,aberdeen,submarine,hygiene,philippine,quarantine,argentine,nicotine"});

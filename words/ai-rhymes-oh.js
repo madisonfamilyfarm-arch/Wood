@@ -1,0 +1,1 @@
+AIR_ADD("oh",{"oh":"so,no,know,go,show,though,ago,low,although,co","ohh":"so,no,know,go,show,though,oh,ago,low,although","ohm":"home,rome,chrome,dome,foam,jerome,comb,roam,tome,gnome"});

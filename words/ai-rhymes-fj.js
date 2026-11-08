@@ -1,0 +1,1 @@
+AIR_ADD("fj",{"fjord":"board,record,lord,award,toward,scored,afford,ford,sword,ward"});

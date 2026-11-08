@@ -1,0 +1,1 @@
+AIR_ADD("eb",{"ebay":"sunday,anyway,yesterday,birthday,holiday,thursday,highway,railway,norway,broadway","eb":"webb,ebb","ebb":"web,jeb,eb,deb,celeb","ebenezer":"caesar,freezer,teaser,cesar","ebola":"cola,viola,lola,motorola,angola,hola,loyola,pensacola,guardiola,nola"});

@@ -1,0 +1,1 @@
+AIR_ADD("hr",{"hr":"are,far,car,star,bar,guitar,mar,pr,par,ar"});

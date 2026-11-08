@@ -1,0 +1,1 @@
+AIR_ADD("ng",{"ngo":"so,no,know,show,though,oh,ago,low,although,co","nguyen":"when,then,again,men,ten,ben,pen,gen,cnn,ken","ngos":"those,shows,goes,knows,rose,suppose,chose,nose,grows,flows"});

@@ -1,0 +1,1 @@
+AIR_ADD("oo",{"ooh":"to,you,do,who,new,two,too,through,few,true","oooh":"to,you,do,who,new,two,too,through,few,true","oop":"group,soup,coupe,troupe,regroup,recoup,guadalupe,lupe,dupe","oozing":"using,losing,choosing,confusing,refusing,amusing,accusing,abusing,cruising,bruising","ooze":"news,lose,whose,choose,views,shoes,reviews,jews,refuse,blues","oops":"groups,soups"});

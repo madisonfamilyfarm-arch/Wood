@@ -1,0 +1,1 @@
+AIR_ADD("ny",{"nye":"by,my,why,high,try,guy,buy,july,die,eye","nypd":"company,probably,anti,ability,nobody,reality,library,identity,possibility,thirty","nyx":"six,fix,mix,picks,tricks,sticks,kicks,chicks,bricks,clicks","nylon":"amazon,marathon,phenomenon,moron,pentagon,hogan,liaison,babylon,tucson,neutron","nymph":"lymph"});

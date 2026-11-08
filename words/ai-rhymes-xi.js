@@ -1,0 +1,1 @@
+AIR_ADD("xi",{"xian":"on,john,non,upon,iran,don,jon,con,khan,ron","xi":"be,he,we,me,she,see,three,free,de,tv","xie":"be,he,we,me,she,see,three,free,de,tv","xiao":"how,now,allow,wow,bow,thou,cow,dow,mao,vow","xinjiang":"hang,gang,bang,sang,wang,yang,lang,chang,rang,zhang"});

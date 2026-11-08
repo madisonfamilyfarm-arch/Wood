@@ -1,0 +1,1 @@
+AIR_ADD("uk",{"uk":"they,way,may,day,say,away,play,today,pay,stay","ukraine":"main,pain,campaign,train,brain,explain,remain,gain,plane,rain","ukulele":"daily,israeli,bailey,haley,daly,hayley,daley,hailey,bayley,aly","ukrainian":"mediterranean,romanian,albanian,tasmanian,lithuanian,jordanian,subterranean,panamanian","ukrainians":"iranians,romanians,albanians"});

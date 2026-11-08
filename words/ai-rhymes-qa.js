@@ -1,0 +1,1 @@
+AIR_ADD("qa",{"qatar":"are,far,car,star,bar,guitar,hr,mar,pr,par"});

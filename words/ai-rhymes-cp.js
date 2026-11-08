@@ -1,0 +1,1 @@
+AIR_ADD("cp",{"cpu":"to,you,do,who,new,two,too,through,few,true","cps":"yes,less,guess,press,success,unless,vs,dress,stress,express"});

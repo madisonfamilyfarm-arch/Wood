@@ -1,0 +1,1 @@
+AIR_ADD("ts",{"tse":"be,he,we,me,she,see,three,free,de,tv","tsar":"are,far,car,star,bar,guitar,hr,mar,pr,par","tsai":"by,my,why,high,try,guy,buy,july,die,eye","ts":"yes,less,guess,press,success,unless,vs,dress,stress,express","tsunami":"tommy,mommy,swami,rami,commie,salami,murakami"});

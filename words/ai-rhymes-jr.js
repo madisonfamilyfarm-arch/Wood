@@ -1,0 +1,1 @@
+AIR_ADD("jr",{"jr":"junior"});

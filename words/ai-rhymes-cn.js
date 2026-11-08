@@ -1,0 +1,1 @@
+AIR_ADD("cn",{"cnn":"when,then,again,men,ten,ben,en,pen,gen,ken","cnet":"internet,asset,sunset,outlet,mindset,somerset,onset,alphabet,juliet,headset"});

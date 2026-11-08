@@ -1,0 +1,1 @@
+AIR_ADD("oy",{"oy":"illinois,oi,choi,roi,doi,croix,hoi","oyster":"cloister"});

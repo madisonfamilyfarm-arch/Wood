@@ -1,0 +1,1 @@
+AIR_ADD("sv",{"sven":"when,then,again,men,ten,ben,pen,gen,cnn,ken","svetlana":"gonna,wanna,marijuana,donna,madonna,rihanna,nirvana,mana,guyana,botswana"});

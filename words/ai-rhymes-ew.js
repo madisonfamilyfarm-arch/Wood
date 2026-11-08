@@ -1,0 +1,1 @@
+AIR_ADD("ew",{"ewe":"to,you,do,who,new,two,too,through,few,true","ewing":"doing,pursuing,suing,booing,undoing,queuing,debuting,canoeing,tattooing,wooing","ewan":"ruin,wuhan"});

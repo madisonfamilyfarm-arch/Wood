@@ -1,0 +1,1 @@
+AIR_ADD("uz",{"uzbekistan":"pakistan,afghanistan,batman,businessman,afghan,taliban,caravan,fisherman,tristan,lifespan","uzi":"susie,suzy,jacuzzi"});

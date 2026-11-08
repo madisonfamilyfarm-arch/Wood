@@ -1,0 +1,1 @@
+AIR_ADD("pn",{"pneumatic":"democratic,dramatic,automatic,diplomatic,static,problematic,systematic,traumatic,attic,cinematic","pneumonia":"ammonia,catalonia,sonya"});

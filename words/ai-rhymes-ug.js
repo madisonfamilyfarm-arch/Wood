@@ -1,0 +1,1 @@
+AIR_ADD("ug",{"ugh":"drug,bug,plug,hug,doug,dug,rug,mug,tug,thug","ugandan":"abandon,brandon,landon"});

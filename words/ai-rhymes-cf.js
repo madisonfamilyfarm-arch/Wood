@@ -1,0 +1,1 @@
+AIR_ADD("cf",{"cfo":"so,no,know,go,show,though,oh,ago,low,although"});

@@ -1,0 +1,1 @@
+AIR_ADD("nb",{"nbc":"be,he,we,me,she,see,three,free,de,tv","nba":"they,way,may,day,say,away,play,today,pay,stay"});

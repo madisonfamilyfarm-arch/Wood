@@ -1,0 +1,1 @@
+AIR_ADD("pf",{"pfizer":"advisor,adviser,kaiser,wiser,visor,riser,geyser","pfeiffer":"decipher,cipher,cypher"});

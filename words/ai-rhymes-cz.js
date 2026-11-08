@@ -1,0 +1,1 @@
+AIR_ADD("cz",{"czar":"are,far,car,star,bar,guitar,hr,mar,pr,par","czech":"check,tech,neck,deck,sec,dec,heck,quebec,trek,wreck","czechs":"sex,ex,checks,rex,flex,decks,specs,tex,lex,fedex"});

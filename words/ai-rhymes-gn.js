@@ -1,0 +1,1 @@
+AIR_ADD("gn",{"gnu":"to,you,do,who,new,two,too,through,few,true","gnome":"home,rome,chrome,dome,foam,jerome,comb,roam,tome,ohm","gnomes":"homes,holmes,combs,domes,foams","gnawing":"drawing,withdrawing,sawing","gnarly":"charlie,harley,barley,marley,carly,charley,farley"});

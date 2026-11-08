@@ -1,0 +1,1 @@
+AIR_ADD("bj",{"bjorn":"born,porn,worn,corn,horn,torn,warn,sworn,borne,thorn"});

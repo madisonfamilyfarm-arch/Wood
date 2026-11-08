@@ -1,0 +1,1 @@
+AIR_ADD("sr",{"sri":"be,he,we,me,she,see,three,free,de,tv","sr":"senior,monsignor","srinagar":"radar,reservoir,memoir,seminar,nascar,avatar,jaguar,repertoire,registrar,rockstar"});

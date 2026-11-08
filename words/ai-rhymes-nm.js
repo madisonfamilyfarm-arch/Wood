@@ -1,0 +1,1 @@
+AIR_ADD("nm",{"nmr":"are,far,car,star,bar,guitar,hr,mar,pr,par"});

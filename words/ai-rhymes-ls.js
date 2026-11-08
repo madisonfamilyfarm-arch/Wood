@@ -1,0 +1,1 @@
+AIR_ADD("ls",{"lsd":"be,he,we,me,she,see,three,free,de,tv","ls":"yes,less,guess,press,success,unless,vs,dress,stress,express"});

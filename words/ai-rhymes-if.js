@@ -1,0 +1,1 @@
+AIR_ADD("if",{"if":"cliff,stiff,sniff,riff,whiff,diff,schiff,tiff,biff","ifs":"cliffs,riffs"});

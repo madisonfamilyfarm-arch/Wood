@@ -1,0 +1,1 @@
+AIR_ADD("mr",{"mri":"by,my,why,high,try,guy,buy,july,die,eye","mr":"sister,mister,transistor,lister,twister,resistor,blister","mrs":"dismisses,missus"});

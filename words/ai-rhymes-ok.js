@@ -1,0 +1,1 @@
+AIR_ADD("ok",{"ok":"they,way,may,day,say,away,play,today,pay,stay","okay":"they,way,may,day,say,away,play,today,pay,stay","oklahoma":"coma,lymphoma,aroma,melanoma,carcinoma,sonoma,glaucoma,loma,moma,paloma","okada":"nevada,granada,prada,armada,radha,estrada,wada","okinawa":"kagawa"});

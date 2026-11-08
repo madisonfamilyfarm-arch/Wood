@@ -1,0 +1,1 @@
+AIR_ADD("zu",{"zulu":"interview,revenue,eu,avenue,tissue,overview,statue,hindu,preview,yahoo","zucchini":"bikini,genie,sweeney,martini,lamborghini,mussolini,teeny,mancini,jeannie,pellegrini","zurich":"sulfuric"});

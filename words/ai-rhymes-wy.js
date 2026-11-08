@@ -1,0 +1,1 @@
+AIR_ADD("wy",{"wye":"by,my,why,high,try,guy,buy,july,die,eye","wy":"they,way,may,day,say,away,play,today,pay,stay","wynn":"been,within,win,skin,begin,thin,min,berlin,spin,sin","wynne":"been,within,win,skin,begin,thin,min,berlin,spin,sin","wylie":"highly,riley,miley,wiley,smiley,reilly,wily","wyatt":"quiet,diet,riot,hyatt","wyoming":"roaming,combing,homing,foaming"});

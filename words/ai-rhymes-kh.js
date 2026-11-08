@@ -1,0 +1,1 @@
+AIR_ADD("kh",{"khan":"on,john,non,upon,iran,don,jon,con,ron,juan","khmer":"their,there,where,care,air,share,hair,fair,wear,square","khartoum":"room,whom,assume,boom,costume,resume,bloom,tomb,consume,zoom","khaki":"hockey,rocky,jockey,cocky,kawasaki,nagasaki,maki,miyazaki","khrushchev":"medvedev"});

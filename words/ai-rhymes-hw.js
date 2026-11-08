@@ -1,0 +1,1 @@
+AIR_ADD("hw",{"hwan":"on,john,non,upon,iran,don,jon,con,khan,ron","hwa":"la,ya,ah,ma,ha,da,raw,pa,na,nah","hwang":"hang,gang,bang,sang,yang,lang,chang,rang,zhang,dang"});

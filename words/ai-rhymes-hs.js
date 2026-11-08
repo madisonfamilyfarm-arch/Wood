@@ -1,0 +1,1 @@
+AIR_ADD("hs",{"hsu":"to,you,do,who,new,two,too,through,few,true","hsbc":"be,he,we,me,she,see,three,free,de,tv"});

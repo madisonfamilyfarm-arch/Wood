@@ -1,0 +1,1 @@
+AIR_ADD("uf",{"ufo":"so,no,know,go,show,though,oh,ago,low,although","ufos":"those,shows,goes,knows,rose,suppose,chose,nose,grows,flows"});
