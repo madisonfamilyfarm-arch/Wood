@@ -62,3 +62,5 @@ function geoDispSafe(g){try{if(!g)return;const live=new Set();scene.traverse(o=>
 {const r0=rebuildDrone;rebuildDrone=function(){const old=DR&&DR.g;const r=r0.apply(this,arguments);if(old&&old!==(DR&&DR.g))setTimeout(()=>geoDispSafe(old),0);return r;};}
 {const d0=mpDrop;mpDrop=function(id){const pe=mp.peers[id];const old=pe&&pe.mesh&&pe.mesh.g;const r=d0.apply(this,arguments);if(old)setTimeout(()=>geoDispSafe(old),0);return r;};}
 {const s0=MPH.sp;MPH.sp=function(m,pe){const old=pe&&pe.mesh&&pe.mesh.g;const r=s0.apply(this,arguments);if(old&&pe.mesh&&pe.mesh.g!==old)setTimeout(()=>geoDispSafe(old),0);return r;};}
+// no shooting (or "Take off first" pop-ups) while the builder is open
+{const f0=fire;fire=function(){if(document.body.classList.contains('wsOn'))return;return f0.apply(this,arguments);};}
