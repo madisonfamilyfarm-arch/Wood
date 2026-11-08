@@ -10250,6 +10250,38 @@ let CSRAW='';{const c0=cleanSpeech;cleanSpeech=function(t){CSRAW=String(t||'');r
 }catch(e){}return s0.apply(this,arguments);};}
 {const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
 
+// numbers & units
+const UNITS={mm:['L',.001],millimeter:['L',.001],cm:['L',.01],centimeter:['L',.01],m:['L',1],meter:['L',1],metre:['L',1],km:['L',1000],kilometer:['L',1000],inch:['L',.0254],in:['L',.0254],foot:['L',.3048],ft:['L',.3048],yard:['L',.9144],mile:['L',1609.344],
+ second:['T',1],sec:['T',1],minute:['T',60],min:['T',60],hour:['T',3600],hr:['T',3600],day:['T',86400],week:['T',604800],year:['T',31536000],decade:['T',315360000],century:['T',3153600000],
+ gram:['W',1],g:['W',1],kilogram:['W',1000],kg:['W',1000],kilo:['W',1000],ounce:['W',28.3495],oz:['W',28.3495],pound:['W',453.592],lb:['W',453.592],ton:['W',907184.7],
+ milliliter:['V',1],ml:['V',1],liter:['V',1000],litre:['V',1000],cup:['V',236.588],pint:['V',473.176],quart:['V',946.353],gallon:['V',3785.41],teaspoon:['V',4.929],tablespoon:['V',14.787]};
+function unitK(u){u=String(u||'').toLowerCase().replace(/^an? /,'').trim();const al={feet:'foot',inches:'inch',centuries:'century',kms:'km',mph:null};if(al[u]!==undefined)return al[u];if(UNITS[u])return u;if(/ies$/.test(u)&&UNITS[u.slice(0,-3)+'y'])return u.slice(0,-3)+'y';if(/s$/.test(u)&&UNITS[u.slice(0,-1)])return u.slice(0,-1);if(/es$/.test(u)&&UNITS[u.slice(0,-2)])return u.slice(0,-2);return null;}
+function fmtN(x){if(!isFinite(x))return '∞';if(Math.abs(x)>=1e6)return Math.round(x).toLocaleString('en-US');return (Math.round(x*1000)/1000).toLocaleString('en-US');}
+function isPrime(n){if(n<2||n%1)return false;for(let i=2;i*i<=n;i++)if(n%i===0)return false;return true;}
+{const s0=smartHear;smartHear=function(txt){try{const raw=' '+String(CSRAW||txt||'').toLowerCase().replace(/[?!,]/g,' ').replace(/\s+/g,' ')+' ';const s=nNorm(String(txt||''));const B=(nWho(s).find(w=>w.B)||{}).B||aiNear(1e9)[0];if(!B)return s0.apply(this,arguments);let m;const say=t=>{sbSay({B},t);return true;};
+  if(m=raw.match(/ how many ([a-z]+) (?:are )?(?:in|per) (?:a |an |one |1 )?([a-z]+) /)){const a=unitK(m[1]),b=unitK(m[2]);if(a&&b&&UNITS[a][0]===UNITS[b][0]){if(a==='day'&&b==='year')return say('📅 365 days (366 in a leap year)!');if(a==='week'&&b==='year')return say('📅 52 weeks (and 1 extra day)!');const em={L:'📏',T:'⏱',W:'⚖️',V:'🥛'}[UNITS[a][0]];return say(em+' '+fmtN(UNITS[b][1]/UNITS[a][1])+' '+m[1]+' in '+(/^[aeiouh]/.test(b)&&b!=='yard'?'an ':'a ')+b+'!');}}
+  if(m=raw.match(/ (?:convert |what is |whats |what s |how much is |how many [a-z]+ (?:is|are) )?(-?[\d.]+) ([a-z]+) (?:to|in|into) ([a-z]+) /)){const a=unitK(m[2]),b=unitK(m[3]),n=parseFloat(m[1]);
+    if(/^(c|celsius|degrees?)$/.test(m[2])&&/^(f|fahrenheit)$/.test(m[3]))return say('🌡 '+n+' °C = '+fmtN(n*9/5+32)+' °F');if(/^(f|fahrenheit)$/.test(m[2])&&/^(c|celsius)$/.test(m[3]))return say('🌡 '+n+' °F = '+fmtN((n-32)*5/9)+' °C');
+    if(a&&b&&UNITS[a][0]===UNITS[b][0]&&isFinite(n))return say('📏 '+n+' '+m[2]+' = '+fmtN(n*UNITS[a][1]/UNITS[b][1])+' '+m[3]);}
+  if(m=raw.match(/ (-?[\d.]+) (?:to the power of|to the|\^|raised to) (-?[\d.]+)(?:th|st|nd|rd)?(?: power)? /)){const r=Math.pow(+m[1],+m[2]);return say('🧮 '+m[1]+'^'+m[2]+' = '+fmtN(r));}
+  if(m=raw.match(/ (\d+) (?:squared) /))return say('🧮 '+m[1]+'² = '+fmtN((+m[1])**2));
+  if(m=raw.match(/ (\d+) (?:cubed) /))return say('🧮 '+m[1]+'³ = '+fmtN((+m[1])**3));
+  if(m=raw.match(/ is (\d+) (?:a )?prime(?: number)? /)){const n=+m[1];return say(isPrime(n)?'✅ Yes! '+n+' is prime':'❌ No — '+n+(n>1?' can be divided by '+(()=>{for(let i=2;i<n;i++)if(n%i===0)return i;})():' isn\'t prime'));}
+  if(m=raw.match(/ is (\d+) (?:an? )?(even|odd)(?: number)? /)){const n=+m[1],ev=n%2===0;return say((ev===(m[2]==='even')?'✅ Yes, ':'❌ No, ')+n+' is '+(ev?'even':'odd'));}
+  if(m=raw.match(/ what (?:number )?comes (after|before) (-?\d+) /)){const n=+m[2];return say('🔢 '+(m[1]==='after'?n+1:n-1));}
+  if(m=raw.match(/ (?:what s |whats |what is |which is )?(bigger|larger|greater|smaller|less|more) (-?[\d.]+) or (-?[\d.]+) /)){const a=+m[2],b=+m[3],big=/bigger|larger|greater|more/.test(m[1]);if(a===b)return say('⚖️ They\'re the same!');return say('⚖️ '+(big?(a>b?m[2]:m[3]):(a<b?m[2]:m[3]))+' is '+m[1]+'!');}
+  if(/ how (much|many) is a dozen /.test(raw))return say('🥚 A dozen is 12! (a baker\'s dozen is 13)');
+  if(/ how many (is|in) a (score) /.test(raw))return say('🔢 A score is 20!');
+  if(/ (what is|whats|what s) pi /.test(raw))return say('🥧 Pi ≈ 3.14159… — how many times a circle\'s width fits around its edge!');
+  if(/ what is (infinity) /.test(raw))return say('♾ Something that never ends — bigger than any number!');
+  if(/ (what is|whats|what s) the (biggest|largest) number /.test(raw))return say('♾ There isn\'t one — you can always add 1! (A googol is 1 with 100 zeros)');
+  if(/ (what is|whats|what s) a (googol) /.test(raw))return say('🔢 1 followed by 100 zeros!');
+  if(/ how many (zeros|zeroes) (are )?in a (million) /.test(raw))return say('🔢 6 zeros: 1,000,000');
+  if(/ how many (zeros|zeroes) (are )?in a (billion) /.test(raw))return say('🔢 9 zeros: 1,000,000,000');
+  if(/ how many (zeros|zeroes) (are )?in a (trillion) /.test(raw))return say('🔢 12 zeros!');
+}catch(e){}return s0.apply(this,arguments);};}
+{const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
+
 // =====================================================================================
 // ===== 🌎 REAL WORLD MAP (CesiumJS): the real Earth from satellite photos + real hills, starting over the farm =====
 // The game itself (physics, multiplayer, weapons, workshop…) is the same — Cesium just draws the world underneath.
