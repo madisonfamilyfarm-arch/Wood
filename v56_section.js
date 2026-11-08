@@ -30,3 +30,5 @@ let GEO_KEEP=null;function geoDisp(o){try{if(!o)return;if(!GEO_KEEP){GEO_KEEP=ne
 // auto-smooth: don't judge the speed in the first seconds after starting (the phone is still warming up the graphics) — it was turning the picture down for no reason
 {const s0=startGame;startGame=function(){PERF.t0=performance.now();return s0.apply(this,arguments);};}
 {const v0=document.onvisibilitychange;document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')PERF.t0=performance.now();});}
+// start screen on a phone: it was taller than the screen and centered, so the title + top got cut off and couldn't be scrolled to
+{const st=document.createElement('style');st.textContent='#start{justify-content:flex-start!important;padding-top:calc(20px + env(safe-area-inset-top))!important;padding-bottom:calc(24px + env(safe-area-inset-bottom))!important}#start>:first-child{margin-top:auto}#start>:last-child{margin-bottom:auto}';document.head.appendChild(st);}
