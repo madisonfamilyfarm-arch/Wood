@@ -230,4 +230,5 @@ rep("const thrust=D.thr*S.Tm*(1-clamp(Vf/(S.top*1.25),0,1)*0.75);","const thrust
 rep("  if(V>0.01)_a.addScaledVector(va,-drag/m/V);\n","  if(V>0.01)_a.addScaledVector(va,-drag/m/V);\n  if(V>S.top*1.35)_a.addScaledVector(va,-(V-S.top*1.35)*1.5/V);\n  {const vmax=D.pos.y-gy>700?700:180;if(V>vmax)_a.addScaledVector(va,-(V-vmax)*4/V);}\n")
 rep("_a.set(0,-9.8,0).addScaledVector(_f,thrust/m).addScaledVector(_u,lift/m);","_a.set(0,-9.8,0).addScaledVector(_f,Math.min(thrust/m,ST.airliner?22:45)).addScaledVector(_u,clamp(lift/m,-60,60));")
 rep("  D.pos.addScaledVector(v,dt);\n  // ground\n","  {const vm=D.pos.y-gy>700?700:200,vl=v.length();if(vl>vm)v.multiplyScalar(vm/vl);}\n  D.pos.addScaledVector(v,dt);\n  // ground\n")
+r=r.replace("fun:'😊 Just for fun'","fun:'😊 Easy / friendly (they won\\'t shoot you)'")
 open('rc.html','w').write(r);print('ok',len(r))

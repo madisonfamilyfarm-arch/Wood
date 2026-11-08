@@ -19,3 +19,9 @@ setInterval(ftankBtn,700);
 {const b0=buildItems;buildItems=function(){const L=b0();try{L.splice(1,0,mItem('🪖🛸 Flying tank — ready to drive + FLY',()=>{menuToggle(false);ftankGo();}));}catch(e){}return L;};}
 try{for(const c of MCAT){if(c[0]==='games'){const g0=window['mCatItems'];}}}catch(e){}
 {const g0=mCatItems;mCatItems=function(k){const L=g0.apply(this,arguments);try{if(k==='games'||k==='fly'){L.splice(1,0,mItem('🪖🛸 Flying tank (ready to go)',()=>ftankGo()));if(k==='games')L.splice(2,0,mItem('✈️ Real-size airliner',()=>airlinerGo()));}}catch(e){}return L;};}
+// 🛡 you can only get blown up while you're actually flying/driving — not parked, walking, in a menu, the builder or chat
+setInterval(()=>{try{if(!started)return;const safe=WALK.on||(menu&&menu.open)||(WS&&WS.open)||($('bsBox')&&$('bsBox').style.display==='flex')||!(D.state==='flying'&&D.armed)||(D.state==='landed');if(safe&&!DZ.dead)D.shield=Math.max(D.shield||0,performance.now()+600);}catch(e){}},200);
+{const d0=dzDie;dzDie=function(){try{if(WALK.on||(menu&&menu.open)||(WS&&WS.open)||D.state==='landed'||!D.armed)return;}catch(e){}return d0.apply(this,arguments);};}
+// 😊 "Just for fun" AI = friendly: they play and fight each other, but they don't shoot at you
+setInterval(()=>{try{if(AIB.diff==='fun')PROT.me=performance.now()+3000;}catch(e){}},1000);
+{const t0=aiDropTnt;aiDropTnt=function(B){try{if(AIB.diff==='fun'){const me=dzMe();if(me&&B&&B.p&&Math.hypot(me.x-B.p.x,me.z-B.p.z)<12)return;}}catch(e){}return t0.apply(this,arguments);};}
