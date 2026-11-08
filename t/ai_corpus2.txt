@@ -1,0 +1,166 @@
+# HELD-OUT test: new phrasings never used while tuning (voice-typing style)
+yo ace come follow me real quick || follow
+can u guys like follow me around || follow
+gizmo stay on my tail || follow
+dash be my buddy and follow me || follow
+come on lets go everyone follow || follow
+blaze escort me to safety || follow
+please accompany me || follow
+ace pursue me || follow
+everyone head to the lake || go
+fly down to the lake gizmo || go
+can you take a trip to the meadow || go
+blaze cruise over to the tower || go
+lets all go to the camp || go
+go to the dirt track || go
+zoom over to the airfield ace || go
+travel to the fire tower please || go
+ace proceed to the lake || go
+navigate to the meadow || go
+come over to me blaze || come
+yo get over here quick || come
+can you come to where i am || come
+dash come closer || come
+race you to the tower || race
+i challenge you || race
+lets see who is faster || race
+you cant beat me || race
+blaze race me || race
+time for a race || race
+fight me || attack
+lets battle || attack
+come at me bro || attack
+war time || attack
+everyone obliterate blaze || hunt
+dash go get gizmo || hunt
+go wreck blaze || hunt
+ace eliminate gizmo || hunt
+target blaze || hunt
+everybody chase down dash || hunt
+who's the weakest || advice
+who should i go after next || advice
+who should i target || advice
+truce please || peace
+stop attacking me || peace
+put the weapons down || peace
+can we be friends || peace
+ace guard me || team
+team up with me blaze || team
+defend me || team
+everyone help me fight || team
+land now || land
+ace touch down || land
+everyone land please || land
+put it down on the ground || land
+take off now || takeoff
+launch everyone || takeoff
+get in the air || takeoff
+ace do a backflip || flip
+do some tricks || flip
+show off for me || flip
+blaze do a loop || flip
+twirl around || spin
+do a pirouette || spin
+spin in circles || spin
+everybody boogie || dance
+party time || dance
+lets celebrate || dance
+sit tight || hover
+stay right there ace || hover
+pause || hover
+dont move || hover
+halt || hover
+go around me || circle
+orbit around me blaze || circle
+ascend || higher
+fly way up high || higher
+descend || lower
+come lower || lower
+hurry || faster
+floor it || faster
+full speed ahead || faster
+ease up || slower
+take it easy || slower
+head home || home
+return home blaze || home
+go back to the start || home
+jump in a boat ace || switch
+try the submarine || switch
+grab a plane || switch
+ride the helicopter || switch
+blaze become a car || switch
+drop a bomb on dash || tnt
+bomb them || tnt
+ace bombing run on blaze || tnt
+lets play tag ace || tag
+you're it || tag
+play hide and go seek || hide
+simon says || leader
+mirror me || leader
+i'm done playing || stopgame
+end the game || stopgame
+tell me something funny || joke
+got any jokes || joke
+riddle me this || riddle
+tell me a cool fact || fact
+did you know anything cool || fact
+tell me a bedtime story || story
+sing for me || song
+rock paper scissors shoot || rps
+scissors || rps
+toss a coin || coin
+roll dice || dice
+pick a random number || number
+count to 10 || count
+what's 6 plus 7 || math
+what is 10 times 10 || math
+whats 100 divided by 5 || math
+where's the meadow || directions
+how far away is the lake || directions
+which direction is the fire tower || directions
+how high am i right now || status
+what's my speed || status
+who's winning right now || score
+whats the score || score
+who's online || who
+who else is here || who
+what time is it right now || time
+how do i drop tnt || howto
+how do i talk || howto
+what are your commands || help
+hey there || greet
+hiya || greet
+good evening everyone || greet
+how's your day || howareyou
+how you doing || howareyou
+thank you so much || thanks
+thanks a lot blaze || thanks
+see you later || bye
+goodnight || bye
+you're the best || compliment
+you are really smart || compliment
+great job everyone || compliment
+you're so slow || insult
+oops sorry || sorry
+i'm really bored || bored
+whats your favorite place || favorite
+are you human || robot
+my name's maddie || name
+i really like trains || like
+do you remember me || memory
+be quiet please || quiet
+i am so excited || feelings
+i'm sad || feelings
+what are you up to || doing
+who are you || whoareyou
+i'm hungry || hungry
+where do you come from || wherelive
+sure || yes
+nope || no
+asdf jkl || huh
+ace go to the meadow and then land || go+land
+everyone follow me and do flips || follow+flip
+blaze switch to a boat then go to the lake || switch+go
+gizmo do a flip || flip
+you too || again
+dash || huh

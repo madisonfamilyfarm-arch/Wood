@@ -1,0 +1,282 @@
+# message || expected intent   (written like voice typing — garbles, run-ons, slang)
+follow me || follow
+ace follow me || follow
+fallow me please || follow
+can you guys follow me || follow
+everyone follow me || follow
+come with me || follow
+stick with me ace || follow
+tag along with me || follow
+chase me || follow
+come along || follow
+be my wingman || follow
+stay behind me || follow
+keep up with me || follow
+um gizmo can you follow me || follow
+is mo follow me || follow
+ace go to the lake || go
+go to the lake || go
+fly to the meadow || go
+head over to the fire tower || go
+lets go to the airfield || go
+can you go to the campsite || go
+drive to the camp site || go
+take me to the lake || go
+go check out the fire tour || go
+fly over to the medal || go
+go to the pond || go
+visit the tower || go
+everyone go to the lake || go
+ace go explore the woods || go
+meet me at the lake || go
+go to the run way || go
+come here || come
+come over here || come
+get over here || come
+ace come here || come
+come to me || come
+come back here || come
+where are you guys || where
+ace where are you || where
+wear are you || where
+where'd you go || where
+race me || race
+lets race || race
+i bet i can beat you || race
+wanna race || race
+raise me || race
+race me to the lake || race
+lets have a race ace || race
+challenge you to a race || race
+first one to the tower wins || race
+attack || attack
+attack me || attack
+lets fight || attack
+battle time || attack
+bring it on || attack
+shoot me if you can || attack
+come at me || attack
+lets have a war || attack
+open fire || attack
+everyone attack blaze || hunt
+go after blaze || hunt
+get blaze || hunt
+take out comet || hunt
+hunt down blaze || hunt
+blow up comet || hunt
+ace annihilate blaze || hunt
+who should i blow up next || advice
+who should i attack || advice
+who's the easiest to beat || advice
+stop shooting || peace
+dont shoot me || peace
+truce || peace
+lets be friends || peace
+cease fire || peace
+stop fighting please || peace
+no more rockets || peace
+be on my team || team
+ace join my team || team
+cover me || team
+protect me || team
+back me up || team
+help me fight || team
+you're on my side ace || team
+land || land
+ace land || land
+come down and land || land
+touch down || land
+land on the pad || land
+park it || land
+take off || takeoff
+lift off || takeoff
+launch || takeoff
+do a flip || flip
+do a flit || flip
+ace do a flip || flip
+everyone do a flip || flip
+show me a trick || flip
+do a barrel roll || flip
+loop the loop || flip
+spin || spin
+spin around || spin
+do a spin || spin
+dance || dance
+dance party || dance
+everybody dance || dance
+bust a move || dance
+wait || hover
+wait here || hover
+stay there || hover
+hover || hover
+hold on || hover
+stop moving || hover
+freeze || hover
+hold still ace || hover
+circle me || circle
+fly around me || circle
+orbit me || circle
+go higher || higher
+fly higher || higher
+climb || higher
+go up || higher
+go lower || lower
+fly lower || lower
+get low || lower
+go faster || faster
+hurry up || faster
+step on it || faster
+zoom || faster
+slow down || slower
+go slower || slower
+not so fast || slower
+go home || home
+go back to the pad || home
+return to base || home
+switch to a plane || switch
+ace switch to a plane || switch
+get in a boat || switch
+change to a helicopter || switch
+use the submarine || switch
+hop in a car || switch
+switch to a drone || switch
+become a jet || switch
+take the chopper || switch
+drop tnt || tnt
+ace drop a bomb || tnt
+bombs away || tnt
+ace drop tnt on blaze || tnt
+throw dynamite || tnt
+lets play tag || tag
+play tag with me || tag
+tag you're it || tag
+wanna play tag || tag
+hide and seek || hide
+lets play hide and seek || hide
+play hide n seek || hide
+follow the leader || leader
+copy me || leader
+do what i do || leader
+lets play a game || play
+i want to play something || play
+play with me || play
+stop playing || stopgame
+game over || stopgame
+i quit || stopgame
+tell me a joke || joke
+say something funny || joke
+make me laugh || joke
+know any jokes || joke
+tell me a riddle || riddle
+give me a riddle || riddle
+fun fact || fact
+tell me a fact || fact
+teach me something || fact
+tell me a story || story
+story time || story
+sing a song || song
+sing me something || song
+rock paper scissors || rps
+i pick rock || rps
+paper || rps
+flip a coin || coin
+heads or tails || coin
+roll the dice || dice
+roll a die || dice
+pick a number between 1 and 10 || number
+count to 5 || count
+count down from 10 || count
+what is 5 plus 3 || math
+whats 7 times 8 || math
+what's twelve divided by four || math
+how much is 9 minus 2 || math
+where is the lake || directions
+how do i get to the fire tower || directions
+which way is the airfield || directions
+how far is the campsite || directions
+where am i || whereami
+how high am i || status
+how fast am i going || status
+what's the score || score
+who's winning || score
+how many kills do i have || score
+who's here || who
+who is playing || who
+how many pilots are there || who
+what time is it || time
+how do i shoot || howto
+how do i fly || howto
+how do i make a room || howto
+how do i flip || howto
+how do i build a tank || howto
+what can you do || help
+help || help
+what should i say || help
+hi || greet
+hello || greet
+hey guys || greet
+yo || greet
+good morning || greet
+what's up || greet
+howdy || greet
+how are you || howareyou
+how's it going || howareyou
+you good || howareyou
+thanks || thanks
+thank you ace || thanks
+thx || thanks
+bye || bye
+goodbye || bye
+see ya later || bye
+gotta go || bye
+you're awesome || compliment
+nice flying || compliment
+good job ace || compliment
+you are so cool || compliment
+you're dumb || insult
+you suck || insult
+sorry || sorry
+my bad || sorry
+i'm bored || bored
+what should we do || bored
+what's your favorite color || favorite
+what's your favorite animal || favorite
+whats your favourite food || favorite
+are you a robot || robot
+are you real || robot
+how old are you || age
+my name is madison || name
+call me maddie || name
+i like raccoons || like
+i love tanks || like
+what do you know about me || memory
+be quiet || quiet
+shh || quiet
+you can talk again || talk
+i'm sad || feelings
+i'm so happy || feelings
+this is awesome || feelings
+what are you doing || doing
+what are you flying || doing
+who are you || whoareyou
+what's your name || whoareyou
+i'm scared || scared
+i'm hungry || hungry
+do you like pizza || dolike
+where do you live || wherelive
+yes || yes
+yeah sure || yes
+no || no
+nah || no
+undo that || huh
+blorp zibble || huh
+gizmo go to the lake and then race me || go+race
+ace follow me then do a flip || follow+flip
+everyone land and then take off || land+takeoff
+blaze go to the tower and wait there || go+hover
+ace switch to a plane and follow me || switch+follow
+do it again || again
+you too || again
+one more time || again
+ace do a flip || flip
+him too || again
