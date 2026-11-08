@@ -22,3 +22,5 @@ function rocketParts(){try{return DR&&DR.g?(DR.g.userData.rkParts||(DR.g.userDat
   requestAnimationFrame(tk);};requestAnimationFrame(tk);}
 // a new build = find its rocket engines again
 {const r0=rebuildDrone;rebuildDrone=function(){const r=r0.apply(this,arguments);try{if(DR&&DR.g)DR.g.userData.rkParts=null;}catch(e){}return r;};}
+// rockets (and the airliner) aren't held down by the 120 m drone height limit — keep going up and you reach space
+{const t0=tickDrone;tickDrone=function(){const keep=CFG.maxH;let up=false;try{up=!!(ST&&(ST.airliner||(ST.info&&ST.info.space&&(SPEC.parts||[]).some(p=>p.t==='rocket'))));}catch(e){}if(up)CFG.maxH=Math.max(keep,20000);try{return t0.apply(this,arguments);}finally{if(up)CFG.maxH=keep;}};}

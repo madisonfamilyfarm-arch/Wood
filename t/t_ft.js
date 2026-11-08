@@ -1,0 +1,10 @@
+const H0=require('./harness');
+H0(async({mk})=>{const P=await mk('P','http://127.0.0.1:8765/woods-rc-sim.html');P.on('pageerror',e=>console.log('PAGEERR',e.message));await P.waitForTimeout(3000);
+const S='/tmp/claude-0/-home-claude/45cffd64-7151-5ab5-acd7-339a16c71f6a/scratchpad/';
+console.log(await P.evaluate(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const o=[];startGame('free');await W(500);
+ const kd=c=>dispatchEvent(new KeyboardEvent('keydown',{code:c,key:c}));const ku=c=>dispatchEvent(new KeyboardEvent('keyup',{code:c,key:c}));
+ ftankGo();await W(1500);o.push('kind '+vhKind()+' btn '+$('ftFly').textContent+' shown '+($('ftFly').style.display!=='none'));const p0=D.pos.clone();kd('ArrowUp');await W(3000);ku('ArrowUp');o.push('drove '+D.pos.distanceTo(p0).toFixed(1));
+ ftankSwitch();await W(1000);const y0=D.pos.y;kd('ArrowUp');await W(3000);ku('ArrowUp');o.push('fly kind '+vhKind()+' climbed '+(D.pos.y-y0).toFixed(1)+' btn '+$('ftFly').textContent+' state '+D.state);
+ kd('ArrowUp');await W(3000);ku('ArrowUp');o.push('alt before land '+(D.pos.y-H(D.pos.x,D.pos.z)).toFixed(1)+' btn '+$('ftFly').textContent);ftankSwitch();await W(400);o.push('chute '+CHUTE.on+' btn '+$('ftFly').textContent);let k=0;while(k<40&&SPEC.flyAs==='combo'){await W(500);k++;}o.push('landed after '+(k*0.5)+'s chute '+CHUTE.on);o.push('back kind '+vhKind()+' alt '+(D.pos.y-H(D.pos.x,D.pos.z)).toFixed(1)+' state '+D.state);
+ const n=mCatItems('games').map(it=>{try{return it.label();}catch(e){return '';}}).filter(x=>/Flying tank|airliner/.test(x));o.push('menu '+n.join(' / '));return o.join('\n');}));
+await P.screenshot({path:S+'ftank.png'});});
