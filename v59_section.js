@@ -45,3 +45,13 @@ function memSave(){try{LS.set('aiMem',AIC.mem);}catch(e){}}
     if(/ what do you (know|remember) about me /.test(s)){const L=[];if(M.name)L.push('you\'re '+M.name);if(M.likes&&M.likes.length)L.push('you like '+M.likes.slice(-4).join(', '));for(const k in M.fav)L.push('your favorite '+k+' is '+M.fav[k]);for(const k in M.pets)L.push('your '+k+' is '+M.pets[k]);sbSay({B},L.length?'I know '+L.join(', ')+' 😊':'Not much yet! Tell me stuff — "my name is…", "I like…" 😄');return true;}
   }catch(e){console.warn('mem',e);}return s0.apply(this,arguments);};}
 {const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
+// ---------------------------------------------------------------- 🤔 vague messages get a real question back (not "say that again"), "come on / let's go" = follow me, "everyone except Ace …"
+{const s0=smartHear;smartHear=function(txt){try{const s=nNorm(String(txt||''));const W=nWho(s);const B=(W.find(w=>w.B)||{}).B||aiNear(1e9)[0];if(!B)return s0.apply(this,arguments);
+    const s2=s.replace(/ (ace|blaze|comet|gizmo|dash|max|nova|zip|bolt|rex) /g,' ').replace(/ +/g,' ');if(AIC.offer&&performance.now()-(AIC.offerT||0)<30000)return s0.apply(this,arguments);
+    if(/^ (go there|go over there|go that way|over there|there) $/.test(s2)){sbSay({B},'Go where? 🤔 Say a place — like "the lake", "the airfield" or "the fire tower"!');return true;}
+    if(/^ (do it|do that|do that thing|do the thing|the thing|that thing|get it|get that|that one|this one) $/.test(s2)){sbSay({B},'Do what? 🤔 Tell me — like "do a flip", "follow me" or "race me"!');return true;}
+    if(/^ (come on|cmon|c mon|lets go|let us go|lets roll|move it|come along|on me|with me) $/.test(s2)){return s0.call(this,(W.length?W.map(w=>pbName(w.B||{name:''})).join(' and ')+' ':'')+'follow me');}
+    const ex=s.match(/ (everyone|everybody|all of you|you all|guys) (except|but|but not|other than) ([a-z0-9 -]+?) (follow|land|come|race|attack|go|stop|hover|flip|spin|dance)/);
+    if(ex){const skip=AIB.L.filter(X=>ex[3].indexOf(pbName(X).toLowerCase())>=0);const keep=pbAlive().filter(X=>!skip.includes(X));if(skip.length&&keep.length){const rest=s.slice(s.indexOf(' '+ex[4]+' ')).trim();return s0.call(this,keep.map(pbName).join(' and ')+' '+rest);}}
+  }catch(e){console.warn('vague',e);}return s0.apply(this,arguments);};}
+{const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
