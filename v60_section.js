@@ -27,3 +27,10 @@ const GQ2=[
 {const s0=smartHear;smartHear=function(txt){try{const s=nNorm(String(txt||''));const W=nWho(s);const B=(W.find(w=>w.B)||{}).B||aiNear(1e9)[0];
     for(const [re,f] of GQ2){if(re.test(s)){const a=f(s,B);if(a===null)return true;if(B&&a){sbSay({B},a);return true;}if(a){toast(a,3000);return true;}}}}catch(e){console.warn('gq2',e);}return s0.apply(this,arguments);};}
 {const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
+// ---------------------------------------------------------------- 🎭 each AI pilot can describe its own personality (brave / chatty / trash-talker / friendly) — they really act that way in battles
+{const s0=smartHear;smartHear=function(txt){try{const s=nNorm(String(txt||''));const W=nWho(s);const L=W.filter(w=>w.B).map(w=>w.B);
+    if(/ (what is|whats|describe) your personality | what are you like | tell me about yourself | who are you really /.test(s)){const who=L.length?L:[aiNear(1e9)[0]];who.forEach((B,i)=>{if(!B)return;const p=pbP(B);const t=[];if(p.brave>0.75)t.push('super brave 💪');else if(p.brave<0.45)t.push('a bit careful 😅');if(p.chat>0.75)t.push('really chatty 🗣');if(p.trash>0.6)t.push('a trash-talker 😏');if(p.friendly>0.75)t.push('super friendly 🤗');if(!t.length)t.push('chill 😎');
+      sbSay({B},'I\'m '+pbName(B)+' — '+t.join(', ')+'. Favorite ride: '+(['drone 🚁','heli 🚁','plane ✈️','car 🚙','boat 🚤','sub 🐟'][Math.floor(p.chat*5.99)]),400+i*700);});return true;}
+    if(/ who is the (best|bravest|toughest|nicest|funniest) (pilot|ai|one|of you)/.test(s)){const k=/brav|tough/.test(s)?'brave':/nice/.test(s)?'friendly':/funn/.test(s)?'trash':'brave';const B=pbAlive().slice().sort((a,b)=>pbP(b)[k]-pbP(a)[k])[0];if(B){sbSay({B},PICK(['Me, obviously 😎','That\'d be me! 🙋','Ask anyone — it\'s me 😏']));return true;}}
+  }catch(e){}return s0.apply(this,arguments);};}
+{const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}

@@ -1,7 +1,7 @@
 // ================================================================ v54: 🎮 AI pilots play like REAL multiplayer players — own plans (targets, teams, retreat + fix up, comebacks), a scoreboard,
 // player-style chat ("I'm going after Blaze, cover me!", "gg", "rematch?", "that was close!", "where'd you go?"), bot-vs-bot banter, and answers to player questions.
 const PB={said:0,ev:0,score:{},grudge:{}};
-function pbP(B){if(!B.pp){let h=0;for(const ch of B.name)h=(h*31+ch.charCodeAt(0))>>>0;const r=k=>((h>>>k)%100)/100;B.pp={chat:0.35+r(3)*0.6,brave:0.3+r(7)*0.7,trash:r(11),friendly:0.3+r(15)*0.7};}return B.pp;}
+function pbP(B){if(!B.pp){let h=0;for(const ch of B.name)h=(h*31+ch.charCodeAt(0))>>>0;let st=h||1;const rnd=()=>{st=(st+0x6D2B79F5)>>>0;let t=st;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;};const r=()=>rnd();B.pp={chat:0.35+r(3)*0.6,brave:0.3+r(7)*0.7,trash:r(11),friendly:0.3+r(15)*0.7};}return B.pp;}
 function pbS(id,n){return PB.score[id]||(PB.score[id]={n,k:0,d:0});}
 function pbName(B){return B.name.replace('🤖 ','');}
 function pbAlive(){return AIB.L.filter(B=>!B.dead);}
