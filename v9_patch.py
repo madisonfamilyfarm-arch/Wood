@@ -209,4 +209,5 @@ rep("' g · 🌀 '+I.n+' motors · 🛡 '","' g'+(I.n?' · 🌀 '+I.n+' motors':
 rep("(I.topHeavy>4?' · <span style=\"color:#ff9f0a\">🏗 top-heavy — wobbly</span>':'')","(I.topHeavy>4&&I.n>0?' · <span style=\"color:#ff9f0a\">🏗 top-heavy — wobbly</span>':'')")
 rep("' · ⚡ '+Math.round(st.top)+' m/s","' · ⚡ '+Math.round(/tank/.test(faTxt)&&st.top>8?Math.max(3.5,Math.min(8,st.top*0.36)):st.top)+' m/s")
 rep("$('bTake').textContent=D.state==='landed'?'🛫 TAKE OFF':D.state==='down'||D.state==='tumble'?'🔧 FIX':'🛬 LAND';","{const gv=!WALK.on&&(vkind()==='car'||vkind()==='boat');$('bTake').textContent=D.state==='down'||D.state==='tumble'?'🔧 FIX':gv?(D.state==='landed'||!D.armed?'🚦 GO':'🛑 STOP'):D.state==='landed'?'🛫 TAKE OFF':'🛬 LAND';}")
+rep("D.vel.x+=(tvx-D.vel.x)*k;D.vel.z+=(tvz-D.vel.z)*k;","{let dvx=(tvx-D.vel.x)*k,dvz=(tvz-D.vel.z)*k;const aMax=clamp(hMax*0.65,4,12)*dt*(SPEC.acro?1.6:1),dm=Math.hypot(dvx,dvz);if(dm>aMax&&!D.hit){dvx*=aMax/dm;dvz*=aMax/dm;}D.vel.x+=dvx;D.vel.z+=dvz;}")
 open('rc.html','w').write(r);print('ok',len(r))
