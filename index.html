@@ -9921,6 +9921,19 @@ function memSave(){try{LS.set('aiMem',AIC.mem);}catch(e){}}
     if(ex){const skip=AIB.L.filter(X=>ex[3].indexOf(pbName(X).toLowerCase())>=0);const keep=pbAlive().filter(X=>!skip.includes(X));if(skip.length&&keep.length){const rest=s.slice(s.indexOf(' '+ex[4]+' ')).trim();return s0.call(this,keep.map(pbName).join(' and ')+' '+rest);}}
   }catch(e){console.warn('vague',e);}return s0.apply(this,arguments);};}
 {const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
+// ---------------------------------------------------------------- 🗨 follow-up questions about what an AI pilot just said ("why?", "who got you?", "how many have you got?")
+const PBLAST={B:null,k:'',t:0,x:''};
+const PBPEND={};{const p0=pbLine;pbLine=function(k,B,t){const r=p0.apply(this,arguments);try{PBPEND[r]={B,k,x:t||''};}catch(e){}return r;};}
+{const q0=pbSay;pbSay=function(B,t){const ok=q0.apply(this,arguments);try{const p=PBPEND[t];if(ok&&p){PBLAST.B=p.B;PBLAST.k=p.k;PBLAST.x=p.x;PBLAST.t=performance.now();}for(const k in PBPEND)delete PBPEND[k];}catch(e){}return ok;};}
+{const s0=smartHear;smartHear=function(txt){try{const s=nNorm(String(txt||''));const W=nWho(s);const now=performance.now();const fresh=PBLAST.B&&now-PBLAST.t<30000&&!PBLAST.B.dead;
+    if(/^ (why|but why|why tho|why though|how come|why would you do that|why did you do that|why me) $/.test(s)&&fresh){const B=PBLAST.B,g=PB.grudge[B.id],gn=g?(g===mp.id?meName():(AIB.L.find(x=>x.id===g)||{name:'someone'}).name.replace('🤖 ','')):null;
+      const R={hunt:gn&&gn.toLowerCase()===String(PBLAST.x).toLowerCase()?'Because '+gn+' blew me up last time! 😤':PICK(['They\'re the closest — easy target 🎯','Because they\'re winning and I want to stop them 😈','Why not? 😜']),huntMe:g===mp.id?'You got me last time — payback! 😤':PICK(['Because you\'re the best pilot here 😎','It\'s a battle! Nothing personal 😇']),
+        low:'My health was almost gone! I need to fix up 🔧',respawn:'Because '+(gn||'someone')+' blew me up! 😤',gotYou:'It\'s a battle! You can get me back 😜',banter:'They started it! 😤',idleBattle:'Just thinking out loud 🤔',closeCall:'That rocket almost hit me! 😱'};
+      sbSay({B},R[PBLAST.k]||PICK(['Because it\'s fun! 😄','No reason 😜']));return true;}
+    if(/ who (got|blew up|killed|shot|destroyed|wrecked) you /.test(s)){const B=(W.find(w=>w.B)||{}).B||(fresh?PBLAST.B:null)||aiNear(1e9)[0];if(B){const g=PB.grudge[B.id];const gn=g?(g===mp.id?'YOU did 😤':(AIB.L.find(x=>x.id===g)||{name:'someone'}).name.replace('🤖 ','')+' did! 😠'):'Nobody yet! 😎';sbSay({B},gn);return true;}}
+    if(/ how many (kills|blow ups|blowups|points) (do you have|have you got|you got|did you get) | are you winning | whats your score | what is your score /.test(s)){const L=W.filter(w=>w.B).map(w=>w.B);const who=L.length?L:[(fresh?PBLAST.B:null)||aiNear(1e9)[0]];who.forEach((B,i)=>{const sc=PB.score[B.id]||{k:0,d:0};sbSay({B},'I\'ve got '+sc.k+' blow-up'+(sc.k===1?'':'s')+' and got blown up '+sc.d+' time'+(sc.d===1?'':'s')+(sc.k>sc.d?' 😎':sc.k<sc.d?' 😅':' 🤷'),400+i*600);});return true;}
+  }catch(e){console.warn('pbfollow',e);}return s0.apply(this,arguments);};}
+{const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
 
 // =====================================================================================
 // ===== 🌎 REAL WORLD MAP (CesiumJS): the real Earth from satellite photos + real hills, starting over the farm =====
