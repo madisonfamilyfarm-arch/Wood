@@ -1,0 +1,3 @@
+const H=require('./harness');H(async({mk})=>{const P=await mk('P','http://127.0.0.1:8765/woods-rc-sim.html');await P.waitForTimeout(3000);await P.evaluate(()=>{startGame('free');D.state='flying';D.armed=true;});await P.waitForTimeout(800);
+console.log(await P.evaluate(async()=>{const o=[];const w=ms=>new Promise(r=>setTimeout(r,ms));const g=()=>renderer.info.memory.geometries;o.push('start '+g()+' chunks '+chunks.size);
+ for(let r=0;r<4;r++){for(const [x,z] of [[600,0],[0,0],[-600,0],[0,0]]){D.pos.set(x,H(x,z)+30,z);D.vel.set(0,0,0);await w(2500);}o.push('round '+r+': geos '+g()+' chunks '+chunks.size);}return o.join('\n');}));});

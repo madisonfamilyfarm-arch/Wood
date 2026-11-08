@@ -1,0 +1,6 @@
+const {chromium,devices}=require('playwright');
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});const ctx=await b.newContext({...devices['iPhone 15 Pro landscape']});await ctx.addInitScript(()=>{try{localStorage.setItem('wds_cfg',JSON.stringify({look:'fast'}));}catch(e){}});
+  const p=await ctx.newPage();await p.route('**/three.min.js',r=>r.fulfill({path:__dirname+'/node_modules/three/build/three.min.js',contentType:'text/javascript'}));
+  await p.goto('http://127.0.0.1:8765/woods-rc-sim.html',{waitUntil:'domcontentloaded'});await p.waitForTimeout(3000);await p.evaluate(()=>{startGame('free');DZ.on=true;});await p.waitForTimeout(2500);
+  console.log(await p.evaluate(()=>[...document.querySelectorAll('body *')].filter(e=>{const s=getComputedStyle(e);if(s.display==='none'||s.visibility==='hidden')return false;const r=e.getBoundingClientRect();return r.width>8&&r.height>40&&r.x>500&&r.y>150;}).map(e=>{const r=e.getBoundingClientRect();return (e.id||e.className||e.tagName)+' '+e.tagName+(e.type?'['+e.type+']':'')+' '+[r.x,r.y,r.width,r.height].map(Math.round).join(',')+' "'+(e.textContent||'').slice(0,12)+'"';}).join('\n')));
+  await p.screenshot({path:'fire.png'});await b.close();})();

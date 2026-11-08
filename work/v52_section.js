@@ -44,7 +44,7 @@ const NSYN={attack:['annihilate','obliterate','demolish','decimate','eradicate',
   peace:['surrender','forgive','reconcile','befriend','pacify'],dance:['boogie','jive','shimmy','groove','tango','waltz','twerk'],race:['compete','duel','contest']};
 const NSTOP=new Set('the a an please pls can could would will you u ya ye guys hey ok okay so um uh like just now right go to me my i it that this some'.split(' '));
 function nNorm(t){let s=' '+String(t||'').toLowerCase().replace(/[“”"]/g,'').replace(/[’']/g,"'").replace(/[!?.;:]+/g,' ').replace(/\s+/g,' ')+' ';
-  const C=[[/ what's /g,' what is '],[/ whats /g,' what is '],[/ where's /g,' where is '],[/ wheres /g,' where is '],[/ who's /g,' who is '],[/ whos /g,' who is '],[/ how's /g,' how is '],[/ it's /g,' it is '],[/ i'm /g,' i am '],[/ im /g,' i am '],[/ you're /g,' you are '],[/ youre /g,' you are '],[/ ur /g,' you are '],[/ let's /g,' lets '],[/ don't /g,' dont '],[/ can't /g,' cant '],[/ won't /g,' wont '],[/ where'd /g,' where did '],[/ wanna /g,' want to '],[/ gonna /g,' going to '],[/ gotta /g,' got to '],[/ y'all /g,' everyone '],[/ yall /g,' everyone '],[/ u /g,' you '],[/ r /g,' are ']];
+  const C=[[/ what's /g,' what is '],[/ whats /g,' what is '],[/ where's /g,' where is '],[/ wheres /g,' where is '],[/ who's /g,' who is '],[/ whos /g,' who is '],[/ how's /g,' how is '],[/ it's /g,' it is '],[/ i'm /g,' i am '],[/ im /g,' i am '],[/ you're /g,' you are '],[/ youre /g,' you are '],[/ ur /g,' you are '],[/ let's /g,' lets '],[/ don't /g,' dont '],[/ can't /g,' cant '],[/ won't /g,' wont '],[/ where'd /g,' where did '],[/ wanna /g,' want to '],[/ gonna /g,' going to '],[/ gotta /g,' got to '],[/ y'all /g,' everyone '],[/ yall /g,' everyone '],[/ u /g,' you '],[/ r /g,' are '],[/ (d&d|d & d|dnd|d n d|d and d|t&t|t and t|tea and tea|tee n tee|tnts) /g,' tnt ']];
   C.forEach(([r,v])=>{s=s.replace(r,v).replace(r,v);});return s;}
 function nWords(s){return s.trim().split(' ').filter(Boolean);}
 function nStem(w){return w.replace(/(ing|ed|es|s|er|ly)$/,'').replace(/(.)\1$/,'$1');}
@@ -81,7 +81,7 @@ function nParse(clause,ctx){const s=nNorm(clause);const who=nWho(s),place=nPlace
   if(q&&sc.where&&!place)return{i:'where',s,who};
   if(q&&!/ go | fly | head | race /.test(s))return null; // other questions: the normal brain answers them (directions, math, score…)
   if(sc.again)return{i:'again',s,who};
-  if(sc.stopgame)return{i:'stopgame',s};if(sc.leader)return{i:'leader',s,who};if(sc.hide&&/ seek | hide /.test(s))return{i:'hide',s,who};if(sc.tag&&!/ tag along /.test(s)&&(/ play /.test(s)||/ tag /.test(s)||/ it /.test(s)))return{i:'tag',s,who};
+  if(sc.stopgame)return{i:'stopgame',s};if(sc.leader)return{i:'leader',s,who};if(sc.hide&&(/ seek | hide /.test(s)||(NSYN.hide||[]).some(w=>s.indexOf(' '+w)>=0)))return{i:'hide',s,who};if(sc.tag&&!/ tag along /.test(s)&&(/ play /.test(s)||/ tag /.test(s)||/ it /.test(s)))return{i:'tag',s,who};
   if(sc.tnt){const on=/ (on|at) /.test(s);return{i:'tnt',s,who,target:on?(/ on me | at me /.test(s)?'me':tgt[tgt.length-1]):null};}
   if(sc.home&&!/ race /.test(s))return{i:'home',s,who};
   if(sc.race){return{i:'race',s,who,place};}
@@ -146,6 +146,6 @@ function nRun(c,base){const T=nTargets(c);const pre=T?T.map(nName).join(' and ')
         NLU.pend={t:performance.now(),opts:[{c,word:c.i},{c:Object.assign({},c,{i:c.alt}),word:c.alt}]};sbSay({B:(c.who&&c.who[0]&&c.who[0].B)||aiNear(1e9)[0]},'Did you mean '+nm[c.i]+' or '+nm[c.alt]+'? 🤔');return true;}
       if(c.i!=='again')NLU.last=c;const r=nRun(c,s0);if(r!==false)return r;}
     // the normal brain gets everything else (questions, chat, games…)
-    const r=s0.call(this,raw);if(r===false&&AIB.L.some(B=>!B.dead)&&!Object.keys(mp.peers).some(id=>!/^bot|~|^tg|^tst/.test(id))){const B=aiNear(1e9)[0];sbSay({B},PICK(['Hmm, I didn\'t quite get that 🤔 Try "follow me", "race me", "let\'s play tag" or "what can you do"!','Say that again? I want to get it right 👂','I\'m still learning that one 😅 Try "what can you do"!']));return true;}return r;}catch(e){console.warn('nlu',e);return s0.apply(this,arguments);}};}
+    const r=s0.call(this,raw);if(r===false&&AIB.L.some(B=>!B.dead)&&!Object.keys(mp.peers).some(id=>!/^bot|~|^tg|^tst/.test(id))){const B=aiNear(1e9)[0];const fz=window.kbFuzzy&&kbFuzzy(raw);if(fz){sbSay({B},fz);return true;}sbSay({B},PICK(['Hmm, I didn\'t quite get that 🤔 Try "follow me", "race me", "let\'s play tag" or "what can you do"!','Say that again? I want to get it right 👂','I\'m still learning that one 😅 Try "what can you do"!']));return true;}return r;}catch(e){console.warn('nlu',e);return s0.apply(this,arguments);}};}
 // games always find a pilot (switching one into a drone if needed)
 {const g0=gameStart;gameStart=function(kind,B){if(!B||!(B.kind==='drone'||B.kind==='heli')){const fl=aiNear(1e9,true)[0];if(fl)B=fl;else{const any=B||aiNear(1e9)[0];if(any){try{aiSwitch(any,'drone');}catch(e){}B=AIB.L.find(x=>x.name===any.name&&!x.dead)||any;B.kind='drone';}}}return g0.call(this,kind,B);};}

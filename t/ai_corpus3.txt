@@ -1,0 +1,84 @@
+# PLAYER-STYLE held-out: things real players type/say in a multiplayer battle (voice-typing style, garbled)
+which team are you on || whichteam
+what team r u on ace || whichteam
+are you on my team blaze || whichteam
+whose side are you on || whichteam
+r u with me or against me || whichteam
+help me || helpme
+help me im getting blown up || helpme
+someone help || helpme
+i need help over here || helpme
+save me gizmo || helpme
+they are attacking me help || helpme
+gg || gg
+good game everyone || gg
+gg guys that was fun || gg
+well played ace || gg
+rematch || rematch
+rematch right now || rematch
+i want a rematch || rematch
+are you ok || health
+ace are you hurt || health
+how much health do you have || health
+you alright blaze || health
+who is winning || score
+whos winning right now || score
+show me the scoreboard || score
+what are the scores || score
+nice shot || niceshot
+good shot ace || niceshot
+nice one blaze || niceshot
+lol || laugh
+haha || laugh
+lmao that was funny || laugh
+you missed || taunt
+ha missed me || taunt
+im coming for you ace || taunt
+you are going down blaze || taunt
+watch out gizmo || taunt
+who should i blow up next || advice
+who should i go after || advice
+who's the easiest to beat || advice
+go after blaze || hunt
+ace attack gizmo || hunt
+get him || hunt
+cover me || team
+come with me ace || follow
+follow me guys || follow
+be on my team || team
+team up with me || team
+lets team up blaze || team
+ace and blaze team up with me || team
+lets battle || attack
+start a battle || attack
+stop fighting || peace
+truce || peace
+lets be friends no more rockets || peace
+lets race || race
+race me to the lake || race
+wanna play tag || tag
+hide and seek || hide
+drop tnt on blaze || tnt
+throw d&d at gizmo || tnt
+do a flip || flip
+do a backflip ace || flip
+where is everyone || where
+where are you blaze || where
+come here || come
+land || land
+take off || takeoff
+go higher || higher
+fly lower || lower
+hurry up || faster
+slow down a little || slower
+hey ace || greet
+whats up guys || greet
+how are you doing || howareyou
+thanks || thanks
+thank you blaze || thanks
+bye guys || bye
+see ya later || bye
+be quiet || quiet
+you can talk again || talk
+tell me a joke || joke
+whats 12 times 4 || math

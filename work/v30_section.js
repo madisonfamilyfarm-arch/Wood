@@ -64,7 +64,7 @@ function smartHear(txt){const s=' '+String(txt||'').toLowerCase().replace(/[!?.,
   return s0.apply(this,arguments);};}
 // ---------------------------------------------------------------- 🐢 chat you can actually READ: AI messages come one at a time (≥2.5 s apart) and stay on screen longer
 const SAYQ=[];
-{const s0=aiSayAs;aiSayAs=function(name,text){SAYQ.push([name,text]);if(SAYQ.length>6)SAYQ.splice(0,SAYQ.length-6);};setInterval(()=>{const m=SAYQ.shift();if(m)s0(m[0],m[1]);},2600);}
+{const s0=aiSayAs;aiSayAs=function(name,text){SAYQ.push([name,text]);if(SAYQ.length>6)SAYQ.splice(0,SAYQ.length-6);};aiSayAs.__raw=s0;setInterval(()=>{const m=SAYQ.shift();if(m)s0(m[0],m[1]);},2600);}
 // ---------------------------------------------------------------- 📱💻🥽 Settings: what are you playing on?
 function devSet(m){LS.set('devMode',m);PHONE=devIsPhone();const sticks=document.querySelectorAll('.stick');sticks.forEach(s=>s.style.display=(m==='computer')?'none':'');
   if(m==='vr'&&!(typeof vr!=='undefined'&&vr.on))try{toggleVR();}catch(e){}if(m!=='vr'&&typeof vr!=='undefined'&&vr.on)try{toggleVR();}catch(e){}

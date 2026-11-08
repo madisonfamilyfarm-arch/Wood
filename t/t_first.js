@@ -1,0 +1,5 @@
+const {chromium,devices}=require('playwright');(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});
+for(const [dn,dev] of [['P',devices['iPhone 15 Pro']],['L',devices['iPhone 15 Pro landscape']]]){const ctx=await b.newContext(dev);const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.route('**/three.min.js',r=>r.fulfill({path:__dirname+'/node_modules/three/build/three.min.js',contentType:'text/javascript'}));await p.goto('http://127.0.0.1:8765/woods-rc-sim.html');await p.waitForTimeout(5000);await p.screenshot({path:'first'+dn+'1.png'});
+const btns=await p.evaluate(()=>[...document.querySelectorAll('button')].filter(e=>e.offsetParent!==null||getComputedStyle(e).position==='fixed').filter(e=>{const r=e.getBoundingClientRect();return r.width>0&&r.top<innerHeight&&getComputedStyle(e).display!=='none'&&getComputedStyle(e).visibility!=='hidden';}).map(e=>e.textContent.trim().slice(0,30)).slice(0,20));console.log(dn,'buttons',JSON.stringify(btns),'errs',errs);await ctx.close();}
+await b.close();})();

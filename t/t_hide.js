@@ -1,0 +1,4 @@
+const H=require('./harness');H(async({mk})=>{const P=await mk('P','http://127.0.0.1:8765/woods-rc-sim.html');await P.waitForTimeout(3000);
+console.log(await P.evaluate(async()=>{startGame('free');aiSet(2);DZ.ai=false;D.state='flying';D.armed=true;D.pos.y+=8;await new Promise(r=>setTimeout(r,2500));const o=[];const c0=chatAdd;chatAdd=function(n,t){o.push('   '+String(n).slice(0,12)+': '+t);return c0.apply(this,arguments);};
+ const w=ms=>new Promise(r=>setTimeout(r,ms));smartHear('lets play hide and seek');await w(14000);const B=GAME.B;o.push('hider '+(B&&B.name)+' at '+(B&&B.p.toArray().map(Math.round)));smartHear('where are you');await w(1500);smartHear('give me a hint');await w(1500);
+ if(B){D.pos.copy(B.p);D.pos.y+=1;}await w(3000);o.push('game after reaching: '+GAME.on);return o.join('\n');}));});

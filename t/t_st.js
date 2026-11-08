@@ -1,0 +1,2 @@
+const H=require('./harness');H(async({mk})=>{const P=await mk('P','http://127.0.0.1:8765/woods-rc-sim.html');await P.waitForTimeout(3000);await P.evaluate(()=>startGame('free'));await P.waitForTimeout(1000);
+console.log(await P.evaluate(()=>{const o=[];for(const k of ['rally','tank']){const c=Object.keys(VPRESETS.car);useSpec(JSON.parse(JSON.stringify(VPRESETS.car[k])));o.push(k+' '+JSON.stringify({grip:ST.grip,wb:ST.wb,steer:ST.steer,skid:ST.skid,top:ST.top,acc:ST.acc}));}o.push(Object.keys(VPRESETS.car).join(','));return o.join('\n');}));});

@@ -1,0 +1,4 @@
+const {chromium}=require('playwright');(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist','--enable-webgl']});const p=await b.newPage();await p.goto('http://127.0.0.1:8765/woods-rc-sim.html',{waitUntil:'domcontentloaded'});await p.waitForTimeout(3000);
+console.log(await p.evaluate(async()=>{const r=[];for(let i=0;i<3;i++){let a=performance.now();await new Promise(r=>setTimeout(r,0));r.push((performance.now()-a).toFixed(0));}
+let a=performance.now();await new Promise(r=>{const c=new MessageChannel();c.port1.onmessage=r;c.port2.postMessage(0);});r.push('msg '+(performance.now()-a).toFixed(0));return r.join(' ');}));
+const q=await b.newPage();console.log(await q.evaluate(async()=>{let a=performance.now();await new Promise(r=>setTimeout(r,0));return 'blank '+(performance.now()-a).toFixed(0);}));await b.close();})();

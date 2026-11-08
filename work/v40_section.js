@@ -55,6 +55,6 @@ function vhBreak(n,quiet){const pool=(VBREAK[vhKind()]||VBREAK.drone).filter(k=>
 {const c0=dmgClear;dmgClear=function(){const r=c0.apply(this,arguments);try{VH.hp=VH.max;vhBar();}catch(e){}return r;};}
 // ---------------------------------------------------------------- 🤖 AI vehicles have armor too (a rocket won't always finish an AI tank)
 {const b0=dzBotDie;dzBotDie=function(B,txt){if(HIT.ctx&&B&&!B.dead){const hp0=VHP[B.kind==='car'&&B.tank?'tank':B.kind]||22;if(B.hpMax==null){B.hpMax=hp0;B.hp=hp0;}
-    const d=B.p.distanceTo(HIT.ctx.p),dmg=HIT.ctx.r*4*clamp(1-0.65*d/HIT.ctx.r,0.25,1);B.hp-=dmg;if(B.hp>0){try{sparks(B.p,0xffaa44);puff(B.p.clone(),0x444444,0.5,1.4);}catch(e){}B.say=PICK(['Ouch! 😵','I\'m hit!','That one stung!','Still going! 💪']);return;}B.hpMax=null;}
+    const d=B.p.distanceTo(HIT.ctx.p),dmg=HIT.ctx.r*4*clamp(1-0.65*d/HIT.ctx.r,0.25,1);B.hp-=dmg;if(B.hp>0){try{sparks(B.p,0xffaa44);puff(B.p.clone(),0x444444,0.5,1.4);}catch(e){}{const nw=performance.now();if(Math.random()<0.4&&!(B.sayHitT>nw)){B.sayHitT=nw+15000;B.say=PICK(['Ouch! 😵','I\'m hit!','That one stung!','Still going! 💪']);}}return;}B.hpMax=null;}
   return b0.apply(this,arguments);};}
 setInterval(()=>{try{for(const B of AIB.L){if(!B.dead&&B.hpMax&&B.hp<B.hpMax)B.hp=Math.min(B.hpMax,B.hp+B.hpMax*0.03);}}catch(e){}},2000);

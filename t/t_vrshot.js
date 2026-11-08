@@ -1,0 +1,7 @@
+const {chromium,devices}=require('playwright');(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});const ctx=await b.newContext(devices['iPhone 15 Pro landscape']);
+await ctx.addInitScript(()=>{try{localStorage.setItem('wds_cfg',JSON.stringify({look:'fast'}));}catch(e){}});const p=await ctx.newPage();
+await p.route('**/three.min.js',r=>r.fulfill({path:__dirname+'/node_modules/three/build/three.min.js',contentType:'text/javascript'}));
+await p.goto('http://127.0.0.1:8765/woods-rc-sim.html');await p.waitForTimeout(3000);await p.evaluate(()=>{startGame('free');aiSet(2);});await p.waitForTimeout(1500);
+await p.evaluate(()=>toggleVR());await p.waitForTimeout(1500);await p.screenshot({path:'vr1.png'});if(process.env.OFF){await p.evaluate(()=>toggleVR());await p.waitForTimeout(1500);await p.screenshot({path:'vr0.png'});}
+const info=await p.evaluate(()=>[...document.querySelectorAll('button,[id]')].filter(e=>{const r=e.getBoundingClientRect();return r.width>5&&r.height>5&&getComputedStyle(e).display!=='none'&&getComputedStyle(e).visibility!=='hidden'&&r.top<innerHeight&&r.left<innerWidth&&(e.tagName==='BUTTON'||/btn|Btn|chat|Chat/.test(e.id));}).map(e=>{const r=e.getBoundingClientRect();return e.tagName+'#'+e.id+' "'+(e.textContent||'').trim().slice(0,18)+'" '+[r.left,r.top,r.width,r.height].map(Math.round).join(',')+' z'+getComputedStyle(e).zIndex;}).join('\n'));
+console.log(info);await b.close();})();

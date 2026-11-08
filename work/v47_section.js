@@ -80,7 +80,7 @@ const SFXS={state:'',wet:false,stepD:0,last:new V3(),amb:0,water:0,waterT:0,ai:[
 function sfxGear(sp){const G=[0,7,14,23,33,46,62];let i=0;while(i<G.length-2&&sp>G[i+1])i++;const u=clamp((sp-G[i])/(G[i+1]-G[i]),0,1);return 0.28+0.72*u-(i?0:0.1);}
 function sfxEngine(dt){const E=SFX.E,A=SFX.A,t=A.currentTime,k=WALK.on?'walk':vhKind(),fly=D.state==='flying'||D.state==='takeoff',sp=Math.hypot(D.vel.x,D.vel.z),air=D.vel.length();
   let thr=0,f=120,lp=1500,ng=0.2,bg=0,am=0,amHz=0,o2k=1.007,g2=0.3,o3k=0.5,g3=0.3,vol=0.5,nf=900;
-  const alive=!(D.state==='tumble'||D.state==='down')&&(fly||D.armed)&&started&&!menu.open&&CFG.engSnd!==false;
+  const alive=!(D.state==='tumble'||D.state==='down')&&(fly||D.armed)&&started&&!menu.open&&CFG.engSnd!==false&&!(typeof DZ!=='undefined'&&DZ.dead);
   if(k==='walk'||!alive)thr=0;
   else if(k==='drone'||k==='combo'){const I=WALK.inp||Z0;thr=fly?clamp(0.45+Math.abs(I.ly)*0.35+Math.hypot(I.rx,I.ry)*0.25,0,1):0.15;const sz=clamp((ST.L||0.3)/0.3,0.4,3);f=(150+300*thr)/Math.sqrt(sz);o2k=1.012;g2=0.45;o3k=2;g3=0.12;lp=1400+thr*4200;ng=0.22;nf=f*3;vol=0.5;}
   else if(k==='heli'){thr=fly?clamp(0.55+Math.abs(D.vel.y)*0.06+sp*0.01,0,1):0.3;f=55+thr*20;o2k=2.01;g2=0.15;o3k=22;g3=0.05;lp=380+thr*500;ng=0.1;nf=1200;bg=1.1;am=SPEC&&SPEC.style==='blimp'?0:0.85;amHz=(11+thr*5);vol=0.7;}
@@ -96,7 +96,7 @@ function sfxEngine(dt){const E=SFX.E,A=SFX.A,t=A.currentTime,k=WALK.on?'walk':vh
   // the old single-tone engine is replaced
   if(typeof SND!=='undefined'&&SND.on)SND.out.gain.setTargetAtTime(0,t,0.05);
   // wind grows with air speed (louder in fast planes / dives)
-  const ws=(k==='walk'?0:air);const wv=clamp((ws-4)/40,0,1);SFX.W.g.gain.setTargetAtTime(alive&&(fly||k==='plane')?wv*wv*0.5*sfxVol():0,t,0.15);SFX.W.f.frequency.setTargetAtTime(250+wv*1800,t,0.2);
+  const ws=(k==='walk'?0:air);const wv=clamp((ws-4)/40,0,1);SFX.W.g.gain.setTargetAtTime(alive&&(fly||k==='plane')?Math.pow(wv,1.5)*0.6*sfxVol():0,t,0.15);SFX.W.f.frequency.setTargetAtTime(250+wv*1800,t,0.2);
   // tires + skid (cars) · tracks clank (tank)
   const ground=(k==='car'||k==='monster'||k==='tank')&&alive;const tg=ground?clamp(sp/25,0,1)*0.22*sfxVol():0;SFX.T.g.gain.setTargetAtTime(tg,t,0.1);SFX.T.f.frequency.setTargetAtTime(300+sp*25,t,0.2);
   let slip=0;if(ground&&k!=='tank'&&sp>4){const fx=-Math.sin(D.yaw),fz=-Math.cos(D.yaw);slip=Math.abs(D.vel.x*fz-D.vel.z*fx);}SFX.S.g.gain.setTargetAtTime(slip>3.5?clamp((slip-3.5)/8,0,1)*0.12*sfxVol():0,t,0.05);
@@ -122,11 +122,11 @@ function sfxWorld(dt){const t=SFX.A.currentTime,v=sfxVol();
   SFXS.waterT-=dt;if(SFXS.waterT<=0){SFXS.waterT=1;let w=0;const c=cam.position;for(let i=0;i<8;i++){const a=i/8*6.28;for(const r of [8,20]){if(inWater(c.x+Math.cos(a)*r,c.z+Math.sin(a)*r))w=Math.max(w,r===8?1:0.5);}}SFXS.water=w;}
   if(vhKind()!=='boat'&&vhKind()!=='sub'){SFX.Wa.g.gain.setTargetAtTime(SFXS.water*0.06*amb*v,t,0.5);SFX.Wa.f.frequency.setTargetAtTime(350,t,0.5);}}
 // nearby AI vehicles (and the train) — the 2 closest get a voice with left/right panning
-function sfxAI(dt){const t=SFX.A.currentTime,v=sfxVol();const C=[];if(SFX.set.ai){for(const B of AIB.L){if(B.dead)continue;const d=cam.position.distanceTo(B.p);if(d<70)C.push({p:B.p,k:B.kind,d,sp:B.v?B.v.length():8});}
+function sfxAI(dt){const t=SFX.A.currentTime,v=sfxVol();const C=[];if(SFX.set.ai){for(const B of AIB.L){if(B.dead)continue;const d=cam.position.distanceTo(B.p);if(d<70)C.push({p:B.p,k:B.kind==='car'&&B.tank?'tank':B.kind,d,sp:B.v?B.v.length():8});}
     try{if(typeof TRAIN!=='undefined'&&TRAIN.mesh&&!TRAIN.derailed){const p=TRAIN.mesh.position,d=cam.position.distanceTo(p);if(d<90)C.push({p,k:'train',d,sp:Math.abs(TRAIN.v||6)});}}catch(e){}}
   C.sort((a,b)=>a.d-b.d);SFX.V.forEach((V,i)=>{const c=C[i];if(!c){V.out.gain.setTargetAtTime(0,t,0.2);return;}const w=sfxWhere(c.p);let f=200,am=0,amHz=0,lp=1500,ng=0,o2=1.01,vol=0.35;
     if(c.k==='drone'){f=230+c.sp*8;lp=3000;o2=1.013;vol=0.3;}else if(c.k==='heli'){f=60;am=0.85;amHz=13;lp=450;ng=1;vol=0.5;}else if(c.k==='plane'){f=50+c.sp*2;am=0.3;amHz=f/2;lp=1400;vol=0.5;}
-    else if(c.k==='car'){f=60+sfxGear(c.sp)*160;am=0.3;amHz=f/2;lp=1200;vol=0.35;}else if(c.k==='boat'){f=90+c.sp*10;am=0.4;amHz=f;lp=1500;vol=0.35;}else if(c.k==='sub'){f=45;lp=250;vol=0.3;}else if(c.k==='train'){f=34;am=0.6;amHz=1.2+c.sp*0.5;lp=500;ng=0.8;vol=0.6;}
+    else if(c.k==='tank'){f=38+c.sp*4;am=0.55;amHz=6+c.sp*2;lp=600;ng=0.4;vol=0.45;}else if(c.k==='car'){f=60+sfxGear(c.sp)*160;am=0.3;amHz=f/2;lp=1200;vol=0.35;}else if(c.k==='boat'){f=90+c.sp*10;am=0.4;amHz=f;lp=1500;vol=0.35;}else if(c.k==='sub'){f=45;lp=250;vol=0.3;}else if(c.k==='train'){f=34;am=0.6;amHz=1.2+c.sp*0.5;lp=500;ng=0.8;vol=0.6;}
     V.o.frequency.setTargetAtTime(f,t,0.1);V.o2.frequency.setTargetAtTime(f*o2,t,0.1);V.lp.frequency.setTargetAtTime(Math.min(lp,w.lp),t,0.1);V.lfo.frequency.setTargetAtTime(amHz,t,0.1);V.ad.gain.setTargetAtTime(am,t,0.1);V.ng.gain.setTargetAtTime(ng,t,0.1);
     if(V.pan)V.pan.pan.setTargetAtTime(w.pan,t,0.1);V.out.gain.setTargetAtTime(started&&!menu.open?vol*w.g*1.4*v*SFX.set.eng/100:0,t,0.15);});}
 {const t0=tickSound;tickSound=function(dt){if(!SFX.on)return t0.apply(this,arguments);try{sfxEngine(dt);sfxEvents(dt);sfxWorld(dt);sfxAI(dt);}catch(e){if(!sfxEngine.err){sfxEngine.err=1;console.warn('sfx tick',e);}}};}

@@ -1,0 +1,2 @@
+const H=require('./harness');H(async({mk})=>{const P=await mk('P','http://127.0.0.1:8765/woods-rc-sim.html');await P.waitForTimeout(3000);await P.evaluate(()=>startGame('free'));await P.waitForTimeout(1000);
+console.log(await P.evaluate(()=>{useSpec(JSON.parse(JSON.stringify(VPRESETS.plane.trainer)));D.pos.set(0,H(0,0)+60,0);D.yaw=0;D.vel.set(0,0,-9);D.state='flying';D.armed=true;const o=[];for(let i=0;i<12;i++){tickDrone(1/60,{lx:0,ly:0,rx:0,ry:0});o.push(D.yaw.toFixed(2)+'/'+(D.hdg!=null?D.hdg.toFixed(2):'-'));}return o.join(' ');}));});

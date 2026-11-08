@@ -1,0 +1,5 @@
+const H=require('./harness');H(async({mk})=>{const P=await mk('P','http://127.0.0.1:8765/woods-rc-sim.html');await P.waitForTimeout(3000);await P.evaluate(()=>startGame('free'));await P.waitForTimeout(800);
+console.log(await P.evaluate(()=>{const o=[];for(const h of ['scale','stunt']){useSpec(JSON.parse(JSON.stringify(VPRESETS.heli[h])));D.pos.set(0,H(0,0)+40,0);D.vel.set(0,0,0);D.state='flying';D.armed=true;D.yaw=0;let top=0;
+ const run=(inp,n)=>{for(let i=0;i<n;i++){Object.assign(rawIn,inp);tickDrone(1/60,inp);D.pos.y=Math.max(D.pos.y,H(D.pos.x,D.pos.z)+25);top=Math.max(top,Math.hypot(D.vel.x,D.vel.z));}};
+ run({lx:0,ly:0,rx:0,ry:1},480);const p0=D.pos.clone(),v0=Math.hypot(D.vel.x,D.vel.z);let ts=0;for(let i=0;i<900;i++){const inp={lx:0,ly:0,rx:0,ry:0};Object.assign(rawIn,inp);tickDrone(1/60,inp);if(Math.hypot(D.vel.x,D.vel.z)<0.5){ts=i/60;break;}}
+ o.push(h+': top '+top.toFixed(1)+' m/s ('+Math.round(top*3.6)+' km/h), released stick at '+v0.toFixed(1)+' → stops in '+(ts||'>15')+'s over '+Math.hypot(D.pos.x-p0.x,D.pos.z-p0.z).toFixed(0)+' m');}return o.join('\n');}));});

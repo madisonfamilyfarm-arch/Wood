@@ -106,7 +106,7 @@ function aiPeerPos(id){if(id==='me')return dzMe();const B=AIB.L.find(b=>b.id===i
   return r;};}
 // AI hunters + bombers fly to their target; drones dodge your rockets (harder = better dodging)
 {const a0=aiTick;aiTick=function(dt){const now=performance.now();try{for(const B of AIB.L){if(B.dead||!(B.kind==='drone'||B.kind==='heli')||B.mode!=='fly')continue;
-      const tid=B.bomb||B.hunt;if(tid){const tp=aiPeerPos(tid);if(tp){B.goal={x:tp.x+(B.bomb?0:Math.sin(now/900+B.i)*10),z:tp.z+(B.bomb?0:Math.cos(now/900+B.i)*10),h:Math.max(6,tp.y-H(tp.x,tp.z)+(B.bomb?9:4)),kind:'go'};
+      const tid=B.bomb||B.hunt;if(tid){const tp=aiPeerPos(tid);if(tp){B.goal={x:tp.x+(B.bomb?0:Math.sin(now/1400+B.i*1.7)*16),z:tp.z+(B.bomb?0:Math.cos(now/1400+B.i*1.7)*16),h:clamp(tp.y-H(tp.x,tp.z)+(B.bomb?9:String(tid).startsWith('bot')?-1:4),6,B.bomb?45:35),kind:'go'};
           if(B.bomb&&Math.hypot(tp.x-B.p.x,tp.z-B.p.z)<4&&!(B.bombCd>now)){B.bombCd=now+4000;aiDropTnt(B);B.bomb=null;}}else{B.bomb=null;B.hunt=null;}}
       // dodge
       const dodge={fun:0.25,medium:0.6,hard:0.95}[AIB.diff]||0.3;if(Math.random()<dodge)for(const s of shots){if(!s.own||s.w!=='rocket'||s.life<=0||!s.m)continue;const to=B.p.clone().sub(s.m.position),d=to.length();if(d>22||d<1)continue;const sv=s.v.clone().normalize();if(sv.dot(to.normalize())<0.93)continue;

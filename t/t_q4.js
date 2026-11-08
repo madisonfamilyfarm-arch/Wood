@@ -1,0 +1,3 @@
+const H=require('./harness');H(async({mk})=>{const P=await mk('P','http://127.0.0.1:8765/woods-rc-sim.html');await P.waitForTimeout(3000);
+console.log(await P.evaluate(async()=>{startGame('free');aiSet(3);await new Promise(r=>setTimeout(r,2500));const o=[];const log=[];const c0=chatAdd;chatAdd=function(n,t){log.push(t);return c0.apply(this,arguments);};
+for(const q of ['switch to a tank','get in a submarine','everyone get in a boat','Ace fly a jet']){log.length=0;const k0=AIB.L.map(B=>B.kind).join(',');smartHear(q);await new Promise(r=>setTimeout(r,2500));o.push(q+': '+k0+' → '+AIB.L.map(B=>B.kind+(B.tank?'(tank)':'')).join(',')+' | '+log.slice(0,2).join(' ‖ '));}return o.join('\n');}));});

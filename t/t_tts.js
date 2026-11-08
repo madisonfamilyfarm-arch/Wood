@@ -1,0 +1,4 @@
+const H=require('./harness');H(async({mk})=>{const P=await mk('P','http://127.0.0.1:8765/woods-rc-sim.html');const errs=[];P.on('pageerror',e=>errs.push(e.message));await P.waitForTimeout(3000);
+console.log(await P.evaluate(async()=>{startGame('free');aiSet(2);await new Promise(r=>setTimeout(r,1500));const said=[];if(window.speechSynthesis){const s0=speechSynthesis.speak.bind(speechSynthesis);speechSynthesis.speak=u=>{said.push(u.text+' [p'+u.pitch.toFixed(2)+']');};}
+ smartHear('talk out loud');await new Promise(r=>setTimeout(r,800));smartHear('ace whats your favorite color');await new Promise(r=>setTimeout(r,3500));smartHear('stop talking out loud');smartHear('blaze tell me a joke');await new Promise(r=>setTimeout(r,3000));
+ const L=mCatItems('ai').map(it=>String(it.label()).replace(/<[^>]+>/g,'')).slice(0,3);return 'ok '+ttsOk()+' said: '+JSON.stringify(said)+'\nmenu: '+L.join(' | ');}));console.log('errs',errs);});

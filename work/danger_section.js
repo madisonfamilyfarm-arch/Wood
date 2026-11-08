@@ -40,7 +40,7 @@ function dzUnder(T,px,py,pz){const rx=px-T.x,rz=pz-T.z,s=rx*T.dx+rz*T.dz;if(s<0.
 const DZG=(function(){const g=new THREE.CylinderGeometry(0.06,0.06,0.55,8);g.rotateX(Math.PI/2);return g;})(),DZM=new THREE.MeshLambertMaterial({color:0x333333}),DZN=new THREE.MeshBasicMaterial({color:0xffa030});
 function dzBotFire(B,tg){if(B.kind==='sub')return;const o=B.p.clone();o.y+=1;const dir=tg.clone().sub(o).normalize();o.addScaledVector(dir,1.3);const m=new THREE.Group();m.add(new THREE.Mesh(DZG,DZM));const f=new THREE.Mesh(GEO.ball,DZN);f.scale.setScalar(0.09);f.position.z=0.35;m.add(f);
   m.position.copy(o);m.lookAt(o.clone().add(dir));scene.add(m);DZ.rk.push({m,v:dir.multiplyScalar(28),life:4,age:0,by:B.id,n:B.name,prev:o.clone(),puff:0});beep(260,0.2,0.04);
-  if(Math.random()<0.35)chatAdd(B.name,['🚀 Incoming!','Boom time!','Gotcha!','Rocket away!'][Math.floor(Math.random()*4)],AI_COLS[B.i]);}
+  if(Math.random()<0.2)chatAdd(B.name,['🚀 Incoming!','Boom time!','Take this! 😤','Rocket away!'][Math.floor(Math.random()*4)],AI_COLS[B.i]);}
 function dzBotsShoot(dt){if(!DZ.on||!DZ.ai||!AIB.L.length)return;const now=performance.now();
   for(const B of AIB.L){if(B.dead)continue;B.rkT=(B.rkT==null?6+Math.random()*10:B.rkT)-dt;if(B.rkT>0)continue;B.rkT=8+Math.random()*12;
     const T=[];const me=dzMe();if(me&&!DZ.dead&&!(D.shield>now))T.push(me);

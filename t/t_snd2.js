@@ -1,0 +1,15 @@
+const H=require('./harness');
+H(async({mk})=>{const P=await mk('P','http://127.0.0.1:8765/woods-rc-sim.html');await P.waitForTimeout(3000);
+  await P.evaluate(()=>{startGame('free');aiSet(0);SFX.A.resume();});await P.waitForTimeout(1000);
+  const g=async(lbl,fn)=>console.log(lbl.padEnd(28),await P.evaluate(async f=>{eval(f);for(let i=0;i<40;i++)tickSound(0.03);await new Promise(r=>setTimeout(r,400));return 'eng '+SFX.E.out.gain.value.toFixed(3)+' f '+SFX.E.o1.frequency.value.toFixed(0)+' wind '+SFX.W.g.gain.value.toFixed(3)+' tires '+SFX.T.g.gain.value.toFixed(3);},String(fn)));
+  await g('drone motors off on pad',"D.armed=false;D.state='landed';D.vel.set(0,0,0);");
+  await g('drone armed idle',"D.armed=true;D.state='landed';D.vel.set(0,0,0);D.thr=0;");
+  await g('drone full climb',"D.armed=true;D.state='flying';D.vel.set(0,6,0);D.thr=1;touch.ly=1;rawIn.ly=1;");
+  await g('drone fast forward',"D.state='flying';D.vel.set(18,0,0);D.thr=0.7;touch.ly=0.5;rawIn.ly=0.5;");
+  await g('drone crashed (down)',"touch.ly=0;rawIn.ly=0;D.state='down';D.vel.set(0,0,0);");
+  await g('walking',"D.state='landed';D.armed=false;walkToggle(true);");
+  await g('back from walk',"walkToggle(false);");
+  await g('dead in battle',"DZ.on=true;D.armed=true;D.state='flying';DZ.dead=performance.now()+10000;");
+  await g('menu open',"DZ.dead=0;menuToggle(true);");
+  await g('menu closed flying',"menuToggle(false);D.state='flying';D.armed=true;D.vel.set(5,0,0);");
+});

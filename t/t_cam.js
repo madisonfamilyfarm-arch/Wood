@@ -1,0 +1,2 @@
+const H=require('./harness');H(async({mk})=>{const P=await mk('P','http://127.0.0.1:8765/woods-rc-sim.html');await P.waitForTimeout(3000);await P.evaluate(()=>startGame('free'));await P.waitForTimeout(800);
+console.log(await P.evaluate(async()=>{const o=[];for(const m of ['GIMBAL','FPV','CHASE','FOLLOW']){__wds.setCam(m);await new Promise(r=>setTimeout(r,500));o.push(m+' fov '+cam.fov.toFixed(0)+' near '+cam.near+' far '+cam.far);}return o.join('\n');}));});

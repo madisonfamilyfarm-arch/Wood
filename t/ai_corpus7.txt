@@ -1,0 +1,13 @@
+# HELD-OUT #7: two commands in one message
+ace follow me and blaze go to the lake || follow+go
+everyone land then take off || land+takeoff
+ace do a flip and then race me || flip+race
+blaze go higher and go faster || higher+faster
+gizmo switch to a plane and follow me || switch+follow
+comet spin and dance || spin+dance
+ace hover here and blaze come to me || hover+follow
+everybody go lower and slow down || lower+slower
+ace attack blaze and gizmo follow me || hunt+follow
+do a flip then land || flip+land
+take off and follow me || takeoff+follow
+follow me then do a flip || follow+flip

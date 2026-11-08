@@ -1,0 +1,10 @@
+const H=require('./harness');H(async({mk})=>{const P=await mk('P','http://127.0.0.1:8765/woods-rc-sim.html');await P.waitForTimeout(3000);
+await P.evaluate(()=>{startGame('free');aiSet(0);D.armed=true;D.state='flying';D.pos.y+=15;
+ window.__cnt=()=>{const m={};scene.traverse(o=>{if(!o.geometry)return;const k=(o.geometry.type||'?')+(o.parent===scene?'@root':'')+':'+(o.name||'');m[k]=(m[k]||0)+1;});return m;};
+ window.__G=new Set();const p0=THREE.BufferGeometry.prototype.dispose;const C=THREE.BufferGeometry;window.__live=new Map();
+});
+const a=await P.evaluate(()=>({c:__cnt(),g:renderer.info.memory.geometries}));
+await P.evaluate(async()=>{for(let i=0;i<20;i++){const p=D.pos.clone().add(new V3((Math.random()-0.5)*60,-15,(Math.random()-0.5)*60));p.y=H(p.x,p.z);explode(p,6,2,true,'me',mp.id);await new Promise(r=>setTimeout(r,400));}});
+await P.waitForTimeout(12000);
+const b=await P.evaluate(()=>({c:__cnt(),g:renderer.info.memory.geometries,cr:CRATERS.length}));
+console.log('geos',a.g,'→',b.g,'craters',b.cr);const keys=new Set([...Object.keys(a.c),...Object.keys(b.c)]);for(const k of keys){const d=(b.c[k]||0)-(a.c[k]||0);if(d)console.log(d>0?'+'+d:d,k);}});

@@ -99,6 +99,6 @@ cycleShot=function(){const T=weaponTypes(),seq=[['photo'],['video'],...T.map((w,
 function digHere(){if(!WALK.on){toast('⛏ Walk first (K), then dig',1500);return;}if(digHere.busy)return;
   if(D.sea&&typeof ISL!=='undefined'&&!ISL.dug&&Math.hypot(WALK.pos.x-ISL.tx,WALK.pos.z-ISL.tz)<1.8){ISL.digT=3;beep(300,0.1,0.05);return;}
   digHere.busy=true;beep(260,0.08,0.05);toast('⛏ Digging…',1200);setTimeout(()=>{digHere.busy=false;const x=WALK.pos.x-Math.sin(WALK.yaw)*0.8,z=WALK.pos.z-Math.cos(WALK.yaw)*0.8,y=H(x,z);
-    const hole=new THREE.Mesh(new THREE.CircleGeometry(0.45,12),new THREE.MeshBasicMaterial({color:0x3a2a18}));hole.rotation.x=-Math.PI/2;hole.position.set(x,y+0.03,z);scene.add(hole);setTimeout(()=>scene.remove(hole),120000);
+    const hole=new THREE.Mesh(window.HOLEG||(window.HOLEG=new THREE.CircleGeometry(0.45,12)),window.HOLEM||(window.HOLEM=new THREE.MeshBasicMaterial({color:0x3a2a18})));hole.rotation.x=-Math.PI/2;hole.position.set(x,y+0.03,z);scene.add(hole);setTimeout(()=>scene.remove(hole),120000);
     const r=Math.random();if(r<0.25){const n=1+Math.floor(Math.random()*4);award('🪙 Found '+n+' old coin'+(n>1?'s':'')+'!',n);}else if(r<0.32)award('💎 A shiny gem!',8);else toast(['🪱 Just a worm','🪨 Only rocks down here','🦴 An old bone… not treasure','🌰 A buried acorn'][Math.floor(Math.random()*4)],1500);},1200);}
 {const p0=updBadge;setInterval(()=>{if(shotMode==='water')try{updBadge();}catch(e){}},500);}
