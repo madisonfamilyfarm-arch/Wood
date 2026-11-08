@@ -4085,7 +4085,7 @@ function tickShots(dt){
         else if(s.w==='mg'){sparks(hp,0xffdd66);mpSend({t:'hit',to:id,w:'mg'});gone=true;}else boomAt=hp;break;}}
     if(!gone&&!boomAt&&!s.own&&DR&&segSphere(s.prev,P,D.pos,ST.rad+0.12)){gone=true;} // the shooter tells us if it hit
     if(!gone&&!boomAt){const gy=H(P.x,P.z),wet=inWater(P.x,P.z)&&P.y<WATER_Y;
-      if(hitTest(P,0.05)||P.y<gy||wet||objHitTest(P)){if(s.w==='paint'){if(!wet)splat(P,s.col);gone=true;}else if(s.w==='mg'){puff(P,wet?0xbfe3ff:0x8a7a60,0.1,0.8);gone=true;}else boomAt=P.clone();}}
+      if(hitTest(P,0.05)||P.y<gy||(wet&&s.w!=='rocket')||objHitTest(P)){if(s.w==='paint'){if(!wet)splat(P,s.col);gone=true;}else if(s.w==='mg'){puff(P,wet?0xbfe3ff:0x8a7a60,0.1,0.8);gone=true;}else boomAt=P.clone();}}
     if(!gone&&!boomAt)for(const d of deer)if(Math.hypot(d.x-P.x,d.z-P.z)<0.8&&P.y-H(d.x,d.z)<1.8){d.state='flee';d.t=4;d.dir=Math.atan2(d.x-D.pos.x,d.z-D.pos.z);if(s.w==='paint')splat(P,s.col);if(s.w==='rocket')boomAt=P.clone();gone=true;break;}
     if(!gone&&!boomAt&&s.life<=0){if(s.w==='rocket')boomAt=P.clone();else gone=true;}
     if(boomAt){if(s.own){const r=clamp(WPN.blast,0.5,1e6),dr=clamp(WPN.destroy,0,1e6);explode(boomAt,r,dr,true,CFG.name,mp.id);mpSend({t:'boom',p:boomAt.toArray().map(r2),r,dr,sid:s.sid});}gone=true;}
@@ -9234,6 +9234,45 @@ function wsGoWord(){const f=WS.flyAs,k=WS.kit||'';const ground=/^(car|tank)$/.te
 {const d0=wsDraw;wsDraw=function(){const r=d0.apply(this,arguments);try{const [w,b]=wsGoWord();if(w!=='fly'){const s=$('wsStats');if(s&&/ready to fly/.test(s.innerHTML))s.innerHTML=s.innerHTML.replace(/ready to fly/g,'ready to '+w);
       const T=$('wsTools');if(T)for(const el of T.querySelectorAll('.btn')){if(/^\s*✅?\s*FLY IT/.test(el.textContent))el.textContent='✅ '+b;}}}catch(e){}return r;};}
 {const t0=toast;toast=function(m){try{if(WS.open&&/FLY IT/.test(String(m))){const [w,b]=wsGoWord();if(w!=='fly')m=String(m).replace(/FLY IT/g,b);}}catch(e){}return t0.apply(this,[m].concat([].slice.call(arguments,1)));};}
+
+// ================================================================ v49: 🌊 TORPEDOES — a rocket underwater becomes a torpedo (slow, bubbles, no flame). When it leaves the water it turns into a rocket; when it dives in again it's a torpedo again.
+const TORP={spd:14};
+{const t0=tickShots;tickShots=function(dt){const pre=[];try{for(const s of shots){if(s.w!=='rocket'||!s.m)continue;const P=s.m.position,inW=inWater(P.x,P.z)&&P.y<WATER_Y;
+      if(inW&&!s.torp){s.torp=true;s.v.y*=0.35;if(s.v.length()>TORP.spd)s.v.setLength(TORP.spd);if(s.m.userData.flame)s.m.userData.flame.visible=false;if(s.age3>0.05){try{sfx('splash',P.clone(),0.6);puff(new V3(P.x,WATER_Y,P.z),0xe8f6ff,0.5,1.2);}catch(e){}}}
+      else if(!inW&&s.torp){s.torp=false;if(s.m.userData.flame)s.m.userData.flame.visible=true;try{sfx('rocket',P.clone());puff(new V3(P.x,WATER_Y,P.z),0xe8f6ff,0.6,1.2);}catch(e){}if(s.v.y<3)s.v.y=3;}
+      s.age3=(s.age3||0)+dt;if(s.torp){s.puff=1;pre.push(s);}}}catch(e){}
+  const r=t0.apply(this,arguments);
+  // torpedo: stays slow, floats level (no sinking), leaves a bubble trail, runs longer
+  for(const s of pre){if(shots.indexOf(s)<0)continue;try{const T=WTYPES[s.w];s.v.y+=T.g*dt;if(s.v.length()>TORP.spd)s.v.setLength(TORP.spd);s.life+=dt*0.6;s.bub=(s.bub||0)-dt;if(s.bub<=0){s.bub=0.06;puff(s.m.position.clone(),0xd6f0ff,0.07,0.9);}}catch(e){}}return r;};}
+// big underwater blasts throw up a water column
+{const e0=explode;explode=function(p,r){const res=e0.apply(this,arguments);try{if(inWater(p.x,p.z)&&p.y<WATER_Y+1.5){const n=Math.min(18,5+(r||4));for(let i=0;i<n;i++)puff(new V3(p.x+(Math.random()-0.5)*r*0.4,WATER_Y+Math.random()*r*0.9,p.z+(Math.random()-0.5)*r*0.4),0xf2fbff,0.4+r*0.08,1.6+Math.random());sfx('splash',p,1.6);}}catch(e){}return res;};}
+// subs call their rockets torpedoes
+{const f0=fire;fire=function(){const r=f0.apply(this,arguments);try{if(vhKind()==='sub'&&curWeapon&&curWeapon()==='rocket'&&!fire.told){fire.told=1;toast('🌊 Torpedo away! (it turns into a rocket if it leaves the water)',2500);}}catch(e){}return r;};}
+
+// ================================================================ v50: 📂 the menu is sorted into categories (✈️ Fly · 🛠 Build · 💥 Weapons · 🤖 AI · 🌐 Multiplayer · 🎮 Games & places · 📷 Camera · 🌦 World · ⚙️ Settings). Search still finds everything.
+const MCAT=[
+  ['fly','✈️ Fly','drone choice, flight settings, assist, radio, lessons, camera view',/^(🚁 Drone|🚁 Drone:|⚙️ Flight settings|🎯 Assist|📻 Radio|🎓 Flight lessons|🎚️ Speed|🎥 Camera|🌀 Motors|🔄 Do a flip|👁 Drone|↩ Back to last checkpoint|🛬 Back to the pad|📍 Launch drone|🔋 Swap battery|🚶 Walk around)/],
+  ['build','🛠 Build','build drones / cars / tanks / boats / subs, workshop, programs, shop',/^(🛠 Build anything|🧩 Workshop|💻 Program mode|🏗 Build mode|📦 Put things down|💰 Shop)/],
+  ['war','💥 Weapons & battle','weapons, TNT, explosions, battle mode, fixing what got blown up',/^(🔫 Weapons|💣 TNT type|💥 Explosion settings|💥 Danger mode|😠 Revenge mode|🔧 Put back|🔥 Fires)/],
+  ['ai','🤖 AI players','AI pilots, play games with them, campers, shouting to them',/^(🤖 AI pilots|🎮 Play a game with the AI|📣 Shout to the AI|🧑‍🚒 AI campers|🚒 Take me to the fire truck)/],
+  ['mp','🌐 Multiplayer','online rooms, multiplayer, play on your phone',/^(🌐 Online rooms|👥 Multiplayer|📱 Play on my phone)/],
+  ['games','🎮 Games & places','races, missions, train, GIGA drone, trails, airports, maps',/^(🏁 Races|🎒 Missions|🚂 Train|🦖 GIGA|➕ 🛤️|🎲 Roll a new airport|🛫 Airport|🗺 Map)/],
+  ['cam','📷 Camera & photos','zoom, shutter, photos and videos',/^(🔍 Zoom|📷 Shutter|📸 Photos|⬇ Photos)/],
+  ['world','🌦 World','weather, time of day, real-world settings',/^(🌦 Weather|🌅 Time of day|🕰 Use the real clock|🌍 Real-world)/],
+  ['set','⚙️ Settings','device, screen, phone model, sound, smoothness, graphics, VR, controllers',/^(⚙️ Playing on|📐 Screen|📱 My phone|⚡ Smoothness|🔊 Sound|✨ Graphics|🥽 VR|⚙️ VR lens|🎮 DJI remote|🕹 Controller|⛶ Full screen)/]];
+let mainAllItems=null;
+{const m0=mainItems;mainAllItems=function(){return m0();};
+  mainItems=function(){const L=m0();const lab=it=>{try{return String(it.label()).replace(/<[^>]+>/g,'');}catch(e){return'';}};const used=new Set();const pick=re=>L.filter(it=>{const l=lab(it);if(re.test(l)){used.add(it);return true;}return false;});
+    const cats=MCAT.map(([k,n,d,re])=>({k,n,d,items:pick(re)}));const back=L.find(it=>/^▶ Back to flying/.test(lab(it)));if(back)used.add(back);const help=L.find(it=>/How to play/.test(lab(it)));if(help)used.add(help);
+    const other=L.filter(it=>!used.has(it)&&!it.info);
+    const out=[];if(back)out.push(back);
+    cats.forEach(c=>{if(c.items.length)out.push(mItem(c.n+' ▸  <span style="opacity:0.6;font-size:0.8em">'+c.d+'</span>',()=>menuPush(c.n,mCatItems(c.k))));});
+    if(other.length)out.push(mItem('📦 Everything else ▸',()=>menuPush('📦 Everything else',mCatItems('other'))));
+    // handy shortcuts right on the front page
+    const q=re=>L.find(it=>re.test(lab(it)));[q(/^🛬 Back to the pad/),q(/^🔄 Do a flip/),q(/^🚶 Walk around/)].forEach(it=>{if(it)out.push(it);});if(help)out.push(help);return out;};}
+function mCatItems(k){const L=mainAllItems();const lab=it=>{try{return String(it.label()).replace(/<[^>]+>/g,'');}catch(e){return'';}};
+  if(k==='other'){const all=MCAT.map(c=>c[3]);return[...L.filter(it=>{const l=lab(it);return !it.info&&!/^▶ Back to flying|How to play/.test(l)&&!all.some(re=>re.test(l));}),mItem('◀ Back',()=>menuBack())];}
+  const c=MCAT.find(c=>c[0]===k);return[mInfo(c[2]),...L.filter(it=>c[3].test(lab(it))),mItem('◀ Back',()=>menuBack())];}
 
 // =====================================================================================
 // ===== 🌎 REAL WORLD MAP (CesiumJS): the real Earth from satellite photos + real hills, starting over the farm =====
