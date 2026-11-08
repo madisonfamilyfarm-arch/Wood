@@ -40,3 +40,12 @@ let GEO_KEEP=null;function geoDisp(o){try{if(!o)return;if(!GEO_KEEP){GEO_KEEP=ne
 {const _cp=new V3();const u0=updateCam;updateCam=function(dt){const r=u0.apply(this,arguments);try{const m=CAMS[camI];if(!/FOLLOW|CHASE|ORBIT|TPV|BEHIND/.test(String(m)))return r;
   const t=WALK.on?WALK.pos.clone().add(new V3(0,1.2,0)):D.pos;if(!t||!hitTest(cam.position,0.35))return r;
   for(let k=1;k<=12;k++){_cp.copy(cam.position).lerp(t,k/13);if(!hitTest(_cp,0.35)){cam.position.copy(_cp);break;}}}catch(e){}return r;};}
+// phone held upright: chat lines sat behind the Chat / Hide-chat buttons → show them just above those buttons
+{const st=document.createElement('style');st.textContent='body.pt #chatLog{left:calc(12px + env(safe-area-inset-left))!important;max-width:72vw!important;font-size:12px!important}';document.head.appendChild(st);}
+// keep the chat lines right above the Hide-chat button (works with any phone zoom)
+setInterval(()=>{try{const cl=$('chatLog'),t=$('chatTog')||$('cbBtn');if(!cl||!t)return;const r=t.getBoundingClientRect();if(!r.height)return;const z=parseFloat(getComputedStyle(cl).zoom)||1;cl.style.setProperty('bottom',((innerHeight-r.top+6)/z)+'px','important');}catch(e){}},500);
+{const st=document.createElement('style');st.textContent='body.pt #dzCount{top:47%!important;font-size:26px!important}';document.head.appendChild(st);}
+// sideways phone in a battle: the big 🎯 FIRE button was hidden UNDER the Chat buttons → chat buttons move up above it
+{const st=document.createElement('style');st.textContent='body.fireUp:not(.pt) #cbBtn,body.fireUp:not(.pt) #chatTog{bottom:calc(128px + env(safe-area-inset-bottom))!important}';document.head.appendChild(st);
+ setInterval(()=>{try{const f=$('bFire');document.body.classList.toggle('fireUp',!!(f&&getComputedStyle(f).display!=='none'));}catch(e){}},400);}
+{const st=document.createElement('style');st.textContent='@media (max-height:500px){#dzCount{top:24%!important;font-size:24px!important}}';document.head.appendChild(st);}
