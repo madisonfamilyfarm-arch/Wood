@@ -3,7 +3,7 @@
 const H=require('./harness');const fs=require('fs');
 const lines=fs.readFileSync(__dirname+'/'+(process.env.CORPUS||'ai_corpus.txt'),'utf8').split('\n').filter(l=>l.trim()&&!l.startsWith('#')).map(l=>{const [m,e]=l.split('||').map(x=>x.trim());return{m,e};});
 H(async({mk})=>{const P=await mk('P','http://127.0.0.1:8765/woods-rc-sim.html');await P.waitForTimeout(3000);
-  const PRE=fs.readdirSync(__dirname+'/srv/words').map(f=>f.slice(9,11));await P.evaluate(async(PRE)=>{if(typeof aiwLoad==='function'){await Promise.all(PRE.map(L=>new Promise(r=>aiwLoad(L.replace(/_/g,' ').trim()||L,r))));}},PRE);
+  const PRE=fs.readdirSync(__dirname+'/srv/words').filter(f=>f.startsWith('ai-words-')).map(f=>f.slice(9,11));await P.evaluate(async(PRE)=>{if(typeof aiwLoad==='function'){await Promise.all(PRE.map(L=>new Promise(r=>aiwLoad(L.replace(/_/g,' ').trim()||L,r))));}},PRE);
   await P.evaluate(()=>{startGame('free');aiBrainSet('builtin');aiSet(4);D.armed=true;D.state='flying';D.pos.y=H(D.pos.x,D.pos.z)+6;});await P.waitForTimeout(3000);
   const names=await P.evaluate(()=>{AIB.L.forEach(B=>{if(B.kind!=='drone'){try{aiSwitch(B,'drone');}catch(e){}}});return AIB.L.map(B=>B.name.replace('🤖 ',''));});
   // rename the corpus pilots to the real AI names in this game (ace/blaze/gizmo/comet → actual)

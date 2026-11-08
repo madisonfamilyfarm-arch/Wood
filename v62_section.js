@@ -11,3 +11,22 @@ const LEARN={w:LS.get('aiWords',{})};
     if(/ what (new )?words (did i teach you|have i taught you|do you know that i taught you) /.test(s)&&B){const K=Object.keys(LEARN.w);sbSay({B},K.length?'🧠 You taught me: '+K.slice(-8).join(', '):'You haven\'t taught me any words yet! Try "skibidi means silly" 😄');return true;}
   }catch(e){}return s0.apply(this,arguments);};}
 {const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
+// ---------------------------------------------------------------- 🎵 RHYMES (26,000+ words): "what rhymes with fly?" + a rhyme game ("let's play rhymes")
+const AIR={d:{},st:{},cb:{}};
+function AIR_ADD(L,d){AIR.d[L]=d;AIR.st[L]=2;(AIR.cb[L]||[]).forEach(f=>{try{f();}catch(e){}});AIR.cb[L]=[];}
+function airLoad(w,cb){const L=aiwPre(w);if(AIR.st[L]===2){cb&&cb();return;}(AIR.cb[L]=AIR.cb[L]||[]).push(cb||(()=>{}));if(AIR.st[L])return;AIR.st[L]=1;
+  const tryUrl=(urls)=>{if(!urls.length){AIR.st[L]=0;const c=AIR.cb[L];AIR.cb[L]=[];c.forEach(f=>{try{f();}catch(e){}});return;}const s=document.createElement('script');s.src=urls[0];s.onerror=()=>{s.remove();tryUrl(urls.slice(1));};document.head.appendChild(s);};
+  tryUrl(['words/ai-rhymes-'+L+'.js','https://madisonfamilyfarm-arch.github.io/Wood/words/ai-rhymes-'+L+'.js']);}
+function airGet(w){w=String(w||'').toLowerCase();const d=AIR.d[aiwPre(w)];return d&&d[w]?d[w].split(','):null;}
+const RHG={on:false,w:'',B:null,n:0,t:0};
+const RHSTART=['fly','cat','drone','tree','car','boat','fire','sky','fast','race','lake','rocket','day','night','star','fun','game','jump','light','ball'];
+{const s0=smartHear;smartHear=function(txt){try{const s=nNorm(String(txt||''));const B=(nWho(s).find(w=>w.B)||{}).B||aiNear(1e9)[0];if(!B)return s0.apply(this,arguments);
+    const m=s.match(/ (?:what rhymes with|what words rhyme with|rhymes? (?:with|for)|give me a rhyme for|a rhyme for|something that rhymes with) ([a-z']{2,20}) /);
+    if(m){const w=m[1];airLoad(w,()=>{const R=airGet(w);sbSay({B},R?'🎵 '+w+' rhymes with: '+R.slice(0,8).join(', '):'Hmm, I can\'t think of a rhyme for "'+w+'" 🤔 (fun fact: "orange" has no rhyme either! 🍊)');});return true;}
+    if(/ (lets|let us|wanna|want to|can we) play (a )?(rhymes?|rhyming|the rhyme game|rhyme game)| rhyme game /.test(s)){RHG.on=true;RHG.B=B;RHG.n=0;RHG.w=PICK(RHSTART);RHG.t=performance.now();airLoad(RHG.w,()=>{});sbSay({B},'🎵 Rhyme game! Say a word that rhymes with "'+RHG.w+'"! (say "stop rhymes" to quit)');return true;}
+    if(RHG.on){if(/ (stop|quit|end|no more) (rhymes?|rhyming|the game|game|playing) |^ stop $/.test(s)){RHG.on=false;sbSay({B:RHG.B||B},'🎵 Good game! You got '+RHG.n+' rhyme'+(RHG.n===1?'':'s')+'! 🏆');return true;}
+      const w=nWords(s).length<=2?nWords(s).filter(x=>x.length>=2).pop():null;const R=airGet(RHG.w)||[];
+      if(w&&w!==RHG.w&&(R.includes(w)||(w.length>2&&RHG.w.length>2&&w.slice(-3)===RHG.w.slice(-3)))){RHG.n++;const nx=PICK(RHSTART.filter(x=>x!==RHG.w));RHG.w=nx;airLoad(nx,()=>{});sbSay({B:RHG.B||B},PICK(['✅ Yes! ','🎉 Nice! ','👏 Good one! '])+'Score: '+RHG.n+'. Next: what rhymes with "'+nx+'"?');return true;}
+      if(w&&performance.now()-RHG.t<600000&&nWords(s).length===1){sbSay({B:RHG.B||B},'❌ Hmm, "'+w+'" doesn\'t rhyme with "'+RHG.w+'"… try again! ('+(R[0]?'hint: like "'+R[Math.floor(Math.random()*Math.min(4,R.length))]+'"':'any rhyme!')+')');return true;}}
+  }catch(e){console.warn('rhyme',e);}return s0.apply(this,arguments);};}
+{const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
