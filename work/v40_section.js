@@ -8,7 +8,7 @@ Object.assign(DMG,{
   turret:{n:'🎯 Turret jammed',fix:'🎯 Unjam the turret',hold:'HOLD to unjam the turret',msg:'🎯 Turret jammed — shooting is slower!'}});
 const VHP={tank:120,car:45,monster:60,boat:45,sub:55,plane:30,heli:30,drone:22,combo:40,walk:0};
 const VBREAK={tank:['cam','track','engine','turret','ant'],car:['tire','cam','engine','ant'],monster:['tire','cam','engine','ant'],boat:['leak','cam','engine'],sub:['leak','cam','engine'],plane:['wing','engine','cam'],heli:['motor','cam','frame','ant'],drone:['motor','cam','frame','ant','gps'],combo:['motor','cam','frame','engine']};
-function vhKind(){const k=vkind();if(k==='car'&&SPEC&&(SPEC.flyAs==='tank'||SPEC.kit==='tank'||(SPEC.parts||[]).filter(p=>p.style==='tread').length>=2))return'tank';if(k==='car'&&SPEC&&SPEC.kit==='monster')return'monster';if(SPEC&&SPEC.flyAs==='sub')return'sub';return VHP[k]?k:'drone';}
+function vhKind(){const k=vkind();if(k==='car'&&SPEC&&(SPEC.flyAs==='tank'||SPEC.kit==='tank'||SPEC.style==='tank'||(SPEC.parts||[]).filter(p=>p.style==='tread').length>=2))return'tank';if(k==='car'&&SPEC&&(SPEC.kit==='monster'||SPEC.style==='monster'))return'monster';if(SPEC&&(SPEC.flyAs==='sub'||(k==='boat'&&SPEC.style==='sub')))return'sub';return VHP[k]?k:'drone';}
 function vhArmor(){const a=SPEC&&SPEC.armor!=null?SPEC.armor:(vhKind()==='tank'?8:5);const plates=SPEC&&SPEC.parts?SPEC.parts.filter(p=>p.t==='shape'&&p.mat==='metal').length:0;return clamp(0.55+a*0.09+plates*0.05,0.6,2.2);}
 const VH={hp:0,max:0,sig:''};
 function vhReset(){VH.max=Math.round((VHP[vhKind()]||22)*vhArmor());VH.hp=VH.max;VH.sig=vhKind()+':'+(SPEC&&SPEC.name);vhBar();}

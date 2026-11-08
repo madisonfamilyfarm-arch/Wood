@@ -1,7 +1,7 @@
 // ================================================================ v48: 📱 builder fits the iPhone for real — room for the notch side, small tidy top line, fold buttons at the bottom, tanks say "ready to drive"
 (function(){const st=document.createElement('style');st.textContent=`
 body.ph #wsTray{width:calc(80px + env(safe-area-inset-left))!important;padding-left:calc(3px + env(safe-area-inset-left))!important;padding-right:3px!important;overflow-x:hidden!important}
-body.ph #wsTray,body.ph #wsTools,body.ph #ezPanel{box-sizing:border-box!important}body.ph .wsPart{flex-shrink:0!important}
+#wsTray,#wsTools,#ezPanel{box-sizing:border-box!important}body.ph .wsPart{flex-shrink:0!important}
 body.ph #wsTray > *{min-width:0;max-width:100%;box-sizing:border-box}body.ph #wsTray > :first-child{font-size:8px!important;line-height:1.2;overflow:hidden}
 body.ph .wsPart{word-break:break-word;line-height:1.15;white-space:normal!important;width:auto!important;min-width:0!important;max-width:100%!important;overflow:hidden}body.ph #wsMid{overflow:hidden}
 body.ph #wsMid{left:calc(80px + env(safe-area-inset-left))!important;right:calc(186px + env(safe-area-inset-right))!important}
