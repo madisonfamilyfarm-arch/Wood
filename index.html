@@ -7129,7 +7129,7 @@ function dzUnder(T,px,py,pz){const rx=px-T.x,rz=pz-T.z,s=rx*T.dx+rz*T.dz;if(s<0.
 const DZG=(function(){const g=new THREE.CylinderGeometry(0.06,0.06,0.55,8);g.rotateX(Math.PI/2);return g;})(),DZM=new THREE.MeshLambertMaterial({color:0x333333}),DZN=new THREE.MeshBasicMaterial({color:0xffa030});
 function dzBotFire(B,tg){if(B.kind==='sub')return;const o=B.p.clone();o.y+=1;const dir=tg.clone().sub(o).normalize();o.addScaledVector(dir,1.3);const m=new THREE.Group();m.add(new THREE.Mesh(DZG,DZM));const f=new THREE.Mesh(GEO.ball,DZN);f.scale.setScalar(0.09);f.position.z=0.35;m.add(f);
   m.position.copy(o);m.lookAt(o.clone().add(dir));scene.add(m);DZ.rk.push({m,v:dir.multiplyScalar(28),life:4,age:0,by:B.id,n:B.name,prev:o.clone(),puff:0});beep(260,0.2,0.04);
-  if(Math.random()<0.35)chatAdd(B.name,['🚀 Incoming!','Boom time!','Gotcha!','Rocket away!'][Math.floor(Math.random()*4)],AI_COLS[B.i]);}
+  if(Math.random()<0.2)chatAdd(B.name,['🚀 Incoming!','Boom time!','Take this! 😤','Rocket away!'][Math.floor(Math.random()*4)],AI_COLS[B.i]);}
 function dzBotsShoot(dt){if(!DZ.on||!DZ.ai||!AIB.L.length)return;const now=performance.now();
   for(const B of AIB.L){if(B.dead)continue;B.rkT=(B.rkT==null?6+Math.random()*10:B.rkT)-dt;if(B.rkT>0)continue;B.rkT=8+Math.random()*12;
     const T=[];const me=dzMe();if(me&&!DZ.dead&&!(D.shield>now))T.push(me);
@@ -8508,7 +8508,7 @@ function aiPeerPos(id){if(id==='me')return dzMe();const B=AIB.L.find(b=>b.id===i
   return r;};}
 // AI hunters + bombers fly to their target; drones dodge your rockets (harder = better dodging)
 {const a0=aiTick;aiTick=function(dt){const now=performance.now();try{for(const B of AIB.L){if(B.dead||!(B.kind==='drone'||B.kind==='heli')||B.mode!=='fly')continue;
-      const tid=B.bomb||B.hunt;if(tid){const tp=aiPeerPos(tid);if(tp){B.goal={x:tp.x+(B.bomb?0:Math.sin(now/900+B.i)*10),z:tp.z+(B.bomb?0:Math.cos(now/900+B.i)*10),h:Math.max(6,tp.y-H(tp.x,tp.z)+(B.bomb?9:4)),kind:'go'};
+      const tid=B.bomb||B.hunt;if(tid){const tp=aiPeerPos(tid);if(tp){B.goal={x:tp.x+(B.bomb?0:Math.sin(now/1400+B.i*1.7)*16),z:tp.z+(B.bomb?0:Math.cos(now/1400+B.i*1.7)*16),h:clamp(tp.y-H(tp.x,tp.z)+(B.bomb?9:String(tid).startsWith('bot')?-1:4),6,B.bomb?45:35),kind:'go'};
           if(B.bomb&&Math.hypot(tp.x-B.p.x,tp.z-B.p.z)<4&&!(B.bombCd>now)){B.bombCd=now+4000;aiDropTnt(B);B.bomb=null;}}else{B.bomb=null;B.hunt=null;}}
       // dodge
       const dodge={fun:0.25,medium:0.6,hard:0.95}[AIB.diff]||0.3;if(Math.random()<dodge)for(const s of shots){if(!s.own||s.w!=='rocket'||s.life<=0||!s.m)continue;const to=B.p.clone().sub(s.m.position),d=to.length();if(d>22||d<1)continue;const sv=s.v.clone().normalize();if(sv.dot(to.normalize())<0.93)continue;
@@ -9545,7 +9545,7 @@ setInterval(()=>{try{if(!started||!AIB.L.length||menu.open)return;const now=perf
   for(const B of AIB.L){const pp=pbP(B);
     // came back after being blown up
     if(B.dead){B._dead=true;continue;}if(B._dead){B._dead=false;B.hp=B.hpMax||B.hp;if(Math.random()<0.7)pbSay(B,pbLine('respawn',B),true);}
-    if(pbBusy(B))continue;if(!(B.kind==='drone'||B.kind==='heli'))continue;
+    if(pbBusy(B))continue;
     if(battle){const f=B.hpMax?B.hp/B.hpMax:1;
       // low health → fall back, fix up, come back
       if(f<0.35&&!(B.retreatT>now)&&pp.brave<0.85){B.retreatT=now+12000;B.hunt=null;const away=B.p.clone().sub(me);away.y=0;away.setLength(60);B.goal={x:B.p.x+away.x,z:B.p.z+away.z,h:10,kind:'go'};pbSay(B,pbLine('low',B),true);continue;}
@@ -9565,7 +9565,7 @@ setInterval(()=>{try{if(!started||!AIB.L.length||menu.open)return;const now=perf
   // nobody's heard from you in a while and you're far away
   if(battle&&me&&now-AIC.lastChat>90000&&now-PBT.far>120000){const n=pbAlive().sort((a,b)=>a.p.distanceTo(me)-b.p.distanceTo(me));if(n.length&&n[0].p.distanceTo(me)>150){PBT.far=now;pbSay(n[0],pbLine('whereU',n[0]));}}
   // now and then, battle chatter
-  if(battle&&Math.random()<0.04){const B=PICK(pbAlive());if(B){const t=PICK(pbAlive().filter(x=>x!==B));const l=pbLine('idleBattle',B,t?pbName(t):'Blaze');if(pbSay(B,l)&&/team up|blow up next/.test(l))aiOffer(/team up/.test(l)?'team':'advice',B);}}}catch(e){console.warn('pb',e);}},2000);
+  if(battle&&Math.random()<0.04){const B=PICK(pbAlive());if(B){const t=PICK(pbAlive().filter(x=>x!==B));let l=pbLine('idleBattle',B,t?pbName(t):'Blaze');if(/Score check/.test(l)&&!Object.values(PB.score).some(x=>x.k))l='Who should I blow up first? 🤔';if(pbSay(B,l)&&/team up|blow up next/.test(l))aiOffer(/team up/.test(l)?'team':'advice',B);}}}catch(e){console.warn('pb',e);}},2000);
 // near misses: a rocket whooshes right past an AI pilot
 {const t0=tickShots;tickShots=function(dt){const r=t0.apply(this,arguments);try{for(const s of shots){if(!s.own||s.w!=='rocket'||!s.m||s.nm)continue;for(const B of AIB.L){if(B.dead)continue;const d=B.p.distanceTo(s.m.position);if(d<4&&d>2.2){s.nm=1;if(Math.random()<0.5)pbSay(B,pbLine('closeCall',B),true);break;}}}}catch(e){}return r;};}
 // "yes" to "anyone wanna team up?"
@@ -9610,6 +9610,13 @@ function vFix(t){let s=String(t||'').trim();const low=s.toLowerCase();let o=low;
 // "attack Gizmo" / "go after Blaze" said to everyone = the others go after that pilot
 {const s0=smartHear;smartHear=function(txt){try{const s=nNorm(String(txt||''));const m=s.match(/^ (?:lets |let us |everyone |guys |you guys )?(attack|go after|get|shoot|blow up|kill|take out|hunt|chase|bomb) ([a-z0-9-]+) (?:now |guys |everyone |please )?$/);
   if(m){const T=AIB.L.find(B=>!B.dead&&pbName(B).toLowerCase()===m[2]);if(T){DZ.on=true;DZ.ai=true;const now=performance.now();const H=pbAlive().filter(X=>X!==T).slice(0,3);H.forEach((X,i)=>{X.hunt=T.id;X.huntCmd=true;X.cmdT=now;if(m[1]==='bomb'){try{X.bomb=T.id;}catch(e){}}if(i<2)sbSay({B:X},PICK(['Going after '+pbName(T)+'! 🎯','On it! '+pbName(T)+' is going down 🚀','Get '+pbName(T)+'! 💥']),400+i*600);});setTimeout(()=>pbSay(T,PICK(['Uh oh… everyone\'s after me 😬','You\'ll never catch me! 💨','Hey! No fair! 😤']),true),1800);NLU.lastWho=[{B:T}];NLU.lastT=now;return true;}}}catch(e){}return s0.apply(this,arguments);};}
+// ---------------------------------------------------------------- 🚀 AI pilots really fight EACH OTHER now (they shoot at the pilot they're hunting, and their rockets can hit other AI)
+{const b0=dzBotsShoot;dzBotsShoot=function(dt){const r=b0.apply(this,arguments);try{if(!DZ.on||!DZ.ai)return r;
+  for(const B of AIB.L){if(B.dead||!B.hunt||B.hunt==='me'||B.kind==='sub')continue;const T=AIB.L.find(X=>X.id===B.hunt);if(!T||T.dead||(B.team==='me'&&T.team==='me'))continue;
+    B.bkT=(B.bkT==null?3+Math.random()*4:B.bkT)-dt;if(B.bkT>0)continue;B.bkT=5+Math.random()*5;const d=T.p.distanceTo(B.p);if(d<5||d>75)continue;
+    const aim=T.p.clone();if(T.vel)aim.addScaledVector(T.vel,d/28);aim.x+=(Math.random()-0.5)*2.5;aim.z+=(Math.random()-0.5)*2.5;aim.y+=d*d*0.0009;dzBotFire(B,aim);}}catch(e){}return r;};}
+{const k0=dzRockets;dzRockets=function(dt){const r=k0.apply(this,arguments);try{for(let i=DZ.rk.length-1;i>=0;i--){const s=DZ.rk[i];if(!s.prev||s.age<0.12)continue;const P=s.m.position;
+    for(const B of AIB.L){if(B.dead||B.id===s.by)continue;if(segSphere(s.prev,P,B.p,1.3)){scene.remove(s.m);DZ.rk.splice(i,1);const p=P.clone();explode(p,4,2.5,false,s.n,s.by);try{mpSend({t:'boom',p:p.toArray().map(r2),r:4,dr:2.5,sid:'',bn:s.n,bi:s.by});}catch(e){}break;}}}}catch(e){}return r;};}
 
 // ================================================================ v55: 📚 GIANT VOCABULARY — the AI knows ~83,000 dictionary words (WordNet): meanings, synonyms, opposites.
 // Any word it doesn't know in a command gets looked up and swapped for a synonym it DOES know ("ascend" → higher, "obliterate Blaze" → attack Blaze).
@@ -9678,6 +9685,23 @@ const GLOSS={quadcopter:'a drone with 4 propellers — two spin one way, two the
       let t=' '+s.trim()+' ',ch=false;for(const w of ws){const m=aiwMap(w)||aiwVerb(w,t);if(m!=null){t=t.replace(' '+w+' ',m?' '+m+' ':' ');ch=true;}}if(ch){AIW.busy=true;try{return s0.call(this,t.trim());}finally{AIW.busy=false;}}}
   }catch(e){console.warn('aiw',e);}return s0.apply(this,arguments);};}
 {const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
+
+// ================================================================ v56: 🔧 fixes found by the overnight play-tests
+// 🥽 VR: the phone is inside a headset, so on-screen buttons (TNT, chat, tools, health bar…) just get in the way of the picture → hide every floating overlay except Exit VR + the respawn countdown
+const VRKEEP=new Set(['vrUI','dzCount']);
+function vrHideOverlays(){const on=document.body.classList.contains('vr');for(const el of document.body.children){if(el.tagName==='CANVAS'||el.tagName==='SCRIPT'||VRKEEP.has(el.id))continue;
+    if(on){if(el.dataset.vrh)continue;const cs=getComputedStyle(el);if(cs.position==='fixed'||cs.position==='absolute'){el.dataset.vrh='1';el.classList.add('vrHid');}}else if(el.dataset.vrh){delete el.dataset.vrh;el.classList.remove('vrHid');}}}
+{const st=document.createElement('style');st.textContent='body.vr .vrHid{display:none!important}';document.head.appendChild(st);}
+setInterval(()=>{try{if(document.body.classList.contains('vr')||document.querySelector('.vrHid'))vrHideOverlays();}catch(e){}},700);
+{const t0=toggleVR;toggleVR=function(){const r=t0.apply(this,arguments);try{vrHideOverlays();}catch(e){}return r;};}
+// 📱 phone layout: the "Hide chat" button sat on top of "💬 Chat" (zoom moved them), and the 2nd button row (DJI / VR / ⛶) covered the mini-map + its zoom buttons
+function layoutFix(){if(!started||document.body.classList.contains('vr'))return;
+  const cb=$('cbBtn'),ct=$('chatTog');if(cb&&ct&&ct.style.display!=='none'&&cb.style.display!=='none'&&!document.body.classList.contains('pt')){const a=cb.getBoundingClientRect(),b=ct.getBoundingClientRect();
+    if(a.width&&b.right>a.left-4&&b.left<a.right){const z=parseFloat(getComputedStyle(ct).zoom)||1;ct.style.left=Math.max(4,(a.left-b.width-8))/z+'px';ct.style.bottom=getComputedStyle(cb).bottom;}}
+  const mb=$('mapBox');if(mb&&getComputedStyle(mb).display!=='none'){const m=mb.getBoundingClientRect();if(m.width>0&&m.width<300){let low=0;for(const id of ['bDJI','bVR','bFS','coinBadge','money']){const e=$(id);if(!e||getComputedStyle(e).display==='none')continue;const r=e.getBoundingClientRect();if(r.left<m.right+60&&r.bottom>low&&r.top<m.top+20)low=r.bottom;}
+      document.querySelectorAll('#top button, #top div').forEach(e=>{const r=e.getBoundingClientRect();if(r.width&&r.height<50&&r.left<m.right+60&&r.top<m.top+20&&r.bottom>low)low=r.bottom;});
+      if(low>m.top-2){mb.style.top=(low+5)+'px';const bt=$('mapBtns');if(bt&&innerHeight<500){bt.style.display='grid';bt.style.gridTemplateColumns='repeat(2,30px)';bt.style.gap='3px';}}}}}
+setInterval(()=>{try{layoutFix();}catch(e){}},800);
 
 // =====================================================================================
 // ===== 🌎 REAL WORLD MAP (CesiumJS): the real Earth from satellite photos + real hills, starting over the farm =====
