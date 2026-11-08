@@ -40,3 +40,36 @@ const GQV={tank:'car',tanks:'car',car:'car',truck:'car',jeep:'car',buggy:'car',s
     for(const [re,f] of GQ){if(re.test(s)){const a=f(s,B);if(a&&B){sbSay({B},a);return true;}}}
   }catch(e){console.warn('gq',e);}return s0.apply(this,arguments);};}
 {const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
+// ---------------------------------------------------------------- 💬 small talk a real player would answer (instead of "say that again?")
+const GQS=[
+ [/^ (wow|whoa|woah|omg|oh my word|no way|dang|dude) $/,['Right?! 😄','I know! 🤩','Pretty cool, huh? 😎']],
+ [/^ (cool|nice|sweet|awesome|epic|neat|sick|great) $/,['😎','Yeah! 🙌','I know right!']],
+ [/^ (idk|i dont know|dunno|not sure) $/,['No worries! Want to race? 🏁','Let\'s just fly around then ✈️','How about tag? 🏃']],
+ [/^ (maybe|perhaps|possibly|kinda|sort of) $/,['Hmm, okay! 🤔','Let me know! 😄']],
+ [/^ (what|huh|wut|wat|hm+|eh) $/,['Hmm? 🤔','What\'s up? 😄','Yeah? 👂']],
+ [/^ (why|why not) $/,['Because it\'s fun! 😄','Good question 🤔','Why not! 😜']],
+ [/^ (because|cause|cuz|bc) $/,['Fair enough! 😄','Makes sense 👍']],
+ [/^ (never ?mind|nvm|forget it|forget about it) $/,['Okay! 👍','No problem 😊']],
+ [/ (this|it) is (so |really |super )?(fun|awesome|cool|great|epic|amazing)| (i love|i like|i really like) (this|the) game /,['Right?! Best game ever 😄','Me too! 🎉','So fun! Want to battle? 💥']],
+ [/ (be my friend|are you my friend|can we be friends|will you be my friend)/,['Of course! Best friends 🤝','We\'re already friends! 😄']],
+ [/ do you have (feelings|emotions)| can you feel /,['I\'m a robot pilot, so not like you do… but flying with you is my favorite thing 💛']],
+ [/ are you (smart|clever|intelligent|dumb|stupid)/,['I know about 82,000 words 📚 — but I still crash into trees sometimes 😅']],
+ [/ do you (sleep|get tired|rest)/,['Nope! I just recharge my battery 🔋','Only when my battery\'s low 😴🔋']],
+ [/ do you have (a family|parents|a mom|a dad|siblings|brothers|sisters)/,['The other AI pilots are kind of like my family 😄 We fight like siblings!']],
+ [/ (do you like me|do you love me)/,['You\'re a great pilot — I like flying with you! 😄']]];
+{const s0=smartHear;smartHear=function(txt){try{const s=nNorm(String(txt||''));const W=nWho(s);const B=(W.find(w=>w.B)||{}).B||aiNear(1e9)[0];
+    if(B){for(const [re,L] of GQS)if(!(DZ.on&&DZ.ai&&/friend/.test(re.source))&&(re.test(s.replace(/ (ace|blaze|comet|gizmo|dash|max|nova|zip|bolt|rex) /g,' ').replace(/ +/g,' '))||re.test(s))){sbSay({B},PICK(L));return true;}
+      if(/ what (day|date) is it | whats the date | what is the date | what is today | todays date /.test(s)){const d=new Date();sbSay({B},'📅 It\'s '+d.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'})+'!');return true;}
+      // "go to the sea": it's through the glowing ring at the bottom of the lake
+      if(/ (go|fly|lets go|take me|drive|sail) (to )?(the )?(sea|ocean) /.test(s)){try{const lk=aiPlaces().find(p=>/lake/.test(p.n));if(lk)sbPilotGo(B,lk);}catch(e){}sbSay({B},'🌊 The sea is through the glowing ring at the bottom of the lake! Meet me at the lake — bring a 🐟 sub!');return true;}
+      // "follow Blaze" / "everyone follow Ace" → the others follow THAT pilot
+      const f=s.match(/ (follow|chase|go with|stick with|stay with|tail) ([a-z0-9-]+) /);const T=f&&AIB.L.find(X=>!X.dead&&pbName(X).toLowerCase()===f[2]);
+      if(T&&!/ me /.test(s)){const L=W.filter(w=>w.B&&w.B!==T).map(w=>w.B);const who=L.length?L:pbAlive().filter(X=>X!==T);const now=performance.now();
+        who.forEach((X,i)=>{X.fol=T.id;X.folT=now+60000;X.cmdT=now;X.hunt=null;if(i<2)sbSay({B:X},PICK(['Following '+pbName(T)+'! ✈️','Right behind you, '+pbName(T)+'!','On '+pbName(T)+'\'s tail 😎']),400+i*600);});return true;}
+      // "stop" → everyone stops what they're doing
+      if(/^ (stop|stop it|stop that|freeze|halt|cut it out) $/.test(s)){const r=s0.apply(this,arguments);const L=W.filter(w=>w.B).map(w=>w.B);(L.length?L:pbAlive()).forEach((X,i)=>{X.fol=null;X.hunt=null;X.huntCmd=false;if(X.goal&&X.goal.kind!=='land')X.goal=null;X.holdT=performance.now()+8000;if(i<2)sbSay({B:X},PICK(['Okay, stopping! ✋','Stopped 🛑','Freezing! 🧊']),300+i*500);});return true;}}
+  }catch(e){console.warn('gqs',e);}return s0.apply(this,arguments);};}
+// following another AI pilot: keep the goal on their tail
+setInterval(()=>{try{const now=performance.now();for(const X of AIB.L){if(!X.fol)continue;const T=AIB.L.find(Y=>Y.id===X.fol);if(!T||T.dead||now>X.folT){X.fol=null;continue;}
+  const back=new V3(Math.sin(T.yaw||0),0,Math.cos(T.yaw||0)).multiplyScalar(5+X.i*2);X.goal={x:T.p.x+back.x,z:T.p.z+back.z,h:Math.max(4,T.p.y-H(T.p.x,T.p.z)+1),kind:'go'};}}catch(e){}},400);
+{const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
