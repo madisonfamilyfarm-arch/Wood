@@ -4256,7 +4256,7 @@ function drawHud(dt){
   else if(vkind()==='car'){const sp=Math.hypot(D.vel.x,D.vel.z);$('osd').textContent='🚙 '+sp.toFixed(1)+' m/s ('+Math.round(sp*2.237)+' mph)'+(D.air?' · ✈ AIR':'')+(D.drift?' · 💨 DRIFT':'')+' · 🔋 '+Math.ceil(D.batt)+'%';}
   else $('osd').textContent='H '+(D.pos.y-g).toFixed(1)+'m · D '+dist.toFixed(0)+'m · H.S '+hs.toFixed(1)+' · V.S '+D.vel.y.toFixed(1)+(dmg?' · 🛠 '+dmg+' prop'+(dmg>1?'s':''):'')+(D.state==='landed'?(D.armed?' · MOTORS ON':' · MOTORS OFF'):D.state==='down'?' · NEEDS FIXING (PHOTO)':'');
   $('cBat').textContent='🔋'+Math.ceil(D.batt)+'%';$('cBat').style.color=D.batt<20?'#ff6b6b':'';
-  $('bTake').textContent=D.state==='landed'?'🛫 TAKE OFF':D.state==='down'||D.state==='tumble'?'🔧 FIX':'🛬 LAND';
+  {const gv=!WALK.on&&(vkind()==='car'||vkind()==='boat');$('bTake').textContent=D.state==='down'||D.state==='tumble'?'🔧 FIX':gv?(D.state==='landed'||!D.armed?'🚦 GO':'🛑 STOP'):D.state==='landed'?'🛫 TAKE OFF':'🛬 LAND';}
   if(course){const n=course.cps.length,best=LS.get('best_'+course.key,0);
     let t=course.pop?course.name+' · '+balloons.filter(b=>!b.alive).length+'/'+balloons.length+' popped':course.name+' · '+Math.min(cpI+1,n)+'/'+n;t+=' · '+fmt(cTime+cPen)+(best?' · best '+fmt(best):'')+(ghost?' · 👻':'');
     const others=Object.values(mp.peers).filter(pe=>pe.c===course.key);if(others.length)t+=' · '+others.map(pe=>pe.name+' '+pe.cp+'/'+n).join(' · ');$('courseTxt').textContent=t;
@@ -9758,6 +9758,8 @@ setInterval(()=>{try{const cl=$('chatLog'),t=$('chatTog')||$('cbBtn');if(!cl||!t
 const STKL={drone:['▲▼ up/down · ◀▶ turn','▲▼ fwd/back · ◀▶ sideways'],plane:['▲▼ throttle · ◀▶ rudder','▲▼ pitch · ◀▶ roll'],car:['▲▼ gas / reverse','◀▶ steer'],boat:['▲▼ gas / reverse','◀▶ steer'],sub:['▲▼ go / back · ◀▶ turn','▲ rise · ▼ dive'],walk:['▲▼ walk · ◀▶ turn','👀 look around']};
 setInterval(()=>{try{if(!started)return;let k=WALK.on?'walk':vkind();if(k==='heli')k='drone';if(!WALK.on&&vhKind()==='sub')k='sub';const L=STKL[k]||STKL.drone;
   if((CFG.stickMode===1)&&k==='drone')return;const a=document.querySelector('#stL .t'),b=document.querySelector('#stR .t');if(a&&a.textContent!==L[0])a.textContent=L[0];if(b&&b.textContent!==L[1])b.textContent=L[1];}catch(e){}},600);
+// cars + boats: the top button is 🚦 GO / 🛑 STOP (it said TAKE OFF / LAND)
+{const t0=takeoff;takeoff=function(){try{const gv=!WALK.on&&(vkind()==='car'||vkind()==='boat');if(gv&&D.state!=='down'&&D.state!=='tumble'){if(D.armed&&D.state!=='landed'){D.vel.x*=0.3;D.vel.z*=0.3;D.state='landed';toast('🛑 Stopped — push the stick to drive again',1500);return;}D.armed=true;if(D.state==='landed')D.state='flying';toast('🚦 GO! Push the stick to drive',1500);return;}}catch(e){}return t0.apply(this,arguments);};}
 
 // ================================================================ v57: 🧠 the AI pilots KNOW the game — real answers to "what's the fastest vehicle", "how do I get money", "make it night", "get in a sub", secrets…
 function gqTntList(){try{return Object.values(TNTK).map(k=>k.n).join(', ');}catch(e){return'lots';}}
