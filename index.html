@@ -10217,6 +10217,39 @@ let KBLAST='';
     const fz=kbFuzzy(txt,true);if(fz){sbSay({B},fz);return true;}}catch(e){}return s0.apply(this,arguments);};}
 {const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
 
+// v64: word games & grammar — syllables, word starting with a letter, "word that means X", anagrams, first letter, palindromes, plurals, past tense
+const IRRV={be:'was/were',beat:'beat',become:'became',begin:'began',bend:'bent',bet:'bet',bite:'bit',blow:'blew',break:'broke',bring:'brought',build:'built',burn:'burned/burnt',buy:'bought',catch:'caught',choose:'chose',come:'came',cost:'cost',cut:'cut',dig:'dug',dive:'dived/dove',do:'did',draw:'drew',dream:'dreamed/dreamt',drink:'drank',drive:'drove',eat:'ate',fall:'fell',feed:'fed',feel:'felt',fight:'fought',find:'found',fly:'flew',forget:'forgot',forgive:'forgave',freeze:'froze',get:'got',give:'gave',go:'went',grow:'grew',hang:'hung',have:'had',hear:'heard',hide:'hid',hit:'hit',hold:'held',hurt:'hurt',keep:'kept',know:'knew',lay:'laid',lead:'led',learn:'learned/learnt',leave:'left',lend:'lent',let:'let',lie:'lay',light:'lit',lose:'lost',make:'made',mean:'meant',meet:'met',pay:'paid',put:'put',quit:'quit',read:'read',ride:'rode',ring:'rang',rise:'rose',run:'ran',say:'said',see:'saw',sell:'sold',send:'sent',set:'set',shake:'shook',shine:'shone',shoot:'shot',show:'showed',shut:'shut',sing:'sang',sink:'sank',sit:'sat',sleep:'slept',slide:'slid',speak:'spoke',spend:'spent',spin:'spun',stand:'stood',steal:'stole',stick:'stuck',sting:'stung',strike:'struck',swim:'swam',swing:'swung',take:'took',teach:'taught',tear:'tore',tell:'told',think:'thought',throw:'threw',understand:'understood',wake:'woke',wear:'wore',win:'won',write:'wrote'};
+const IRRN={mouse:'mice',goose:'geese',man:'men',woman:'women',child:'children',tooth:'teeth',foot:'feet',person:'people',ox:'oxen',sheep:'sheep',deer:'deer',fish:'fish',moose:'moose',cactus:'cacti',octopus:'octopuses (or octopi)',knife:'knives',wife:'wives',life:'lives',leaf:'leaves',wolf:'wolves',half:'halves',calf:'calves',shelf:'shelves',elf:'elves',loaf:'loaves',thief:'thieves',potato:'potatoes',tomato:'tomatoes',hero:'heroes',echo:'echoes',volcano:'volcanoes',torpedo:'torpedoes',louse:'lice',die:'dice',crisis:'crises',fungus:'fungi',dwarf:'dwarfs',roof:'roofs',chief:'chiefs',aircraft:'aircraft',series:'series',species:'species'};
+function plural(w){if(IRRN[w])return IRRN[w];if(/(s|x|z|ch|sh)$/.test(w))return w+'es';if(/[^aeiou]y$/.test(w))return w.slice(0,-1)+'ies';return w+'s';}
+function pastT(w){if(IRRV[w])return IRRV[w];if(/e$/.test(w))return w+'d';if(/[^aeiou]y$/.test(w))return w.slice(0,-1)+'ied';if(/^[^aeiou]*[aeiou][^aeiouwxy]$/.test(w))return w+w.slice(-1)+'ed';return w+'ed';}
+function sylN(w){w=w.toLowerCase().replace(/[^a-z]/g,'');if(w.length<=3)return 1;w=w.replace(/(?:[^laeiouy]es|[^laeiouy]ed|[^laeiouy]e)$/,'').replace(/^y/,'');const m=w.match(/[aeiouy]{1,2}/g);let n=m?m.length:1;if(/[^aeiou]le$/.test(w))n++;return Math.max(1,n);}
+const WGOOD=w=>/^[a-z]{4,9}$/.test(w)&&SPEECH_KEEP_BASE.has(w);
+let WARR=null;function wArr(){if(!WARR)WARR=[...SPEECH_KEEP_BASE].filter(WGOOD);return WARR;}
+function anag(w){const k=w.split('').sort().join('');return [...SPEECH_KEEP_BASE].filter(x=>x!==w&&x.length===w.length&&/^[a-z]+$/.test(x)&&x.split('').sort().join('')===k).slice(0,6);}
+let CSRAW='';{const c0=cleanSpeech;cleanSpeech=function(t){CSRAW=String(t||'');return c0.apply(this,arguments);};}
+{const s0=smartHear;smartHear=function(txt){try{const s=nNorm(String(txt||''));const B=(nWho(s).find(w=>w.B)||{}).B||aiNear(1e9)[0];if(!B)return s0.apply(this,arguments);let m;
+  const say=t=>{sbSay({B},t);return true;};
+  if(m=s.match(/ how many syllables (?:are )?(?:in|does) (?:the word )?([a-z]+)(?: have)? $/))return say('👏 "'+m[1]+'" has '+sylN(m[1])+' syllable'+(sylN(m[1])>1?'s':'')+' (I think!)');
+  if(m=s.match(/ (?:give me|tell me|say|what s|whats|what is|name) (?:a|an|some) words? (?:that )?(?:starts?|starting|begins?|beginning) with (?:an? |the letter )?([a-z]) $/)){const L=wArr().filter(x=>x[0]===m[1]).sort(()=>Math.random()-.5).slice(0,60);if(!L.length)return say('🤔 Hmm, I can\'t think of one!');const P=[...new Set(L.map(aiwPre))].slice(0,3);let left=P.length;const done=()=>{if(--left>0)return;const ok=L.filter(x=>{const r=aiwGet(x);return r&&r.ex&&!r.from;}).slice(0,3);const out=ok.length?ok:L.slice(0,3);sbSay({B},'🔤 How about: '+out.join(', ')+'!');};P.forEach(p=>aiwLoad(L.find(x=>aiwPre(x)===p),done));return true;}
+  if(m=s.match(/ (?:give me |tell me |what s |whats |what is )?(?:a|another) word (?:that means|for|meaning) ([a-z]+) $/)||s.match(/ (?:what s |whats |what is )?(?:another|a different) word for ([a-z]+) $/)){const w=m[1];aiwLoad(w,()=>{const r=aiwGet(w);const sy=r&&r.s&&String(r.s).split(/[,;]\s*/).filter(x=>x&&x!==w).slice(0,5);sbSay({B},sy&&sy.length?'💡 Words that mean "'+w+'": '+sy.join(', '):'🤔 I don\'t know another word for "'+w+'" yet');});return true;}
+  if(m=s.match(/ (?:what s |whats |what is |give me |find )?(?:an |the )?anagrams? (?:of|for) ([a-z]+) $/)){const a=anag(m[1]);return say(a.length?'🔀 "'+m[1]+'" → '+a.join(', '):'🔀 I couldn\'t find a real-word anagram of "'+m[1]+'"');}
+  if(m=s.match(/ what letter (?:does|do) ([a-z]+) (?:start|begin) with $/))return say('🔤 "'+m[1]+'" starts with '+m[1][0].toUpperCase());
+  if(m=s.match(/ what letter (?:does|do) ([a-z]+) end with $/))return say('🔤 "'+m[1]+'" ends with '+m[1].slice(-1).toUpperCase());
+  if(m=s.match(/ is ([a-z ]+?) a palindrome $/)){const rm=String(CSRAW||'').toLowerCase().match(/is ([a-z ]+?) a palindrome/);if(rm)m=rm;const w=m[1].replace(/ /g,''),y=w.split('').reverse().join('')===w;return say(y?'🔁 Yes! "'+w+'" reads the same backwards!':'🔁 Nope — backwards it\'s "'+w.split('').reverse().join('')+'"');}
+  if(/ (what is|whats|what s) a palindrome $/.test(s))return say('🔁 A word that reads the same backwards — like racecar, kayak, level, mom!');
+  if(m=s.match(/ (?:what s |whats |what is )?(?:the )?plural (?:of|for) (?:a |an )?([a-z]+) $/))return say('🔢 One '+m[1]+', two '+plural(m[1])+'!');
+  if(m=s.match(/ (?:what s |whats |what is )?(?:the )?past (?:tense )?(?:of|for) ([a-z]+) $/)){const w=m[1].replace(/^to /,'');return say('⏪ Today I '+w+', yesterday I '+pastT(w)+'!');}
+  if(m=s.match(/ how many vowels (?:are )?(?:in|does) ([a-z]+)(?: have)? $/)){const n=(m[1].match(/[aeiou]/g)||[]).length;return say('🅰️ "'+m[1]+'" has '+n+' vowel'+(n===1?'':'s'));}
+  if(/ (what are|whats|what s|what is) (the )?vowels $/.test(s))return say('🅰️ A, E, I, O, U (and sometimes Y)!');
+  if(/ (what is|whats|what s) an? (adjective|describing word) $/.test(s))return say('🎨 A word that describes something — like big, red, fast or shiny!');
+  if(/ (what is|whats|what s) an? adverb $/.test(s))return say('🏃 A word that tells HOW something happens — like quickly, loudly or gently!');
+  if(/ (what is|whats|what s) a pronoun $/.test(s))return say('👉 A word that stands in for a noun — like he, she, it, they, we!');
+  if(/ (what is|whats|what s) a (compound word) $/.test(s))return say('🧩 Two words stuck together — like sunflower, airplane, rainbow!');
+  if(/ how many letters (are )?(in|does) the alphabet( have)? $/.test(s))return say('🔤 26 letters!');
+  if(/ (what is|whats|what s) the (longest|biggest) word $/.test(s))return say('📏 "Pneumonoultramicroscopicsilicovolcanoconiosis" — 45 letters! (a lung disease from volcano dust)');
+}catch(e){}return s0.apply(this,arguments);};}
+{const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
+
 // =====================================================================================
 // ===== 🌎 REAL WORLD MAP (CesiumJS): the real Earth from satellite photos + real hills, starting over the farm =====
 // The game itself (physics, multiplayer, weapons, workshop…) is the same — Cesium just draws the world underneath.
