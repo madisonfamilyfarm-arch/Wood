@@ -41,3 +41,6 @@ WS.camAsked=new Set();
 // a slider that applies its last change right after you let go still counts as the SAME step
 addEventListener('pointerup',()=>{HIST.upT=performance.now();},true);
 {const c0=wsChanged;wsChanged=function(){const late=HIST.burst&&!HIST.down&&performance.now()-(HIST.upT||0)<400;if(late)HIST.down=true;try{return c0.apply(this,arguments);}finally{if(late)HIST.down=false;}};}
+// 🛡 nobody can shoot you while you're in the builder (bots don't aim at you, rockets/bullets don't hurt) — plus 2 s of shield when you come back out
+setInterval(()=>{try{const ed=(WS&&WS.open)||($('bsBox')&&$('bsBox').style.display==='flex');if(ed){D.shield=Math.max(D.shield||0,performance.now()+2000);}}catch(e){}},250);
+{const d0=dzDie;dzDie=function(){try{if(WS.open)return;}catch(e){}return d0.apply(this,arguments);};}
