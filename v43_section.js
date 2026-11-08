@@ -17,7 +17,7 @@ const RB={
   idle:['This {place} is so pretty right now 🌲','Anyone want to race? 🏁','I bet I can do more flips than you 😜','Hey {me}, wanna play tag? 🏃','I\'m bored… want to play hide and seek? 🙈','Did you see that bird? 🐦','Let\'s explore together! 🧭','I love flying over the lake 🌊','Follow the leader? I\'ll copy everything you do! 🔁','The fire tower has the BEST view 🗼'],
   flip:['Nice flip! 🔄','Whoa, smooth! 😎','10 out of 10 flip! 🏆','Teach me that one!','Show-off! 😆','Do another one! 🔁'],
   crash:['Ouch! You okay? 😬','Yikes — need a hand? 🔧','That looked like it hurt! 😵','Oof! Shake it off, you got this 💪','Uh oh, crash! Press 🔧 to fix up!'],
-  boom:['WHOA! 😱','That was HUGE! 💥','My ears are ringing! 🙉','Holy smokes! 💨','Did you feel that?!','KABOOM! 🤯'],
+  boom:['WHOA! 😱','That was HUGE! 💥','My ears are ringing! 🙉','Oh my word! 💨','Did you feel that?!','KABOOM! 🤯'],
   tagIt:['Tag! You\'re it! 😆','Gotcha! You\'re it! 🏃','TAG! Catch me if you can! 💨'],tagGot:['Aww, you got me! Now I\'m it 😤','Nooo! Okay, here I come! 👀','You\'re fast! My turn to chase 🏃'],
   found:['You found me! 🎉','Aww, you found me! Good eyes 👀','Found! You\'re a great seeker 🔍']};
 function rb(k,B){let t=PICK(RB[k]);const me=meName();let place='woods';try{const p=B?B.p:dzMe();const pl=aiPlaces().reduce((a,q)=>Math.hypot(q.x-p.x,q.z-p.z)<Math.hypot(a.x-p.x,a.z-p.z)?q:a);place=pl.n;}catch(e){}return t.replace(/\{me\}/g,me).replace(/\{place\}/g,place);}
