@@ -22,3 +22,6 @@ setInterval(()=>{try{const now=performance.now();for(const B of AIB.L){if(!B.fol
   aiGoTo(B,pe.p.x+Math.sin(B.i*2.1)*4,pe.p.z+Math.cos(B.i*2.1)*4,Math.max(3,pe.p.y-H(pe.p.x,pe.p.z)+1));}}catch(e){}},400);
 // an AI pilot that's busy doing what someone asked doesn't randomly hop into another vehicle (that also teleported it home!)
 {const a0=aiSwitch;aiSwitch=function(B,kind,why){try{if(B&&!kind&&!why&&(pbBusy(B)||(B.hunt&&B.huntCmd))){B.swT=30+Math.random()*30;return;}}catch(e){}return a0.apply(this,arguments);};}
+// a friend joins the room → one of my AI pilots says hi to them (and goodbye when they leave)
+{const c0=chatSys;chatSys=function(t){const r=c0.apply(this,arguments);try{const s=String(t||'');let m=s.match(/^👥 (.+) joined$/);if(m&&AIB.L.length&&!/^🤖/.test(m[1])){const nm=m[1];setTimeout(()=>{const B=pbAlive()[Math.floor(Math.random()*pbAlive().length)];if(B)pbSay(B,PICK(['Welcome, '+nm+'! 👋','Hey '+nm+'! Wanna battle? 😎','Yo '+nm+'! Race you! 🏁']),true);},2500);}
+  m=s.match(/^👋 (.+) left/);if(m&&AIB.L.length&&!/^🤖/.test(m[1])){const nm=m[1];setTimeout(()=>{const B=pbAlive()[0];if(B)pbSay(B,PICK(['Bye '+nm+'! 👋','See ya, '+nm+'!']),true);},1500);}}catch(e){}return r;};}
