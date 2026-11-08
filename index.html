@@ -8800,7 +8800,7 @@ function vhBreak(n,quiet){const pool=(VBREAK[vhKind()]||VBREAK.drone).filter(k=>
 {const c0=dmgClear;dmgClear=function(){const r=c0.apply(this,arguments);try{VH.hp=VH.max;vhBar();}catch(e){}return r;};}
 // ---------------------------------------------------------------- 🤖 AI vehicles have armor too (a rocket won't always finish an AI tank)
 {const b0=dzBotDie;dzBotDie=function(B,txt){if(HIT.ctx&&B&&!B.dead){const hp0=VHP[B.kind==='car'&&B.tank?'tank':B.kind]||22;if(B.hpMax==null){B.hpMax=hp0;B.hp=hp0;}
-    const d=B.p.distanceTo(HIT.ctx.p),dmg=HIT.ctx.r*4*clamp(1-0.65*d/HIT.ctx.r,0.25,1);B.hp-=dmg;if(B.hp>0){try{sparks(B.p,0xffaa44);puff(B.p.clone(),0x444444,0.5,1.4);}catch(e){}B.say=PICK(['Ouch! 😵','I\'m hit!','That one stung!','Still going! 💪']);return;}B.hpMax=null;}
+    const d=B.p.distanceTo(HIT.ctx.p),dmg=HIT.ctx.r*4*clamp(1-0.65*d/HIT.ctx.r,0.25,1);B.hp-=dmg;if(B.hp>0){try{sparks(B.p,0xffaa44);puff(B.p.clone(),0x444444,0.5,1.4);}catch(e){}{const nw=performance.now();if(Math.random()<0.4&&!(B.sayHitT>nw)){B.sayHitT=nw+15000;B.say=PICK(['Ouch! 😵','I\'m hit!','That one stung!','Still going! 💪']);}}return;}B.hpMax=null;}
   return b0.apply(this,arguments);};}
 setInterval(()=>{try{for(const B of AIB.L){if(!B.dead&&B.hpMax&&B.hp<B.hpMax)B.hp=Math.min(B.hpMax,B.hp+B.hpMax*0.03);}}catch(e){}},2000);
 
@@ -9529,7 +9529,7 @@ const PBL={
   banter:['Not if I get you first, {t}! 😤','Bring it, {t}! 💪','Ha! You can\'t catch me, {t}! 💨','{t}, I\'ve got your number 😏']};
 function pbLine(k,B,t){let s=PICK(PBL[k]);let place='the lake';try{const pl=aiPlaces().filter(p=>!/truck|fire$/.test(p.n));place=PICK(pl).n;}catch(e){}return s.replace(/\{me\}/g,meName()).replace(/\{t\}/g,t||'someone').replace(/\{place\}/g,place);}
 // someone listening to YOU right now doesn't make their own plans
-function pbBusy(B){const now=performance.now();return (B.cmdT&&now-B.cmdT<35000)||(GAME.on&&GAME.B===B)||B.holdT>now||B.orbT>now||B.bomb||(B.team==='me'&&B.hunt&&B.huntCmd);}
+function pbBusy(B){const now=performance.now();return B.fol||B.folPeer||(B.cmdT&&now-B.cmdT<35000)||(GAME.on&&GAME.B===B)||B.holdT>now||B.orbT>now||B.bomb||(B.team==='me'&&B.hunt&&B.huntCmd);}
 {const s0=sbSay;sbSay=function(w,t){try{if(w&&w.B&&performance.now()-AIC.lastChat<1500)w.B.cmdT=performance.now();}catch(e){}return s0.apply(this,arguments);};}
 // ---------------------------------------------------------------- 📊 scoreboard + reactions to kills
 {const b0=dzBotDie;dzBotDie=function(B,txt){const was=B&&B.dead;const r=b0.apply(this,arguments);try{if(B&&!was&&B.dead){const c=HIT.ctx;pbS(B.id,pbName(B)).d++;B.diedT=performance.now();
@@ -9779,9 +9779,34 @@ const GQS=[
       if(/^ (stop|stop it|stop that|freeze|halt|cut it out) $/.test(s)){const r=s0.apply(this,arguments);const L=W.filter(w=>w.B).map(w=>w.B);(L.length?L:pbAlive()).forEach((X,i)=>{X.fol=null;X.hunt=null;X.huntCmd=false;if(X.goal&&X.goal.kind!=='land')X.goal=null;X.holdT=performance.now()+8000;if(i<2)sbSay({B:X},PICK(['Okay, stopping! ✋','Stopped 🛑','Freezing! 🧊']),300+i*500);});return true;}}
   }catch(e){console.warn('gqs',e);}return s0.apply(this,arguments);};}
 // following another AI pilot: keep the goal on their tail
-setInterval(()=>{try{const now=performance.now();for(const X of AIB.L){if(!X.fol)continue;const T=AIB.L.find(Y=>Y.id===X.fol);if(!T||T.dead||now>X.folT){X.fol=null;continue;}
-  const back=new V3(Math.sin(T.yaw||0),0,Math.cos(T.yaw||0)).multiplyScalar(5+X.i*2);X.goal={x:T.p.x+back.x,z:T.p.z+back.z,h:Math.max(4,T.p.y-H(T.p.x,T.p.z)+1),kind:'go'};}}catch(e){}},400);
+setInterval(()=>{try{const now=performance.now();for(const X of AIB.L){if(!X.fol)continue;const T=AIB.L.find(Y=>Y.id===X.fol);if(!T||T.dead||now>X.folT){X.fol=null;continue;}X.hunt=null;
+  const back=new V3(Math.sin(T.yaw||0),0,Math.cos(T.yaw||0)).multiplyScalar(5+X.i*2);aiGoTo(X,T.p.x+back.x,T.p.z+back.z,Math.max(4,T.p.y-H(T.p.x,T.p.z)+1));}}catch(e){}},400);
 {const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
+
+// ================================================================ v58: 🌐 AI pilots in REAL multiplayer — they answer your friends too, and everybody sees what they say
+// 1) whatever my AI pilots say goes to everyone in the room
+{const c0=chatAdd;chatAdd=function(who,txt,col){const r=c0.apply(this,arguments);try{if(!chatAdd.remote&&typeof who==='string'&&/^🤖 /.test(who)&&mpOpen()&&AIB.L.some(B=>B.name===who))mpSend({t:'botchat',who,txt:String(txt).slice(0,200),col});}catch(e){}return r;};}
+MPH.botchat=function(m,pe){chatAdd.remote=true;const f0=chatAdd.force;chatAdd.force=true;try{chatAdd(String(m.who||'🤖').slice(0,40)+' ('+pe.name+'\'s AI)',String(m.txt||'').slice(0,200),m.col);}finally{chatAdd.remote=false;chatAdd.force=f0;}};
+// 2) a friend talks → MY AI pilots answer them (as if they were "me" for that message)
+const PEERCTX={on:false,name:'',p:null};
+{const n0=meName;meName=function(){return PEERCTX.on?PEERCTX.name:n0.apply(this,arguments);};}
+{const d0=dzMe;dzMe=function(){if(PEERCTX.on&&PEERCTX.p)return PEERCTX.p.clone();return d0.apply(this,arguments);};}
+{const h0=MPH.chat;MPH.chat=function(m,pe){const r=h0.apply(this,arguments);try{if(!AIB.L.length||!m.txt)return r;const t=String(m.txt);
+    // only answer if the message is for the AI: it names one of my pilots, or nobody else in the room could answer
+    const s=nNorm(t);const mine=AIB.L.some(B=>s.indexOf(' '+pbName(B).toLowerCase()+' ')>=0);const humans=Object.values(mp.peers).filter(x=>x.name&&!/^🤖/.test(x.name));
+    if(!mine&&humans.length>1)return r;
+    setTimeout(()=>{PEERCTX.on=true;PEERCTX.name=String(pe.name||'friend').replace(/ \(.*\)$/,'');PEERCTX.p=pe.p?pe.p.clone():null;const was=NLU.sync;NLU.sync=true;
+      const g0=AIB.L.map(B=>B.goal&&B.goal.kind);try{smartHear(t);}catch(e){console.warn('peer hear',e);}finally{PEERCTX.on=false;NLU.sync=was;}
+      AIB.L.forEach((B,i)=>{const g=B.goal&&B.goal.kind;if(g==='chase'&&g0[i]!=='chase'){B.folPeer=pe.id;B.folPeerT=performance.now()+90000;B.hunt=null;B.huntCmd=false;B.fol=null;}else if(g!=='chase')B.folPeer=null;});},350);}catch(e){}return r;};}
+// 3) on a phone with NO AI pilots of its own, a message to someone else's AI shouldn't get answered by the campers
+{const s0=smartHear;smartHear=function(txt){try{if(!AIB.L.length&&mpOpen()){const s=nNorm(String(txt||''));const remote=Object.values(mp.peers).some(pe=>pe.name&&/^🤖 /.test(pe.name)&&s.indexOf(' '+pe.name.replace(/^🤖 /,'').replace(/ \(.*\)$/,'').toLowerCase()+' ')>=0);if(remote)return true;}}catch(e){}return s0.apply(this,arguments);};}
+// send an AI pilot somewhere whatever it's driving (drones/helis take off first)
+function aiGoTo(B,x,z,h){if(B.kind==='drone'||B.kind==='heli'){if(B.mode!=='fly'&&B.mode!=='takeoff')B.mode='takeoff';B.goal={x,z,h:h||10,kind:'go'};B.t=20;}else if(B.kind==='plane')B.wp={x,z,alt:25};else B.wp={x,z};B.wpT=25;}
+// following a FRIEND (not me): keep heading to their drone
+setInterval(()=>{try{const now=performance.now();for(const B of AIB.L){if(!B.folPeer)continue;B.hunt=null;const pe=mp.peers[B.folPeer];if(!pe||!pe.p||now>B.folPeerT||B.dead){B.folPeer=null;continue;}
+  aiGoTo(B,pe.p.x+Math.sin(B.i*2.1)*4,pe.p.z+Math.cos(B.i*2.1)*4,Math.max(3,pe.p.y-H(pe.p.x,pe.p.z)+1));}}catch(e){}},400);
+// an AI pilot that's busy doing what someone asked doesn't randomly hop into another vehicle (that also teleported it home!)
+{const a0=aiSwitch;aiSwitch=function(B,kind,why){try{if(B&&!kind&&!why&&(pbBusy(B)||(B.hunt&&B.huntCmd))){B.swT=30+Math.random()*30;return;}}catch(e){}return a0.apply(this,arguments);};}
 
 // =====================================================================================
 // ===== 🌎 REAL WORLD MAP (CesiumJS): the real Earth from satellite photos + real hills, starting over the farm =====
