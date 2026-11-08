@@ -4323,7 +4323,7 @@ function vrHud(asp){
   if(repair.open){const rv=$('rcv'),w=W*0.7,h=w*400/640;c.drawImage(rv,W/2-w/2,Hh/2-h/2,w,h);}
   else if(menu.open){c.save();c.translate(W/2,Hh/2);c.scale(0.8,0.8);c.translate(-W/2,-Hh/2);const it=menu.items,lh=36,MX=7,st=Math.max(0,Math.min(menu.i-3,it.length-MX)),vis=it.slice(st,st+MX),ph=vis.length*lh+20,pw=500,px=W/2-pw/2,py=Hh/2-ph/2;
     c.fillStyle='rgba(8,14,10,0.9)';c.fillRect(px,py,pw,ph);c.font='bold 21px sans-serif';c.textAlign='left';c.textBaseline='middle';
-    vis.forEach((m,i)=>{const y=py+10+i*lh;if(i+st===menu.i){c.fillStyle='#ffd60a';c.fillRect(px+6,y+2,pw-12,lh-4);c.fillStyle='#000';}else c.fillStyle='#fff';let t=m.label();if(m.range)t+=' : '+(m.range.fmt?m.range.fmt(m.range.get()):m.range.get());c.fillText(t.length>40?t.slice(0,39)+'…':t,px+18,y+lh/2);});
+    vis.forEach((m,i)=>{const y=py+10+i*lh;if(i+st===menu.i){c.fillStyle='#ffd60a';c.fillRect(px+6,y+2,pw-12,lh-4);c.fillStyle='#000';}else c.fillStyle='#fff';let t=String(m.label()).replace(/<span class="tld">[^<]*<\/span>/g,'').replace(/<[^>]+>/g,' ').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim();if(m.range)t+=' : '+(m.range.fmt?m.range.fmt(m.range.get()):m.range.get());c.fillText(t.length>40?t.slice(0,39)+'…':t,px+18,y+lh/2);});
     pill('sticks/wheel = choose · ◀ ▶ = change · PHOTO = select · Fn = back',W/2,py+ph+22,'15px sans-serif','#ffd60a');c.restore();}
   else{c.strokeStyle='rgba(255,255,255,0.85)';c.lineWidth=3;c.beginPath();c.arc(W/2,Hh/2,9,0,7);c.stroke();
     if(course){pill($('courseTxt').textContent.slice(0,48),W/2,Hh*0.71,'bold 19px sans-serif','#fff');const ni=nextInfo();if(ni){c.save();c.translate(W/2,Hh*0.62);c.rotate(-ni.rel);c.fillStyle='#33ff66';c.beginPath();c.moveTo(0,-22);c.lineTo(14,6);c.lineTo(0,0);c.lineTo(-14,6);c.closePath();c.fill();c.restore();}}}
@@ -9710,7 +9710,7 @@ const GLOSS={quadcopter:'a drone with 4 propellers — two spin one way, two the
 
 // ================================================================ v56: 🔧 fixes found by the overnight play-tests
 // 🥽 VR: the phone is inside a headset, so on-screen buttons (TNT, chat, tools, health bar…) just get in the way of the picture → hide every floating overlay except Exit VR + the respawn countdown
-const VRKEEP=new Set(['vrUI','dzCount']);
+const VRKEEP=new Set(['vrUI','dzCount','menu','repair','gal','prog','ws','wsGhost','start','mapEd','bsBox','djiStat','scrTurn']);
 function vrHideOverlays(){const on=document.body.classList.contains('vr');for(const el of document.body.children){if(el.tagName==='CANVAS'||el.tagName==='SCRIPT'||VRKEEP.has(el.id))continue;
     if(on){if(el.dataset.vrh)continue;const cs=getComputedStyle(el);if(cs.position==='fixed'||cs.position==='absolute'){el.dataset.vrh='1';el.classList.add('vrHid');}}else if(el.dataset.vrh){delete el.dataset.vrh;el.classList.remove('vrHid');}}}
 {const st=document.createElement('style');st.textContent='body.vr .vrHid{display:none!important}';document.head.appendChild(st);}
