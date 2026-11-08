@@ -39,3 +39,16 @@ const COOLW='flabbergasted gargantuan kerfuffle discombobulated serendipity bamb
 {const s0=smartHear;smartHear=function(txt){try{const s=nNorm(String(txt||''));const B=(nWho(s).find(w=>w.B)||{}).B||aiNear(1e9)[0];
     if(B&&/ (teach me a (new |cool |big |fancy )?word|word of the day|give me a (big|cool|fancy|new|hard|long) word|tell me a (big|cool|fancy|new) word|new vocabulary word) /.test(s)){const w=PICK(COOLW);aiwLoad(w,()=>{const e=aiwGet(w);sbSay({B},'📖 Word of the day: '+w.toUpperCase()+(e?' — '+e.g.split(' ¦ ')[0].replace(/^[a-z]+: /,''):COOLD[w]?' — '+COOLD[w]:'')+' ✨ Try using it!');});return true;}}catch(e){}return s0.apply(this,arguments);};}
 try{Object.assign(SLANG,COOLD);}catch(e){}
+// 🔢 more number + word questions: squared, half of, percent, letters in a word, backwards, words starting with a letter, biggest number, count to N
+{const s0=smartHear;smartHear=function(txt){try{const s=nNorm(String(txt||''));const B=(nWho(s).find(w=>w.B)||{}).B||aiNear(1e9)[0];if(!B)return s0.apply(this,arguments);let m;
+    if((m=s.match(/ (\d+(?:\.\d+)?) (squared|cubed) /))){const n=+m[1],r=m[2]==='squared'?n*n:n*n*n;sbSay({B},'🧮 '+n+(m[2]==='squared'?'²':'³')+' = '+(+r.toFixed(4)));return true;}
+    if((m=s.match(/ (half|a third|a quarter|double|triple) of (\d+(?:\.\d+)?) /))){const n=+m[2],f={half:0.5,'a third':1/3,'a quarter':0.25,double:2,triple:3}[m[1]];sbSay({B},'🧮 '+m[1]+' of '+n+' = '+(+(n*f).toFixed(2)));return true;}
+    if((m=s.match(/ (\d+(?:\.\d+)?) ?(?:percent|%) of (\d+(?:\.\d+)?) /))){sbSay({B},'🧮 '+m[1]+'% of '+m[2]+' = '+(+(m[1]*m[2]/100).toFixed(2)));return true;}
+    if((m=s.match(/ (?:square root of|sqrt of) (\d+(?:\.\d+)?) /))){sbSay({B},'🧮 √'+m[1]+' = '+(+Math.sqrt(+m[1]).toFixed(3)));return true;}
+    if((m=s.match(/ how many letters (?:are )?(?:in|does) (?:the word )?([a-z'-]+) /))){const w=m[1].replace(/'/g,'');sbSay({B},'🔤 "'+w+'" has '+w.length+' letters');return true;}
+    if((m=s.match(/ (?:spell|say) ([a-z'-]+) backwards? /))){sbSay({B},'🔁 '+m[1].split('').reverse().join('').toUpperCase());return true;}
+    if((m=s.match(/ (?:what|which) (?:words? )?(?:starts?|begins?) with (?:the letter |an? )?([a-z]) $/))){const L=m[1];const W=COOLW.concat(Object.keys(SLANG)).filter(w=>w[0]===L&&!/ /.test(w));const base={a:'airplane',b:'battery',c:'camera',d:'drone',e:'explosion',f:'flip',g:'gimbal',h:'helicopter',i:'island',j:'jet',k:'kite',l:'lake',m:'motor',n:'night',o:'orbit',p:'propeller',q:'quadcopter',r:'rocket',s:'submarine',t:'tank',u:'upside-down',v:'velocity',w:'wing',x:'x-ray',y:'yaw',z:'zoom'};sbSay({B},'🔤 '+L.toUpperCase()+' words: '+[base[L]].concat(W.slice(0,4)).filter(Boolean).join(', '));return true;}
+    if(/ (what is|whats) the (biggest|largest|highest) number /.test(s)){sbSay({B},'♾️ There isn\'t one — you can always add 1! (A googol is 1 with 100 zeros 😮)');return true;}
+    if((m=s.match(/ count to (\d+) /))&&+m[1]>10){const n=Math.min(+m[1],30);sbSay({B},Array.from({length:n},(_,i)=>i+1).join('… ')+(+m[1]>30?'… (okay that\'s enough counting 😅)':' 🎉'));return true;}
+  }catch(e){}return s0.apply(this,arguments);};}
+{const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
