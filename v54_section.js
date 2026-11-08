@@ -40,7 +40,7 @@ setInterval(()=>{try{if(!started||!AIB.L.length||menu.open)return;const now=perf
   for(const B of AIB.L){const pp=pbP(B);
     // came back after being blown up
     if(B.dead){B._dead=true;continue;}if(B._dead){B._dead=false;B.hp=B.hpMax||B.hp;if(Math.random()<0.7)pbSay(B,pbLine('respawn',B),true);}
-    if(pbBusy(B))continue;if(!(B.kind==='drone'||B.kind==='heli'))continue;
+    if(pbBusy(B))continue;
     if(battle){const f=B.hpMax?B.hp/B.hpMax:1;
       // low health → fall back, fix up, come back
       if(f<0.35&&!(B.retreatT>now)&&pp.brave<0.85){B.retreatT=now+12000;B.hunt=null;const away=B.p.clone().sub(me);away.y=0;away.setLength(60);B.goal={x:B.p.x+away.x,z:B.p.z+away.z,h:10,kind:'go'};pbSay(B,pbLine('low',B),true);continue;}
@@ -60,7 +60,7 @@ setInterval(()=>{try{if(!started||!AIB.L.length||menu.open)return;const now=perf
   // nobody's heard from you in a while and you're far away
   if(battle&&me&&now-AIC.lastChat>90000&&now-PBT.far>120000){const n=pbAlive().sort((a,b)=>a.p.distanceTo(me)-b.p.distanceTo(me));if(n.length&&n[0].p.distanceTo(me)>150){PBT.far=now;pbSay(n[0],pbLine('whereU',n[0]));}}
   // now and then, battle chatter
-  if(battle&&Math.random()<0.04){const B=PICK(pbAlive());if(B){const t=PICK(pbAlive().filter(x=>x!==B));const l=pbLine('idleBattle',B,t?pbName(t):'Blaze');if(pbSay(B,l)&&/team up|blow up next/.test(l))aiOffer(/team up/.test(l)?'team':'advice',B);}}}catch(e){console.warn('pb',e);}},2000);
+  if(battle&&Math.random()<0.04){const B=PICK(pbAlive());if(B){const t=PICK(pbAlive().filter(x=>x!==B));let l=pbLine('idleBattle',B,t?pbName(t):'Blaze');if(/Score check/.test(l)&&!Object.values(PB.score).some(x=>x.k))l='Who should I blow up first? 🤔';if(pbSay(B,l)&&/team up|blow up next/.test(l))aiOffer(/team up/.test(l)?'team':'advice',B);}}}catch(e){console.warn('pb',e);}},2000);
 // near misses: a rocket whooshes right past an AI pilot
 {const t0=tickShots;tickShots=function(dt){const r=t0.apply(this,arguments);try{for(const s of shots){if(!s.own||s.w!=='rocket'||!s.m||s.nm)continue;for(const B of AIB.L){if(B.dead)continue;const d=B.p.distanceTo(s.m.position);if(d<4&&d>2.2){s.nm=1;if(Math.random()<0.5)pbSay(B,pbLine('closeCall',B),true);break;}}}}catch(e){}return r;};}
 // "yes" to "anyone wanna team up?"
@@ -105,3 +105,10 @@ function vFix(t){let s=String(t||'').trim();const low=s.toLowerCase();let o=low;
 // "attack Gizmo" / "go after Blaze" said to everyone = the others go after that pilot
 {const s0=smartHear;smartHear=function(txt){try{const s=nNorm(String(txt||''));const m=s.match(/^ (?:lets |let us |everyone |guys |you guys )?(attack|go after|get|shoot|blow up|kill|take out|hunt|chase|bomb) ([a-z0-9-]+) (?:now |guys |everyone |please )?$/);
   if(m){const T=AIB.L.find(B=>!B.dead&&pbName(B).toLowerCase()===m[2]);if(T){DZ.on=true;DZ.ai=true;const now=performance.now();const H=pbAlive().filter(X=>X!==T).slice(0,3);H.forEach((X,i)=>{X.hunt=T.id;X.huntCmd=true;X.cmdT=now;if(m[1]==='bomb'){try{X.bomb=T.id;}catch(e){}}if(i<2)sbSay({B:X},PICK(['Going after '+pbName(T)+'! 🎯','On it! '+pbName(T)+' is going down 🚀','Get '+pbName(T)+'! 💥']),400+i*600);});setTimeout(()=>pbSay(T,PICK(['Uh oh… everyone\'s after me 😬','You\'ll never catch me! 💨','Hey! No fair! 😤']),true),1800);NLU.lastWho=[{B:T}];NLU.lastT=now;return true;}}}catch(e){}return s0.apply(this,arguments);};}
+// ---------------------------------------------------------------- 🚀 AI pilots really fight EACH OTHER now (they shoot at the pilot they're hunting, and their rockets can hit other AI)
+{const b0=dzBotsShoot;dzBotsShoot=function(dt){const r=b0.apply(this,arguments);try{if(!DZ.on||!DZ.ai)return r;
+  for(const B of AIB.L){if(B.dead||!B.hunt||B.hunt==='me'||B.kind==='sub')continue;const T=AIB.L.find(X=>X.id===B.hunt);if(!T||T.dead||(B.team==='me'&&T.team==='me'))continue;
+    B.bkT=(B.bkT==null?3+Math.random()*4:B.bkT)-dt;if(B.bkT>0)continue;B.bkT=5+Math.random()*5;const d=T.p.distanceTo(B.p);if(d<5||d>75)continue;
+    const aim=T.p.clone();if(T.vel)aim.addScaledVector(T.vel,d/28);aim.x+=(Math.random()-0.5)*2.5;aim.z+=(Math.random()-0.5)*2.5;aim.y+=d*d*0.0009;dzBotFire(B,aim);}}catch(e){}return r;};}
+{const k0=dzRockets;dzRockets=function(dt){const r=k0.apply(this,arguments);try{for(let i=DZ.rk.length-1;i>=0;i--){const s=DZ.rk[i];if(!s.prev||s.age<0.12)continue;const P=s.m.position;
+    for(const B of AIB.L){if(B.dead||B.id===s.by)continue;if(segSphere(s.prev,P,B.p,1.3)){scene.remove(s.m);DZ.rk.splice(i,1);const p=P.clone();explode(p,4,2.5,false,s.n,s.by);try{mpSend({t:'boom',p:p.toArray().map(r2),r:4,dr:2.5,sid:'',bn:s.n,bi:s.by});}catch(e){}break;}}}}catch(e){}return r;};}
