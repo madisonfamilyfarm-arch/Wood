@@ -14,3 +14,7 @@ function layoutFix(){if(!started||document.body.classList.contains('vr'))return;
       document.querySelectorAll('#top button, #top div').forEach(e=>{const r=e.getBoundingClientRect();if(r.width&&r.height<50&&r.left<m.right+60&&r.top<m.top+20&&r.bottom>low)low=r.bottom;});
       if(low>m.top-2){mb.style.top=(low+5)+'px';const bt=$('mapBtns');if(bt&&innerHeight<500){bt.style.display='grid';bt.style.gridTemplateColumns='repeat(2,30px)';bt.style.gap='3px';}}}}}
 setInterval(()=>{try{layoutFix();}catch(e){}},800);
+// 🧹 explosions, rockets and TNT used to leave their shapes on the graphics chip forever (it slowly filled up in long battles) → free them when they're gone.
+// (only shapes — materials stay, so nothing has to be re-compiled = no freeze)
+let GEO_KEEP=null;function geoDisp(o){try{if(!o)return;if(!GEO_KEEP){GEO_KEEP=new Set();try{Object.values(GEO).forEach(g=>g&&g.isBufferGeometry&&GEO_KEEP.add(g));}catch(e){}try{SHARED_GEO.forEach(g=>GEO_KEEP.add(g));}catch(e){}try{GEO_KEEP.add(DZG);}catch(e){}}
+  o.traverse(m=>{if(m.geometry&&!m.isInstancedMesh&&!GEO_KEEP.has(m.geometry)&&!(typeof SHARED_GEO!=='undefined'&&SHARED_GEO.has(m.geometry))&&!m.geometry.userData.keep)m.geometry.dispose();});}catch(e){}}
