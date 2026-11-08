@@ -1,0 +1,9 @@
+const {chromium,devices}=require('playwright');
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});const ctx=await b.newContext({...devices['iPhone 15 Pro landscape']});await ctx.addInitScript(()=>{try{localStorage.setItem('wds_cfg',JSON.stringify({look:'fast'}));}catch(e){}});
+  const p=await ctx.newPage();await p.route('**/three.min.js',r=>r.fulfill({path:__dirname+'/node_modules/three/build/three.min.js',contentType:'text/javascript'}));
+  await p.goto('http://127.0.0.1:8765/woods-rc-sim.html',{waitUntil:'domcontentloaded'});await p.waitForTimeout(3000);await p.evaluate(()=>startGame('free'));await p.waitForTimeout(1500);
+  await p.evaluate(()=>{bsOpen('tank',null);bsClose();window._ev=[];['pointerdown','pointermove','pointerup','pointercancel'].forEach(t=>addEventListener(t,e=>{if(_ev.length<60)_ev.push(t[7]+(t==='pointermove'?'':':'+Math.round(e.clientX)+','+Math.round(e.clientY))+(WS.drag?'D':''));},true));});await p.waitForTimeout(800);
+  const cdp=await ctx.newCDPSession(p);const touch=async(pts)=>{await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:pts[0][0],y:pts[0][1]}]});for(const q of pts.slice(1)){await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:q[0],y:q[1]}]});await p.waitForTimeout(16);}await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});};
+  const tile2=await p.evaluate(()=>{const t=document.querySelectorAll('#wsTray .wsPart')[1].getBoundingClientRect();return {x:t.x+t.width/2,y:t.y+t.height/2};});
+  await touch([[tile2.x,tile2.y],[tile2.x+1,tile2.y+1]]);await p.waitForTimeout(400);await touch([[tile2.x,tile2.y]]);await p.waitForTimeout(600);
+  console.log(await p.evaluate(()=>WS.parts.length+' parts | '+_ev.join(' ')));await b.close();})();
