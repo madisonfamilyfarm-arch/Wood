@@ -55,3 +55,5 @@ setInterval(()=>{try{if(!started)return;let k=WALK.on?'walk':vkind();if(k==='hel
   if((CFG.stickMode===1)&&k==='drone')return;const a=document.querySelector('#stL .t'),b=document.querySelector('#stR .t');if(a&&a.textContent!==L[0])a.textContent=L[0];if(b&&b.textContent!==L[1])b.textContent=L[1];}catch(e){}},600);
 // cars + boats: the top button is 🚦 GO / 🛑 STOP (it said TAKE OFF / LAND)
 {const t0=takeoff;takeoff=function(){try{const gv=!WALK.on&&(vkind()==='car'||vkind()==='boat');if(gv&&D.state!=='down'&&D.state!=='tumble'){if(D.armed&&D.state!=='landed'){D.vel.x*=0.3;D.vel.z*=0.3;D.state='landed';toast('🛑 Stopped — push the stick to drive again',1500);return;}D.armed=true;if(D.state==='landed')D.state='flying';toast('🚦 GO! Push the stick to drive',1500);return;}}catch(e){}return t0.apply(this,arguments);};}
+// big map on a phone: the ⛰ 3D button sat on top of "⭐ My courses"
+{const st=document.createElement('style');st.textContent='@media (max-width:500px){#mapTop{top:10px!important;bottom:auto!important}}';document.head.appendChild(st);}
