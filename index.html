@@ -9963,7 +9963,7 @@ function dirTxt(dx,dz){const a=Math.atan2(dx,-dz);const N=['north','north-east',
 {const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
 // 😴 you've been sitting still for a couple of minutes → an AI pilot checks on you (once)
 const IDLE={p:null,t:0,told:false};
-setInterval(()=>{try{if(!started||menu.open||!AIB.L.length||AIC.quiet)return;const me=dzMe();if(!me)return;const now=performance.now();
+setInterval(()=>{try{const now=performance.now();if(!started||menu.open||document.body.classList.contains('wsOn')||document.visibilityState!=='visible'){IDLE.t=now;return;}if(!AIB.L.length||AIC.quiet)return;const me=dzMe();if(!me)return;
   if(!IDLE.p||IDLE.p.distanceTo(me)>1.5||now-AIC.lastChat<5000){IDLE.p=me.clone();IDLE.t=now;IDLE.told=false;return;}
   if(!IDLE.told&&now-IDLE.t>150000){IDLE.told=true;const B=pbAlive().sort((a,b)=>a.p.distanceTo(me)-b.p.distanceTo(me))[0];if(B)pbSay(B,PICK(['Hello? Are you still there? 👀','Did you fall asleep? 😴','I\'m bored… wanna race? 🏁','Earth to '+meName()+'! 📡']),true);}}catch(e){}},5000);
 
