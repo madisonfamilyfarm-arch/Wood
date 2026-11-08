@@ -1,11 +1,11 @@
 // ================================================================ v55: 📚 GIANT VOCABULARY — the AI knows ~83,000 dictionary words (WordNet): meanings, synonyms, opposites.
 // Any word it doesn't know in a command gets looked up and swapped for a synonym it DOES know ("ascend" → higher, "obliterate Blaze" → attack Blaze).
-const NSYN_MORE={attack:'ravage devastate exterminate nuke torpedo bombard barrage shell strafe snipe raid storm pound batter clobber wallop whack thump bash pummel ram hammer terminate frag vaporize incinerate erase defeat conquer vanquish overpower destroy eliminate pulverize smash wreck blast bomb assault',
+const NSYN_MORE={attack:'combat warfare skirmish brawl ravage devastate exterminate nuke torpedo bombard barrage shell strafe snipe raid storm pound batter clobber wallop whack thump bash pummel ram hammer terminate frag vaporize incinerate erase defeat conquer vanquish overpower destroy eliminate pulverize smash wreck blast bomb assault',
  follow:'chase escort pursue shadow tail trail stalk hound tailgate convoy accompany',go:'explore journey proceed roam travel venture wander drift ramble rove trek voyage cruise sightsee meander mosey',
  hover:'hover idle linger loiter remain wait tarry freeze halt pause stall standby',higher:'arise ascend climb elevate levitate soar rise skyward upward uplift heighten hoist',
  faster:'accelerate hasten hurry quicken speed sprint zoom zip whizz scoot hustle',slower:'brake decelerate slacken slow dawdle crawl creep',lower:'descend plummet plunge dive sink dip nosedive swoop downward',
  land:'alight dock perch settle touchdown',flip:'somersault tumble cartwheel backflip handspring',peace:'armistice befriend ceasefire forgive pacify placate reconcile surrender truce parley',
- dance:'boogie groove jive shimmy tango waltz jig salsa twerk breakdance moonwalk disco',race:'compete contest duel showdown',spin:'pirouette revolve rotate spiral swirl twirl whirl gyrate'};
+ dance:'boogie groove jive shimmy tango waltz jig salsa twerk breakdance moonwalk disco',race:'compete contest duel showdown',hide:'conceal camouflage lurk skulk',spin:'pirouette revolve rotate spiral swirl twirl whirl gyrate'};
 for(const k in NSYN_MORE){NSYN[k]=NSYN[k]||[];for(const w of NSYN_MORE[k].split(' '))if(!NSYN[k].includes(w))NSYN[k].push(w);}
 // ---------------------------------------------------------------- the dictionary loads one letter at a time, only when needed (so the game stays fast on the phone)
 const AIW={d:{},st:{},cb:{}};

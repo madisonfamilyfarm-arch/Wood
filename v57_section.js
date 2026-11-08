@@ -33,7 +33,7 @@ const GQ=[
 // "switch to a tank" / "get in a submarine" / "drive a tank" → the AI pilot changes vehicle
 const GQV={tank:'car',tanks:'car',car:'car',truck:'car',jeep:'car',buggy:'car',sub:'sub',submarine:'sub',boat:'boat',ship:'boat',plane:'plane',jet:'plane',airplane:'plane',heli:'heli',helicopter:'heli',chopper:'heli',drone:'drone',quad:'drone',quadcopter:'drone'};
 {const s0=smartHear;smartHear=function(txt){try{const s=nNorm(String(txt||''));const W=nWho(s);const L=W.filter(w=>w.B).map(w=>w.B);const B=L[0]||aiNear(1e9)[0];
-    const v=s.match(/ (switch to|change to|get in|hop in|jump in|use|drive|fly|take|grab|ride|pilot|go in|get into) (a |an |the |your )?(tank|tanks|car|truck|jeep|buggy|sub|submarine|boat|ship|plane|jet|airplane|heli|helicopter|chopper|drone|quad|quadcopter) /);
+    const v=s.match(/ (switch to|change to|change into|turn into|transform into|morph into|become|swap to|swap into|get in|hop in|jump in|use|drive|fly|take|grab|ride|pilot|go in|get into) (a |an |the |your )?(tank|tanks|car|truck|jeep|buggy|sub|submarine|boat|ship|plane|jet|airplane|heli|helicopter|chopper|drone|quad|quadcopter) /);
     if(v&&B&&!/ (how|what|why) /.test(s)&&!/ (and|then|after that) /.test(s)){const k=GQV[v[3]];const who=L.length?L:(/ (everyone|everybody|all of you|you guys|guys) /.test(s)?pbAlive():[B]);let n=0;
       who.forEach((X,i)=>{if(X.kind===k&&!/tank/.test(v[3])){sbSay({B:X},'I\'m already in a '+v[3]+'! '+(AI_VIC[k]||''),400+i*500);return;}try{const nm=/tank/.test(v[3])?'tank 🪖':v[3]+' '+(AI_VIC[k]||'');aiSwitch(X,k,PICK(['Switching to a '+nm+'!','Ooh, '+nm+' time!','Hopping in a '+nm]));X.tank=/tank/.test(v[3]);n++;}catch(e){}});
       if(n&&/^ can you /.test(s))sbSay({B:who[0]},'Sure! '+(AI_VIC[k]||'🚀'),300);return true;}

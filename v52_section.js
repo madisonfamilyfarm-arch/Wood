@@ -81,7 +81,7 @@ function nParse(clause,ctx){const s=nNorm(clause);const who=nWho(s),place=nPlace
   if(q&&sc.where&&!place)return{i:'where',s,who};
   if(q&&!/ go | fly | head | race /.test(s))return null; // other questions: the normal brain answers them (directions, math, score…)
   if(sc.again)return{i:'again',s,who};
-  if(sc.stopgame)return{i:'stopgame',s};if(sc.leader)return{i:'leader',s,who};if(sc.hide&&/ seek | hide /.test(s))return{i:'hide',s,who};if(sc.tag&&!/ tag along /.test(s)&&(/ play /.test(s)||/ tag /.test(s)||/ it /.test(s)))return{i:'tag',s,who};
+  if(sc.stopgame)return{i:'stopgame',s};if(sc.leader)return{i:'leader',s,who};if(sc.hide&&(/ seek | hide /.test(s)||(NSYN.hide||[]).some(w=>s.indexOf(' '+w)>=0)))return{i:'hide',s,who};if(sc.tag&&!/ tag along /.test(s)&&(/ play /.test(s)||/ tag /.test(s)||/ it /.test(s)))return{i:'tag',s,who};
   if(sc.tnt){const on=/ (on|at) /.test(s);return{i:'tnt',s,who,target:on?(/ on me | at me /.test(s)?'me':tgt[tgt.length-1]):null};}
   if(sc.home&&!/ race /.test(s))return{i:'home',s,who};
   if(sc.race){return{i:'race',s,who,place};}
