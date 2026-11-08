@@ -1,0 +1,1 @@
+AIW_ADD("lc",{"lcd":"noun: a digital display that uses liquid crystal cells that change reflectivity in an applied electric field","lcm":"noun: the smallest multiple that is exactly divisible by every member of a set of numbers"});

@@ -1,0 +1,1 @@
+AIW_ADD("fc",{"fcc":"noun: an independent government agency that regulates interstate and international communications by radio and…","fcs":"noun: a cooperative nationwide system of banks and associations providing credit to farmers and related businesses"});

@@ -1,0 +1,1 @@
+AIW_ADD("xo",{"xor circuit":"noun: gate for exclusive OR","xor gate":"noun: gate for exclusive OR"});

@@ -1,0 +1,1 @@
+AIW_ADD("mk",{"mko":"noun: a terrorist organization formed in the 1960s by children of Iranian merchants|mek"});

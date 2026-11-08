@@ -1,0 +1,1 @@
+AIW_ADD("sd",{"sd":"noun: a state in north central United States"});

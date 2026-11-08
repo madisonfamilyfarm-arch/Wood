@@ -1,0 +1,1 @@
+AIW_ADD("iy",{"iyar":"noun: the eighth month of the civil year","iyyar":"noun: the eighth month of the civil year"});

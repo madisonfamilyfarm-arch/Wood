@@ -1,0 +1,1 @@
+AIW_ADD("cg",{"cgs":"noun: system of measurement based on centimeters and grams and seconds","cgs system":"noun: system of measurement based on centimeters and grams and seconds|cgs"});

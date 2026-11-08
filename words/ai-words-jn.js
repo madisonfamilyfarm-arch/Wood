@@ -1,0 +1,1 @@
+AIW_ADD("jn",{"jnd":"noun: (psychophysics) the difference between two stimuli that (under properly controlled experimental…","jnr":"noun: a son who has the same first name as his father|jr,junior"});

@@ -1,0 +1,1 @@
+AIW_ADD("hp",{"hp":"noun: a unit of power equal to 746 watts|horsepower,h.p."});

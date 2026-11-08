@@ -1,0 +1,1 @@
+AIW_ADD("lj",{"ljubljana":"noun: the capital of Slovenia"});

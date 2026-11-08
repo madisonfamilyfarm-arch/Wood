@@ -1,0 +1,1 @@
+AIW_ADD("jv",{"jv":"noun: a college or university team that competes at a level below the varsity team"});

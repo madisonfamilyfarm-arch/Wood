@@ -1,0 +1,1 @@
+AIW_ADD("zl",{"zloty":"noun: the basic unit of money in Poland"});

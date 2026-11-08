@@ -1,0 +1,1 @@
+AIW_ADD("bv",{"bvd":"noun: trademark for men's underwear","bvd's":"noun: trademark for men's underwear"});

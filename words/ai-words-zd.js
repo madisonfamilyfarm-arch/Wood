@@ -1,0 +1,1 @@
+AIW_ADD("zd",{"zdv":"noun: an antiviral drug (trade name Retrovir) used in the treatment of AIDS|azt"});

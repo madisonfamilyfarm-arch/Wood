@@ -1,0 +1,1 @@
+AIW_ADD("nd",{"nd":"noun: a yellow trivalent metallic element of the rare earth group|neodymium","ndebele":"noun: a Bantu language sometimes considered a dialect of Zulu","ndjamena":"noun: the capital and largest city of Chad|fort-lamy"});

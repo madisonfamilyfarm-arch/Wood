@@ -1,0 +1,1 @@
+AIW_ADD("w_",{"w-shaped":"adj: shaped in the form of the letter W|formed"});

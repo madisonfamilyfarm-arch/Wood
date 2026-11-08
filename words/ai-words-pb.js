@@ -1,0 +1,1 @@
+AIW_ADD("pb",{"pb":"noun: a soft heavy toxic malleable metallic element|lead,pib","pbit":"noun: a unit of information equal to 1000 terabits or 10^15 bits|pb","pbs":"noun: a solution containing a phosphate buffer"});

@@ -1,0 +1,1 @@
+AIW_ADD("tt",{"tt":"noun: (astronomy) a measure of time defined by Earth's orbital motion|palau,micronesia"});

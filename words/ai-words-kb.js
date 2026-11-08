@@ -1,0 +1,1 @@
+AIW_ADD("kb",{"kb":"noun: a unit of information equal to 1000 bits|k","kbit":"noun: a unit of information equal to 1000 bits|kb","kbo":"noun: any of many minor planets in the Kuiper belt outside the orbit of Neptune at the edge of the solar system"});

@@ -1,0 +1,1 @@
+AIW_ADD("hn",{"hn":"noun: a colorless explosive liquid that is volatile and poisonous and foul-smelling","hnd":"noun: a diploma given for vocational training that prepares the student for a career in a particular area"});

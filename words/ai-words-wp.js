@@ -1,0 +1,1 @@
+AIW_ADD("wp",{"wpm":"noun: the rate at which words are produced (as in speaking or typing)"});

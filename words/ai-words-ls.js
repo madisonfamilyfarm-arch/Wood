@@ -1,0 +1,1 @@
+AIW_ADD("ls",{"lsd":"noun: a powerful hallucinogenic drug manufactured from lysergic acid"});

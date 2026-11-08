@@ -1,0 +1,1 @@
+AIW_ADD("sj",{"sjaelland":"noun: the largest island of Denmark and the site of Copenhagen|zealand"});

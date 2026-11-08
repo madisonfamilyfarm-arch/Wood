@@ -1,0 +1,1 @@
+AIW_ADD("mw",{"mwanza":"noun: a city in northern Tanzania on Lake Victoria","mwera":"noun: a Bantu language spoken in southern coastal Tanzania"});

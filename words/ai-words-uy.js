@@ -1,0 +1,1 @@
+AIW_ADD("uy",{"uygur":"noun: a member of a people who speak Uighur and live in Xinjiang and adjacent areas|uighur"});

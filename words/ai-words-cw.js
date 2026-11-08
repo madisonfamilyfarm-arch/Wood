@@ -1,0 +1,1 @@
+AIW_ADD("cw",{"cwm":"noun: a steep-walled semicircular basin in a mountain|cirque,corrie","cwt":"noun: a United States unit of weight equivalent to 100 pounds|quintal"});

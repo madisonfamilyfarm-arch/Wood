@@ -1,0 +1,1 @@
+AIW_ADD("dc",{"dc":"noun: the district occupied entirely by the city of Washington|d.c.","dccp":"noun: an agency of the United Nations that promotes drug control and crime prevention","dci":"noun: the head of the United States Intelligence Community and director of the Central Intelligence Agency"});

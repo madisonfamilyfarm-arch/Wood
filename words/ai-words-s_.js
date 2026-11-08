@@ -1,0 +1,1 @@
+AIW_ADD("s_",{"s-shape":"noun: a double curve resembling the letter S","s wrench":"noun: a wrench with an S-shaped handle","s-shaped":"adj: shaped in the form of the letter S|formed"});

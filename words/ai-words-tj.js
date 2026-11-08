@@ -1,0 +1,1 @@
+AIW_ADD("tj",{"tjalling charles koopmans":"noun: United States economist (born in the Netherlands) (1910-1985)","tjalling koopmans":"noun: United States economist (born in the Netherlands) (1910-1985)"});

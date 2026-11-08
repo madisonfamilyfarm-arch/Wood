@@ -1,0 +1,1 @@
+AIW_ADD("cb",{"cbc":"noun: counting the number of white and red blood cells and the number of platelets in 1 cubic millimeter of blood","cbr":"noun: (cosmology) the cooled remnant of the hot big bang that fills the entire universe and can be observed…|cmb"});

@@ -1,0 +1,1 @@
+AIW_ADD("nw",{"nw":"noun: the compass point midway between north and west|nor'-west,northwest,northwestward","nwbn":"noun: the compass point that is one point north of northwest","nwbw":"noun: the compass point that is one point west of northwest"});

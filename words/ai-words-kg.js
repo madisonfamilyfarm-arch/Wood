@@ -1,0 +1,1 @@
+AIW_ADD("kg",{"kg":"noun: one thousand grams|kilo,kilogram","kgb":"noun: formerly the predominant security police organization of Soviet Russia"});

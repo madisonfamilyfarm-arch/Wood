@@ -1,0 +1,1 @@
+AIW_ADD("hs",{"hs":"noun: a radioactive transuranic element","hsian":"noun: a city of central China|xian,sian","hsuan chiao":"noun: popular Chinese philosophical system based in teachings of Lao-tzu but characterized by a pantheism of…|taoism","hsv-i":"noun: a herpes virus that causes oral herpes|hsv-1","hsv-ii":"noun: a herpes virus that can cause genital herpes|hsv-2,hs2"});

@@ -1,0 +1,1 @@
+AIW_ADD("pk",{"pkd":"noun: kidney disease characterized by enlarged kidneys containing many cysts","pku":"noun: a genetic disorder of metabolism","pku test":"noun: a test of newborn infants for phenylketonuria"});

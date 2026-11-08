@@ -1,0 +1,1 @@
+AIW_ADD("lb",{"lb":"noun: 16 ounces avoirdupois|pound","lbj":"noun: 36th President of the United States|johnson"});

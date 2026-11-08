@@ -1,0 +1,1 @@
+AIW_ADD("cc",{"cc":"noun: a metric unit of volume equal to one thousandth of a liter ¦ adj: being ten more than one hundred ninety|ml,mil,milliliter,200,cardinal","ccrc":"noun: an agency in the Department of Defense that is a national center for research on all aspects of injury…","ccc":"adj: being one hundred more than two hundred|300,cardinal"});

@@ -1,0 +1,1 @@
+AIW_ADD("lr",{"lr":"noun: a radioactive transuranic element synthesized from californium"});

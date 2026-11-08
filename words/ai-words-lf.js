@@ -1,0 +1,1 @@
+AIW_ADD("lf",{"lf":"noun: 30 to 300 kilohertz"});

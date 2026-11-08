@@ -1,0 +1,1 @@
+AIW_ADD("jh",{"jhvh":"noun: a name for the God of the Old Testament as transliterated from the Hebrew consonants YHVH|jehovah,yahweh,yhwh"});

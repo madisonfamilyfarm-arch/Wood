@@ -1,0 +1,1 @@
+AIW_ADD("cf",{"cf":"noun: a radioactive transuranic element ¦ adv: compare (used in texts to point the reader to another location in the text)|cf.","cfc":"noun: a fluorocarbon with chlorine","cfo":"noun: the corporate executive having financial authority to make appropriations and authorize expenditures for a…","cftr":"noun: the gene that is mutated in cystic fibrosis"});

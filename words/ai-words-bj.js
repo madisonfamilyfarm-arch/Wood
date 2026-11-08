@@ -1,0 +1,1 @@
+AIW_ADD("bj",{"bja":"noun: the bureau in the Department of Justice that assists local criminal justice systems to reduce or prevent…","bjs":"noun: the agency in the Department of Justice that is the primary source of criminal justice statistics for…"});

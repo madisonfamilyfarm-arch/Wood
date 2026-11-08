@@ -1,0 +1,1 @@
+AIW_ADD("kk",{"kkk":"noun: a secret society of white Southerners in the United States|klan"});

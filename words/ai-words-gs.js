@@ -1,0 +1,1 @@
+AIW_ADD("gs",{"gsa":"noun: a central management agency that sets Federal policy for Federal procurement and real property management…","gspc":"noun: an Algerian extremist Islamic offshoot of the Armed Islamic Group","gsr":"noun: a change in the electrical properties of the skin in response to stress or anxiety"});

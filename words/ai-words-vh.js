@@ -1,0 +1,1 @@
+AIW_ADD("vh",{"vhf":"noun: a group of illnesses caused by a viral infection (usually restricted to a specific geographic area)"});

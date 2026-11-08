@@ -1,0 +1,1 @@
+AIW_ADD("u_",{"u-boat":"noun: a submersible warship usually armed with torpedoes|sub,submarine","u-drive":"noun: a rented car|you-drive,self-drive,rent-a-car","u-turn":"noun: complete reversal of direction of travel","u-shaped":"adj: shaped in the form of the letter U|formed"});

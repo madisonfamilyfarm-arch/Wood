@@ -1,0 +1,1 @@
+AIW_ADD("cv",{"cv":"noun: a summary of your academic and work history ¦ adj: being five more than one hundred|resume,105,cardinal","cva":"noun: a sudden loss of consciousness resulting when the rupture or occlusion of a blood vessel leads to oxygen…|stroke,apoplexy"});

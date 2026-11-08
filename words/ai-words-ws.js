@@ -1,0 +1,1 @@
+AIW_ADD("ws",{"wsw":"noun: the compass point midway between west and southwest"});

@@ -1,0 +1,1 @@
+AIW_ADD("nm",{"nm":"noun: a metric unit of length equal to one billionth of a meter|nanometer","nmr":"noun: resonance of protons to radiation in a magnetic field"});

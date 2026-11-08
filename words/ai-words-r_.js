@@ -1,0 +1,1 @@
+AIW_ADD("r_",{"r and b":"noun: a combination of blues and jazz that was developed in the United States by Black musicians"});

@@ -1,0 +1,1 @@
+AIW_ADD("np",{"np":"noun: a radioactive transuranic metallic element","npa":"noun: a terrorist organization that is the militant wing of the Communist Party of the Philippines","npc":"noun: an agency that serves as the focal point for all Intelligence Community activities related to…"});

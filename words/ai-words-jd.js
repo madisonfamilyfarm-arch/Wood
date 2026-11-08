@@ -1,0 +1,1 @@
+AIW_ADD("jd",{"jdam":"noun: a pinpoint bomb guidance device that can be strapped to a gravity bomb thus converting dumb bombs into…"});

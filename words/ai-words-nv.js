@@ -1,0 +1,1 @@
+AIW_ADD("nv",{"nv":"noun: a state in the southwestern United States|nevada"});

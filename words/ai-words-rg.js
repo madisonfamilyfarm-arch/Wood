@@ -1,0 +1,1 @@
+AIW_ADD("rg",{"rg":"noun: a radioactive transuranic element"});

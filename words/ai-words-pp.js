@@ -1,0 +1,1 @@
+AIW_ADD("pp",{"ppk":"noun: a Marxist-Leninist terrorist group of Kurds trying to establish an independent Kurdish state in eastern Turkey","pplo":"noun: a mycoplasma resistant to antibiotics that causes a kind of pneumonia in humans","ppp":"noun: surgical resection of unnecessary palatal and oropharyngeal tissue to open the airway"});

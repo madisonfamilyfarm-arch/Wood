@@ -1,0 +1,1 @@
+AIW_ADD("vc",{"vcr":"noun: a magnetic tape recorder for recording (and playing back) TV programs"});

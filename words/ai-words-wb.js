@@ -1,0 +1,1 @@
+AIW_ADD("wb",{"wb":"noun: a unit of magnetic flux equal to 100,000,000 maxwells|weber","wbc":"noun: blood cells that engulf and digest bacteria and fungi|leukocyte","wbn":"noun: the compass point that is one point north of due west","wbs":"noun: the compass point that is one point south of due west"});

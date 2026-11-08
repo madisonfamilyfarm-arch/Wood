@@ -1,0 +1,1 @@
+AIW_ADD("rn",{"rn":"noun: a radioactive gaseous element formed by the disintegration of radium|radon","rna":"noun: (biochemistry) a long linear polymer of nucleotides found in the nucleus but mainly in the cytoplasm of a…","rna polymerase":"noun: the enzyme that copies DNA into RNA|transcriptase","rnase":"noun: a transferase that catalyzes the hydrolysis of ribonucleic acid"});

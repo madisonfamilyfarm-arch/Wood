@@ -1,0 +1,1 @@
+AIW_ADD("lm",{"lm":"noun: a unit of luminous flux equal to the amount of light given out through a solid angle of 1 steradian by a…|lumen"});

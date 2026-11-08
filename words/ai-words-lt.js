@@ -1,0 +1,1 @@
+AIW_ADD("lt",{"ltm":"noun: your general store of remembered information","ltte":"noun: a terrorist organization in Sri Lanka that began in 1970 as a student protest over the limited university…|tigers"});

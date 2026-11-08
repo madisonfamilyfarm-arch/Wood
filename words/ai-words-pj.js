@@ -1,0 +1,1 @@
+AIW_ADD("pj",{"pj's":"noun: (usually plural) loose-fitting nightclothes worn for sleeping or lounging|pajama,pyjama,jammies"});

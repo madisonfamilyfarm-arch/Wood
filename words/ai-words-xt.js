@@ -1,0 +1,1 @@
+AIW_ADD("xt",{"xt":"noun: the presence of an unwanted signal via an accidental coupling|crosstalk","xtc":"noun: street names for methylenedioxymethamphetamine|go,x,adam,ecstasy,cristal"});

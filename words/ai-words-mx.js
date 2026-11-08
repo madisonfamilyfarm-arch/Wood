@@ -1,0 +1,1 @@
+AIW_ADD("mx",{"mx":"noun: a cgs unit of magnetic flux equal to the flux perpendicular to an area of 1 square centimeter in a…|maxwell"});

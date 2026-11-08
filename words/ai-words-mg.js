@@ -1,0 +1,1 @@
+AIW_ADD("mg",{"mg":"noun: one thousandth (1/1,000) gram|milligram,magnesium"});

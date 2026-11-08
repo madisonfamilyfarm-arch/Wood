@@ -1,0 +1,1 @@
+AIW_ADD("gw",{"gwydion":"noun: Celtic sky god","gwyn":"noun: Celtic underworld god","gwynn":"noun: English comedienne and mistress of Charles II (1650-1687)"});

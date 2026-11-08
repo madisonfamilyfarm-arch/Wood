@@ -1,0 +1,1 @@
+AIW_ADD("kv",{"kv":"noun: a unit of potential equal to a thousand volts","kvass":"noun: fermented beverage resembling beer but made from rye or barley","kvetch":"noun: (Yiddish) a constant complainer ¦ verb: express complaints, discontent, displeasure, or unhappiness|kick,plain,complain|cheer"});

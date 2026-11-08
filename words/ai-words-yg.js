@@ -1,0 +1,1 @@
+AIW_ADD("yg",{"ygdrasil":"noun: (Norse mythology) a huge ash tree whose roots and branches hold the earth and Heaven and Hell together|yggdrasil","yggdrasil":"noun: (Norse mythology) a huge ash tree whose roots and branches hold the earth and Heaven and Hell together"});

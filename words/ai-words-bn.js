@@ -1,0 +1,1 @@
+AIW_ADD("bn",{"bns":"noun: a bachelor's degree in naval science"});

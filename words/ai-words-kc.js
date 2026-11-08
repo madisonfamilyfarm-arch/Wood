@@ -1,0 +1,1 @@
+AIW_ADD("kc",{"kc":"noun: one thousand periods per second|khz"});

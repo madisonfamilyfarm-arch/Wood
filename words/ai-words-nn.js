@@ -1,0 +1,1 @@
+AIW_ADD("nn",{"nne":"noun: the compass point that is midway between north and northeast|nor'-nor'-east","nnrti":"noun: an antiviral drug used against HIV","nnw":"noun: the compass point that is midway between north and northwest|nor'-nor'-west"});

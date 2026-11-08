@@ -1,0 +1,1 @@
+AIW_ADD("p_",{"p-n-p transistor":"noun: a junction transistor having an n-type semiconductor between a p-type semiconductor that serves as an…","p-n junction":"noun: the junction between a p-type semiconductor and an n-type semiconductor","p-type semiconductor":"noun: a semiconductor in which electrical conduction is due chiefly to the movement of positive holes"});

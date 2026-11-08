@@ -1,0 +1,1 @@
+AIW_ADD("vx",{"vx gas":"noun: a highly lethal nerve agent used in chemical warfare"});

@@ -1,0 +1,1 @@
+AIW_ADD("pw",{"pwr":"noun: a nuclear reactor that uses water as a coolant and moderator"});

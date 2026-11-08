@@ -1,0 +1,1 @@
+AIW_ADD("rw",{"rwanda":"noun: a landlocked republic in central Africa","rwanda franc":"noun: the basic unit of money in Rwanda","rwandan":"noun: a native or inhabitant of Rwanda ¦ adj: of or pertaining to Rwanda","rwandese republic":"noun: a landlocked republic in central Africa|rwanda"});

@@ -1,0 +1,1 @@
+AIW_ADD("qw",{"qwerty keyboard":"noun: the standard typewriter keyboard"});

@@ -1,0 +1,1 @@
+AIW_ADD("df",{"dflp":"noun: a Marxist-Leninist group that believes Palestinian goals can only be achieved by revolutionary change"});

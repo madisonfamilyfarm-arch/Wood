@@ -1,0 +1,1 @@
+AIW_ADD("fd",{"fda":"noun: a federal agency in the Department of Health and Human Services established to regulate the release of new…","fdic":"noun: a federally sponsored corporation that insures accounts in national banks and other qualified institutions","fdr":"noun: 32nd President of the United States|roosevelt"});

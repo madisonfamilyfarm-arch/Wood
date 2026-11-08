@@ -1,0 +1,1 @@
+AIW_ADD("lh",{"lh":"noun: a gonadotropic hormone that is secreted by the anterior pituitary","lhasa":"noun: the sacred city of Lamaism|lassa","lhasa apso":"noun: a breed of terrier having a long heavy coat raised in Tibet as watchdogs|lhasa","lhotse":"noun: a mountain in the central Himalayas on the border of Tibet and Nepal (27,890 feet high)"});

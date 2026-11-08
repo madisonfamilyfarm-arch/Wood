@@ -1,0 +1,1 @@
+AIW_ADD("zb",{"zb":"noun: a unit of information equal to 1000 exabits or 10^21 bits","zbit":"noun: a unit of information equal to 1000 exabits or 10^21 bits|zb"});

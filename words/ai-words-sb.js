@@ -1,0 +1,1 @@
+AIW_ADD("sb",{"sb":"noun: a metallic element having four allotropic forms|antimony,bs","sba":"noun: an independent agency of the United States government that protects the interests of small businesses and…","sbe":"noun: the compass point that is one point east of due south","sbw":"noun: the compass point that is one point west of due south"});

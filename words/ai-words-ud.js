@@ -1,0 +1,1 @@
+AIW_ADD("ud",{"uda":"noun: the major Protestant paramilitary group in Northern Ireland","udder":"noun: mammary gland of bovids (cows and sheep and goats)|bag","udmurt":"noun: a member of the Finno-Ugric-speaking people living in eastern European Russia","udometer":"noun: gauge consisting of an instrument to measure the quantity of precipitation"});

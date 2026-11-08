@@ -1,0 +1,1 @@
+AIW_ADD("h_",{"h-bomb":"noun: a nuclear weapon that releases atomic energy by union of light (hydrogen) nuclei at high temperatures to…","h-shaped":"adj: shaped in the form of the letter H|formed"});

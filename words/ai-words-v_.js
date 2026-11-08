@@ -1,0 +1,1 @@
+AIW_ADD("v_",{"v-day":"noun: the day of a victory","v-e day":"noun: the date of Allied victory in Europe, World War II","v-j day":"noun: the date of Allied victory over Japan, World War II","v neck":"noun: the neck of a garment has the shape in front of the letter V","v sign":"noun: a sign (for victory)","v-shaped":"adj: shaped in the form of the letter V|formed"});
