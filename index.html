@@ -10211,16 +10211,28 @@ function kbFuzzy(t,strong){try{const s=nNorm(String(t||''));if(/\b(game|here|thi
   if(!/^ ?(\w+ )?(\w+ )?(what|whats|which|who|why|how|where|when|do|does|did|can|could|is|are|was)\b/.test(s))return null;
   const s2=/^ ?who /.test(s)?s.replace(/ (made|built|created|make|build) /g,' invented '):s;const ws=[...new Set(s2.trim().split(/\s+/).filter(w=>!KBSTOP.has(w)).map(kbStem))];if(ws.length<1)return null;
   let best=null,bs=0;KBTOK.forEach((T,i)=>{let n=0;ws.forEach(w=>{if(T.has(w))n++;});const r=n/ws.length;const sc=n+r;if(n>=2&&r>=(strong?0.99:0.66)&&sc>bs){bs=sc;best=KB[i][1];}});
-  if(best&&ws.length===1&&strong)return null;return best;}catch(e){return null;}}
+  if(best&&ws.length===1&&strong)return null;if(best==='ANIMSAY')return null;return best;}catch(e){return null;}}
+
+// spelling fixer for questions: "wats the capitol of france", "how old is the erth", "bigest dinosaur"
+const KBV=new Set([...KBSTOP,'capital','times','plus','minus','divided','whats','does','many','biggest','smallest','fastest','tallest','longest','oldest']);
+try{KB.forEach(([re])=>(re.source.match(/[a-z]{3,}/g)||[]).forEach(w=>KBV.add(w)));Object.keys(CAPS).forEach(k=>k.split(' ').forEach(w=>KBV.add(w)));}catch(e){}
+const KBVA=[...KBV].filter(w=>w.length>=3);
+const KBFIX={ski:'sky',skye:'sky',son:'sun',mune:'moon',wats:'whats',wat:'what',whut:'what',dose:'does',capitol:'capital',meny:'many',mutch:'much',biggist:'biggest',bigest:'biggest',fastist:'fastest',tallist:'tallest',erth:'earth',urth:'earth',pengwin:'penguin',pengwins:'penguins',cheeta:'cheetah',cheetas:'cheetahs',airplains:'airplanes',airplain:'airplane',bons:'bones',dinosor:'dinosaur',dinosore:'dinosaur',dinosaw:'dinosaur',woter:'water',wether:'weather',lightening:'lightning',volcanoe:'volcano',oshun:'ocean',ocen:'ocean',spyder:'spider',raccon:'raccoon',racoon:'raccoon',racoons:'raccoons',turtel:'turtle',turtels:'turtles',elefant:'elephant',elefants:'elephants',jiraffe:'giraffe',girafe:'giraffe',planit:'planet',planits:'planets',pluto:'pluto'};
+function kbFix(s){const w=s.trim().split(/\s+/);let ch=false;for(let i=0;i<w.length;i++){const x=w[i];if(KBFIX[x]){w[i]=KBFIX[x];ch=true;continue;}if(x.length<4||KBV.has(x)||/\d/.test(x))continue;if(typeof SPEECH_KEEP_BASE!=='undefined'&&SPEECH_KEEP_BASE.has(x)&&x.length<6)continue;
+  const lim=x.length>=7?2:1;let b=null,bd=9;for(const v of KBVA){if(Math.abs(v.length-x.length)>lim||v[0]!==x[0])continue;const d=levD(x,v);if(d<bd){bd=d;b=v;}}if(b&&bd<=lim){w[i]=b;ch=true;}}
+  return ch?' '+w.join(' ')+' ':null;}
+window.kbFix=kbFix;
 window.kbFuzzy=kbFuzzy;
 try{KB.forEach(([re])=>(re.source.match(/[a-z]{3,}/g)||[]).forEach(w=>SPEECH_KEEP.add(w)));Object.keys(CAPS).forEach(k=>k.split(' ').forEach(w=>SPEECH_KEEP.add(w)));Object.values(CAPS).forEach(v=>String(v).toLowerCase().split(/[^a-z]+/).forEach(w=>w&&SPEECH_KEEP.add(w)));}catch(e){}
 {const r0=rb;rb=function(k,B){if(k==='huh'&&KBLAST){const a=kbFuzzy(KBLAST);KBLAST='';if(a)return a;}return r0.apply(this,arguments);};}
 let KBLAST='';
 {const s0=smartHear;smartHear=function(txt){try{KBLAST=String(txt||'');const s=nNorm(String(txt||''));const B=(nWho(s).find(w=>w.B)||{}).B||aiNear(1e9)[0];if(!B)return s0.apply(this,arguments);
+    let sF=null;if(/^ ?(\w+ )?(\w+ )?(what|whats|wats|wat|which|who|why|how|where|when|do|does|dose|can|could|is|are|was|were)\b/.test(s))sF=kbFix(s);if(/ \d+ time \d+ /.test(s))return s0.call(this,String(txt).replace(/(\d+)\s+time\s+(\d+)/,'$1 times $2'));
+    for(const S2 of [s,sF]){if(!S2)continue;const s=S2;
     const c=s.match(/ capital (?:city )?of ([a-z ]+?) $/)||s.match(/ (?:what is|whats) ([a-z ]+?)(?:s|'s)? capital $/);
     if(c){const k=c[1].trim().replace(/^the /,'');sbSay({B},CAPS[k]?'🗺 The capital of '+k.replace(/\b\w/g,x=>x.toUpperCase())+' is '+CAPS[k]+'!':'🗺 Hmm, I don\'t know that one yet 🤔');return true;}
-    for(const [re,a] of KB)if(re.test(s)){if(a==='ANIMSAY'){const an=(s.match(/ (cow|dog|cat|duck|pig|sheep|horse|owl|lion|snake|frog|rooster|chicken)/)||[])[1];const S={cow:'🐄 Moo!',dog:'🐶 Woof woof!',cat:'🐱 Meow!',duck:'🦆 Quack!',pig:'🐷 Oink oink!',sheep:'🐑 Baa!',horse:'🐴 Neigh!',owl:'🦉 Hoot hoot!',lion:'🦁 ROAR!',snake:'🐍 Hisss!',frog:'🐸 Ribbit!',rooster:'🐓 Cock-a-doodle-doo!',chicken:'🐔 Bawk bawk!'};sbSay({B},S[an]||'🤔');return true;}sbSay({B},a);return true;}
-    const fz=kbFuzzy(txt,true);if(fz){sbSay({B},fz);return true;}}catch(e){}return s0.apply(this,arguments);};}
+    for(const [re,a] of KB)if(re.test(s)){if(a==='ANIMSAY'){const an=(s.match(/ (cow|dog|cat|duck|pig|sheep|horse|owl|lion|snake|frog|rooster|chicken)/)||[])[1];const S={cow:'🐄 Moo!',dog:'🐶 Woof woof!',cat:'🐱 Meow!',duck:'🦆 Quack!',pig:'🐷 Oink oink!',sheep:'🐑 Baa!',horse:'🐴 Neigh!',owl:'🦉 Hoot hoot!',lion:'🦁 ROAR!',snake:'🐍 Hisss!',frog:'🐸 Ribbit!',rooster:'🐓 Cock-a-doodle-doo!',chicken:'🐔 Bawk bawk!'};sbSay({B},S[an]||'🤔');return true;}sbSay({B},a);return true;}}
+    const fz=kbFuzzy(txt,true)||(sF&&kbFuzzy(sF,true));if(fz){sbSay({B},fz);return true;}}catch(e){}return s0.apply(this,arguments);};}
 {const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
 
 // v64: word games & grammar — syllables, word starting with a letter, "word that means X", anagrams, first letter, palindromes, plurals, past tense
