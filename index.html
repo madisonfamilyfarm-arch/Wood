@@ -9998,6 +9998,10 @@ const GQ2=[
     if(/ who is the (best|bravest|toughest|nicest|funniest) (pilot|ai|one|of you)/.test(s)){const k=/brav|tough/.test(s)?'brave':/nice/.test(s)?'friendly':/funn/.test(s)?'trash':'brave';const B=pbAlive().slice().sort((a,b)=>pbP(b)[k]-pbP(a)[k])[0];if(B){sbSay({B},PICK(['Me, obviously 😎','That\'d be me! 🙋','Ask anyone — it\'s me 😏']));return true;}}
   }catch(e){}return s0.apply(this,arguments);};}
 {const s0=smartHear;smartHear=function(t){return s0.call(this,vFix(t));};}
+// ---------------------------------------------------------------- 🎚 the AI adjusts to you: lose a bunch in a row → they go easier; win a bunch → they get tougher (like real players would)
+const ADAPT={streakD:0,streakK:0,t:0};
+{const d0=dzDie;dzDie=function(){const was=DZ.dead;const r=d0.apply(this,arguments);try{if(!was&&DZ.dead&&DZ.ai){ADAPT.streakD++;ADAPT.streakK=0;if(ADAPT.streakD>=3&&AIDIFF.k>0.5){AIDIFF.k=Math.max(0.5,AIDIFF.k-0.25);ADAPT.streakD=0;const B=pbAlive()[0];if(B)setTimeout(()=>pbSay(B,PICK(['Okay okay, we\'ll go a little easier 😇','Rough round! We\'ll take it easy for a bit 🤝']),true),3000);}}}catch(e){}return r;};}
+{const k0=dzBotDie;dzBotDie=function(B){const was=B&&B.dead;const c=HIT.ctx;const r=k0.apply(this,arguments);try{if(B&&!was&&B.dead&&c&&c.id===mp.id&&DZ.ai){ADAPT.streakK++;ADAPT.streakD=0;if(ADAPT.streakK>=4&&AIDIFF.k<2){AIDIFF.k=Math.min(2,AIDIFF.k+0.25);ADAPT.streakK=0;const X=pbAlive()[0];if(X)setTimeout(()=>pbSay(X,PICK(['You\'re too good! Time to get serious 😤','Okay, no more Mr. Nice Bot 😈']),true),2500);}}}catch(e){}return r;};}
 
 // ================================================================ v61: 🗣 AI pilots can TALK OUT LOUD (like voice chat with real players). Each pilot has its own voice. Off by default — turn on in 🤖 AI players, or say "talk out loud".
 const TTS={on:LS.get('aiTts',false),q:[],busy:false,last:0};
