@@ -134,3 +134,5 @@ function vFix(t){let s=String(t||'').trim();const low=s.toLowerCase();let o=low;
   idleCalm:['Nice day for flying ☀️','Did you see that deer? 🦌','Race you to the fire tower! 🏁','I love these woods 🌲','Bet you can\'t do 3 flips in a row 🤸'],
   banter:['In your dreams, {t}! 💭','You and what army, {t}? 😂','Come at me, {t}! 😤','Nice try, {t} 😏']};
  for(const k in M)PBL[k]=PBL[k].concat(M[k]);})();
+// 🐟 AI submarines used to never fight back — now they pop missiles up out of the water (like a real sub-launched missile)
+{const f0=dzBotFire;dzBotFire=function(B,tg){if(B&&B.kind==='sub'){const P=B.p.clone();P.y=Math.max(P.y,(typeof WATER_Y!=='undefined'?WATER_Y:0))+1.2;try{puff(P.clone(),0xe8f6ff,0.6,1.2);}catch(e){}return f0.call(this,Object.assign(Object.create(B),{kind:'boat',p:P}),tg);}return f0.apply(this,arguments);};}
