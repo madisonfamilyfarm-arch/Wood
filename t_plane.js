@@ -1,0 +1,10 @@
+const H=require('./harness');
+H(async({mk})=>{const P=await mk('P','http://127.0.0.1:8765/woods-rc-sim.html');await P.waitForTimeout(3000);await P.evaluate(()=>{startGame('free');});await P.waitForTimeout(1500);
+console.log(await P.evaluate(()=>{const o=[];const f=v=>v.toFixed(1);
+ const run=(pre,setup,inpF,sec)=>{useSpec(JSON.parse(JSON.stringify(eval(pre))));setup();D.armed=true;const L=[];for(let i=0;i<sec*60;i++){const inp=inpF(i/60);Object.assign(rawIn,inp);tickDrone(1/60,inp);if(i%30===0)L.push({t:i/60,sp:D.vel.length(),hs:Math.hypot(D.vel.x,D.vel.z),y:D.pos.y-H(D.pos.x,D.pos.z),vy:D.vel.y,yaw:D.yaw,pitch:D.pitch||0,roll:D.roll||0,st:D.state});}return L;};
+ const air=(sp)=>()=>{D.pos.set(0,H(0,0)+60,0);D.yaw=0;D.vel.set(0,0,-sp);D.state='flying';D.pitch=0;D.roll=0;};
+ const show=(lbl,L)=>o.push(lbl+'\n   '+L.filter((e,i)=>i%2==0).map(e=>e.t+'s sp'+f(e.sp)+' alt'+f(e.y)+' vy'+f(e.vy)+' p'+f(e.pitch)+' r'+f(e.roll)+' yaw'+f(e.yaw)+' '+e.st[0]).join('\n   '));
+ show('STALL: slow + full up, no throttle',run('VPRESETS.plane.trainer',air(9),()=>({lx:0,ly:-1,rx:0,ry:-1}),5));
+ show('TURN: right roll 1.5s then hold',run('VPRESETS.plane.trainer',air(16),t=>({lx:0,ly:0.6,rx:t<1.5?0.8:0,ry:0}),6));
+ show('CUT THROTTLE glide',run('VPRESETS.plane.trainer',air(16),()=>({lx:0,ly:-1,rx:0,ry:0}),6));
+ return o.join('\n');}));});

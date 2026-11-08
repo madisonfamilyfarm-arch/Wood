@@ -1,0 +1,6 @@
+const H=require('./harness');H(async({mk})=>{const P=await mk('P','http://127.0.0.1:8765/woods-rc-sim.html');await P.waitForTimeout(3000);
+await P.evaluate(()=>{startGame('free');aiSet(3);});await P.waitForTimeout(4000);
+console.log(await P.evaluate(()=>{const g=scene.children.find(t=>t.isGroup&&t.children.length===142);if(!g)return 'none';const c=g.children;const mats=new Set(c.map(x=>x.material&&x.material.uuid));const geos=new Set(c.map(x=>x.geometry&&x.geometry.uuid));
+ const b=new THREE.Box3().setFromObject(g);return 'mats '+mats.size+' geos '+geos.size+' first params '+JSON.stringify(c[0].geometry.parameters)+' mat '+c[0].material.type+' map '+!!c[0].material.map+' transparent '+c[0].material.transparent+' color '+(c[0].material.color&&c[0].material.color.getHexString())+' box '+JSON.stringify(b.min)+JSON.stringify(b.max)+' pos0 '+JSON.stringify(g.position)+' child types '+[...new Set(c.map(x=>x.type))];}));
+console.log(await P.evaluate(()=>{const L=scene.children.filter(t=>t.isMesh&&t.geometry&&t.geometry.type==='BoxGeometry'&&t.material.color&&t.material.color.getHexString()==='8a8f94');const b=new THREE.Box3();L.forEach(x=>b.expandByObject(x));return 'grey boxes '+L.length+' area '+JSON.stringify(b.min)+JSON.stringify(b.max)+' mats '+new Set(L.map(x=>x.material.uuid)).size;}));
+});
