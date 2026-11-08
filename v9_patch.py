@@ -205,4 +205,7 @@ rep("function killShot(s){scene.remove(s.m);","function killShot(s){scene.remove
 rep("function tntDel(T){scene.remove(T.g);","function tntDel(T){scene.remove(T.g);geoDisp(T.g);")
 rep("if(f.t>=f.life){scene.remove(f.m);BIG.L.splice(i,1);}}","if(f.t>=f.life){scene.remove(f.m);geoDisp(f.m);BIG.L.splice(i,1);}}")
 rep("if(BIG.L.length>60){BIG.L.splice(0,30).forEach(f=>scene.remove(f.m));}","if(BIG.L.length>60){BIG.L.splice(0,30).forEach(f=>{scene.remove(f.m);geoDisp(f.m);});}")
+rep("' g · 🌀 '+I.n+' motors · 🛡 '","' g'+(I.n?' · 🌀 '+I.n+' motors':'')+' · 🛡 '")
+rep("(I.topHeavy>4?' · <span style=\"color:#ff9f0a\">🏗 top-heavy — wobbly</span>':'')","(I.topHeavy>4&&I.n>0?' · <span style=\"color:#ff9f0a\">🏗 top-heavy — wobbly</span>':'')")
+rep("' · ⚡ '+Math.round(st.top)+' m/s","' · ⚡ '+Math.round(/tank/.test(faTxt)&&st.top>8?Math.max(3.5,Math.min(8,st.top*0.36)):st.top)+' m/s")
 open('rc.html','w').write(r);print('ok',len(r))

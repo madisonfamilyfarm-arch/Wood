@@ -18,3 +18,12 @@ setInterval(()=>{try{layoutFix();}catch(e){}},800);
 // (only shapes — materials stay, so nothing has to be re-compiled = no freeze)
 let GEO_KEEP=null;function geoDisp(o){try{if(!o)return;if(!GEO_KEEP){GEO_KEEP=new Set();try{Object.values(GEO).forEach(g=>g&&g.isBufferGeometry&&GEO_KEEP.add(g));}catch(e){}try{SHARED_GEO.forEach(g=>GEO_KEEP.add(g));}catch(e){}try{GEO_KEEP.add(DZG);}catch(e){}}
   o.traverse(m=>{if(m.geometry&&!m.isInstancedMesh&&!GEO_KEEP.has(m.geometry)&&!(typeof SHARED_GEO!=='undefined'&&SHARED_GEO.has(m.geometry))&&!m.geometry.userData.keep)m.geometry.dispose();});}catch(e){}}
+// menu info lines were black text on the dark menu (unreadable)
+{const st=document.createElement('style');st.textContent='#menu .info{color:#cfe3d6!important}';document.head.appendChild(st);}
+// builder: the game's top buttons showed through behind the builder's title line
+{const st=document.createElement('style');st.textContent='#ws{background:#0a100c!important}';document.head.appendChild(st);}
+// builder on a phone: tips pop up over the picture, not on top of the DRIVE IT / tool buttons
+{const st=document.createElement('style');st.textContent='body.wsOn #toast{top:calc(120px + env(safe-area-inset-top))!important;bottom:auto!important}';document.head.appendChild(st);
+ setInterval(()=>{try{const w=$('ws');document.body.classList.toggle('wsOn',!!(w&&getComputedStyle(w).display!=='none'));}catch(e){}},400);}
+// 🪖 a tank you BUILT drove 60 km/h (like a race car!) — real RC tanks crawl. Same feel as the ready-made tank now.
+{const u0=useSpec;useSpec=function(){const r=u0.apply(this,arguments);try{if(vhKind()==='tank'&&ST&&ST.top>8){ST.top=clamp(ST.top*0.36,3.5,8);ST.acc=Math.min(ST.acc,11);}}catch(e){}return r;};}
