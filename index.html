@@ -9755,7 +9755,7 @@ setInterval(()=>{try{const cl=$('chatLog'),t=$('chatTog')||$('cbBtn');if(!cl||!t
  setInterval(()=>{try{const f=$('bFire');document.body.classList.toggle('fireUp',!!(f&&getComputedStyle(f).display!=='none'));}catch(e){}},400);}
 {const st=document.createElement('style');st.textContent='@media (max-height:500px){#dzCount{top:24%!important;font-size:24px!important}}';document.head.appendChild(st);}
 // 🕹 the stick hints said "up/down · turn / fwd/back · sideways" even in a car, tank, boat or plane → each vehicle shows its own
-const STKL={drone:['▲▼ up/down · ◀▶ turn','▲▼ fwd/back · ◀▶ sideways'],plane:['▲▼ throttle · ◀▶ rudder','▲▼ pitch · ◀▶ roll'],car:['▲▼ gas / reverse','◀▶ steer'],boat:['▲▼ gas / reverse','◀▶ steer'],sub:['▲▼ go / back · ◀▶ turn','▲ rise · ▼ dive'],walk:['▲▼ walk · ◀▶ sidestep','👀 look around']};
+const STKL={drone:['▲▼ up/down · ◀▶ turn','▲▼ fwd/back · ◀▶ sideways'],plane:['▲▼ throttle · ◀▶ rudder','▲▼ pitch · ◀▶ roll'],car:['▲▼ gas / reverse','◀▶ steer'],boat:['▲▼ gas / reverse','◀▶ steer'],sub:['▲▼ go / back · ◀▶ turn','▲ rise · ▼ dive'],walk:['▲▼ walk · ◀▶ turn','👀 look around']};
 setInterval(()=>{try{if(!started)return;let k=WALK.on?'walk':vkind();if(k==='heli')k='drone';if(!WALK.on&&vhKind()==='sub')k='sub';const L=STKL[k]||STKL.drone;
   if((CFG.stickMode===1)&&k==='drone')return;const a=document.querySelector('#stL .t'),b=document.querySelector('#stR .t');if(a&&a.textContent!==L[0])a.textContent=L[0];if(b&&b.textContent!==L[1])b.textContent=L[1];}catch(e){}},600);
 
