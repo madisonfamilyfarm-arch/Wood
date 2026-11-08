@@ -4064,8 +4064,8 @@ function spawnShot(w,p,v,col,own,sid,by){
   else m=new THREE.Mesh(pbGeo,new THREE.MeshBasicMaterial({color:col}));
   m.position.copy(p);if(w!=='paint')m.lookAt(p.clone().add(v));scene.add(m);
   shots.push({w,m,v:v.clone(),life:WTYPES[w].life,col,own,sid,by,prev:p.clone(),puff:0});}
-function killShot(s){scene.remove(s.m);if(s.w==='paint')s.m.material.dispose();const i=shots.indexOf(s);if(i>=0)shots.splice(i,1);}
-function splat(p,col){const s=new THREE.Mesh(new THREE.CircleGeometry(0.22,8),new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.9,depthWrite:false}));s.position.copy(p);s.lookAt(cam.position);scene.add(s);splats.push(s);if(splats.length>60){const o=splats.shift();scene.remove(o);o.geometry.dispose();}}
+function killShot(s){scene.remove(s.m);geoDisp(s.m);if(s.w==='paint')s.m.material.dispose();const i=shots.indexOf(s);if(i>=0)shots.splice(i,1);}
+function splat(p,col){const s=new THREE.Mesh(new THREE.CircleGeometry(0.22,8),new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.9,depthWrite:false}));s.position.copy(p);s.lookAt(cam.position);scene.add(s);splats.push(s);if(splats.length>60){const o=splats.shift();scene.remove(o);o.geometry.dispose();try{o.material.dispose();}catch(e){}}}
 // paint that sticks to an aircraft (yours or a friend's) — lp is a point in the model's own space, so it lands in the same spot on every screen
 function paintOn(mesh,lp,col){if(!mesh||!mesh.g)return;const s=mesh.g.scale.x||1,r=0.06/s;
   const b=new THREE.Mesh(new THREE.SphereGeometry(r,8,6),new THREE.MeshLambertMaterial({color:col}));b.position.copy(lp);const n=lp.clone();if(n.lengthSq()<1e-8)n.set(0,1,0);n.normalize();b.quaternion.setFromUnitVectors(UP,n);b.scale.set(1.4,0.35,1.4);
@@ -4101,7 +4101,7 @@ function tickFxBits(dt){for(let i=FXB.length-1;i>=0;i--){const f=FXB[i];f.t+=dt;
   else if(f.fire){const s=f.r*(0.25+0.95*Math.min(1,u*3.2));f.m.scale.setScalar(s);f.m.material.opacity=Math.max(0,1-u);if(f.light){f.light.intensity=Math.max(0,3*(1-u*2.5));}}
   else if(f.tree){const k=Math.min(1,f.t/1.3);f.m.rotation.set(0,0,0);f.m.quaternion.setFromAxisAngle(f.ax,k*k*1.5);if(f.t>(f.stay||4))f.m.position.y-=dt*0.6;}
   else{f.m.position.y+=f.vy*dt;f.m.scale.setScalar(f.r*(1+u*f.grow*3));f.m.material.opacity=0.7*(1-u);}
-  if(f.t>=f.life){scene.remove(f.m);if(f.light&&performance.now()>=f.light.userData.until-60)f.light.intensity=0;FXB.splice(i,1);}}}
+  if(f.t>=f.life){scene.remove(f.m);if(!f.tree)geoDisp(f.m);if(f.light&&performance.now()>=f.light.userData.until-60)f.light.intensity=0;FXB.splice(i,1);}}}
 function boomSound(dist,big){try{const A=beep.a||(beep.a=new (window.AudioContext||window.webkitAudioContext)());const len=A.sampleRate*(big?1.8:1.1),b=A.createBuffer(1,len,A.sampleRate),d=b.getChannelData(0);let x=0;for(let i=0;i<len;i++){x=x*0.9+(Math.random()*2-1)*0.1;d[i]=x*5*Math.pow(1-i/len,2);}
   const s=A.createBufferSource(),f=A.createBiquadFilter(),g=A.createGain();f.type='lowpass';f.frequency.value=big?500:900;g.gain.value=clamp(1.6/(1+dist*0.04),0.05,1.6)*CFG.vol/100;s.buffer=b;s.connect(f);f.connect(g);g.connect(A.destination);s.start(A.currentTime+Math.min(1.5,dist/340));}catch(e){}}
 function explode(p,r,dr,own,byName,byId){
@@ -4114,7 +4114,7 @@ function explode(p,r,dr,own,byName,byId){
   if(dist<r*4)shake=Math.max(shake,clamp(1.2-dist/(r*4),0.15,1.2));
   // trees in the destroy radius get knocked flat (everyone sees the same trees go)
   const gy=H(p.x,p.z);if(dr>0.3&&p.y-gy<dr+16)addCrater({x:+p.x.toFixed(2),z:+p.z.toFixed(2),r:+dr.toFixed(2)},true);
-  if(p.y-gy<r+0.5){const sc=new THREE.Mesh(new THREE.CircleGeometry(Math.max(0.6,Math.min(r,dr||r)*0.7),20),new THREE.MeshBasicMaterial({color:0x1a1410,transparent:true,opacity:0.75,depthWrite:false}));sc.rotation.x=-Math.PI/2;sc.position.set(p.x,gy+0.04,p.z);scene.add(sc);splats.push(sc);if(splats.length>60){const o=splats.shift();scene.remove(o);}}
+  if(p.y-gy<r+0.5){const sc=new THREE.Mesh(new THREE.CircleGeometry(Math.max(0.6,Math.min(r,dr||r)*0.7),20),new THREE.MeshBasicMaterial({color:0x1a1410,transparent:true,opacity:0.75,depthWrite:false}));sc.rotation.x=-Math.PI/2;sc.position.set(p.x,gy+0.04,p.z);scene.add(sc);splats.push(sc);if(splats.length>60){const o=splats.shift();scene.remove(o);try{o.geometry.dispose();o.material.dispose();}catch(e){}}}
   for(const b of balloons)if(b.alive&&b.g.position.distanceTo(p)<r+0.5)popBalloon(b,!own);
   for(const d of deer)if(Math.hypot(d.x-p.x,d.z-p.z)<r*3){d.state='flee';d.t=5;d.dir=Math.atan2(d.x-p.x,d.z-p.z);}
   // you
@@ -6694,7 +6694,7 @@ cycleShot=function(){const T=weaponTypes(),seq=[['photo'],['video'],...T.map((w,
 function digHere(){if(!WALK.on){toast('⛏ Walk first (K), then dig',1500);return;}if(digHere.busy)return;
   if(D.sea&&typeof ISL!=='undefined'&&!ISL.dug&&Math.hypot(WALK.pos.x-ISL.tx,WALK.pos.z-ISL.tz)<1.8){ISL.digT=3;beep(300,0.1,0.05);return;}
   digHere.busy=true;beep(260,0.08,0.05);toast('⛏ Digging…',1200);setTimeout(()=>{digHere.busy=false;const x=WALK.pos.x-Math.sin(WALK.yaw)*0.8,z=WALK.pos.z-Math.cos(WALK.yaw)*0.8,y=H(x,z);
-    const hole=new THREE.Mesh(new THREE.CircleGeometry(0.45,12),new THREE.MeshBasicMaterial({color:0x3a2a18}));hole.rotation.x=-Math.PI/2;hole.position.set(x,y+0.03,z);scene.add(hole);setTimeout(()=>scene.remove(hole),120000);
+    const hole=new THREE.Mesh(window.HOLEG||(window.HOLEG=new THREE.CircleGeometry(0.45,12)),window.HOLEM||(window.HOLEM=new THREE.MeshBasicMaterial({color:0x3a2a18})));hole.rotation.x=-Math.PI/2;hole.position.set(x,y+0.03,z);scene.add(hole);setTimeout(()=>scene.remove(hole),120000);
     const r=Math.random();if(r<0.25){const n=1+Math.floor(Math.random()*4);award('🪙 Found '+n+' old coin'+(n>1?'s':'')+'!',n);}else if(r<0.32)award('💎 A shiny gem!',8);else toast(['🪱 Just a worm','🪨 Only rocks down here','🦴 An old bone… not treasure','🌰 A buried acorn'][Math.floor(Math.random()*4)],1500);},1200);}
 {const p0=updBadge;setInterval(()=>{if(shotMode==='water')try{updBadge();}catch(e){}},500);}
 
@@ -8309,7 +8309,7 @@ function tntDrop(){if(!started||!DR&&!WALK.on)return;const me=dzMe()||D.pos.clon
   if(WALK.on){const y=WALK.yaw||0;v.set(-Math.sin(y)*5,4,-Math.cos(y)*5);p.y+=0.4;}else{v.copy(D.vel||new V3()).multiplyScalar(0.8);p.y-=0.5;}
   const id=mp.id+'.t'+(++tntN);tntAdd(id,p,v,true);mpSend({t:'tnt',tid:id,p:p.toArray().map(r2),v:v.toArray().map(r2)});beep(500,0.08,0.05);toast('💣 TNT dropped!',900);}
 function tntAdd(id,p,v,own,extra){const g=tntMesh();g.position.copy(p);scene.add(g);const T=Object.assign({id,g,p:p.clone(),v:v.clone(),t:0,own,landed:false},extra||{});if(T.small)g.scale.setScalar(0.6);TNTS.push(T);return T;}
-function tntDel(T){scene.remove(T.g);const i=TNTS.indexOf(T);if(i>=0)TNTS.splice(i,1);}
+function tntDel(T){scene.remove(T.g);geoDisp(T.g);const i=TNTS.indexOf(T);if(i>=0)TNTS.splice(i,1);}
 function tntTargets(){const L=[];try{L.push(...fuseTargets());}catch(e){}for(const B of AIB.L)if(!B.dead)L.push(B.p);return L;}
 function tntBoom(T){const p=T.p.clone();tntDel(T);if(!T.own)return;mpSend({t:'tntx',tid:T.id});
   const r=Math.max(0.5,T.r||TNT.r),dr=Math.max(0,T.dr!=null?T.dr:TNT.dr),bn=T.bn||CFG.name,bi=T.bi||mp.id,was=DZ.on;if(TNT.deadly)DZ.on=true;try{explode(p,r,dr,!T.bi,bn,bi);}finally{DZ.on=was;}
@@ -8412,7 +8412,7 @@ function bigTick(dt){for(let i=BIG.L.length-1;i>=0;i--){const f=BIG.L[i];f.t+=dt
     else if(f.kind==='stem'){const k=Math.min(1,f.t/2.2);f.m.scale.set(f.r*(0.6+k*0.3),f.h*k,f.r*(0.6+k*0.3));f.m.position.y=f.y0+f.h*k/2;f.m.material.opacity=0.8*(1-Math.max(0,u-0.5)*2);}
     else if(f.kind==='dust'){const s=0.3+u*f.r;f.m.scale.set(s,1,s);f.m.material.opacity=0.65*(1-u);}
     else if(f.kind==='deb'){f.v.y-=9.8*dt;f.m.position.addScaledVector(f.v,dt);f.m.rotation.x+=dt*5;f.m.rotation.z+=dt*4;const gy=H(f.m.position.x,f.m.position.z);if(f.m.position.y<gy){f.m.position.y=gy;f.v.set(0,0,0);}if(f.trail&&Math.random()<dt*14&&f.v.lengthSq()>4)puff(f.m.position.clone(),0x333333,0.3+f.sz,1.2);}
-    if(f.t>=f.life){scene.remove(f.m);BIG.L.splice(i,1);}}
+    if(f.t>=f.life){scene.remove(f.m);geoDisp(f.m);BIG.L.splice(i,1);}}
   if(BIG.shakeT>0){BIG.shakeT-=dt;shake=Math.max(shake,Math.min(1.2,BIG.shakeK*BIG.shakeT));}}
 {const f0=fireTick;fireTick=function(dt){const r=f0.apply(this,arguments);try{if(!SIM.pause)bigTick(dt);}catch(e){console.warn('big',e);}return r;};}
 function bigFlash(k){let el=$('bigFlash');if(!el){el=document.createElement('div');el.id='bigFlash';el.style.cssText='position:fixed;inset:0;z-index:60;pointer-events:none;background:#fff6d8;opacity:0;transition:opacity 0.9s ease-out';document.body.appendChild(el);}
@@ -8817,7 +8817,7 @@ setInterval(()=>{PERF.light=!!(PHONE||LS.get('devMode','auto')==='phone'||LS.get
       if(PERF.fps<26){PERF.low++;}else PERF.low=Math.max(0,PERF.low-1);
       if(PERF.low>=3){PERF.low=0;const cur=renderer.getPixelRatio(),nx=cur>1?1:cur>0.75?0.75:cur;if(nx<cur){renderer.setPixelRatio(nx);renderer.setSize(innerWidth,innerHeight,false);if(!PERF.told){PERF.told=true;toast('⚡ It was getting laggy — made the picture a little lighter so it runs smoother (Menu → 🔍 search "smooth" to change)',4500);}}
         // lots of leftover smoke / fire? clear the oldest
-        if(BIG.L.length>60){BIG.L.splice(0,30).forEach(f=>scene.remove(f.m));}}}}
+        if(BIG.L.length>60){BIG.L.splice(0,30).forEach(f=>{scene.remove(f.m);geoDisp(f.m);});}}}}
   requestAnimationFrame(loop);})();})();
 function perfItems(){return[mInfo(()=>'⚡ Right now: about '+Math.round(PERF.fps)+' frames per second'),
   mItem(()=>'⚡ Auto-smooth (turns graphics down when it lags): '+(LS.get('autoSmooth',true)?'ON':'off'),()=>LS.set('autoSmooth',!LS.get('autoSmooth',true))),
@@ -9702,6 +9702,10 @@ function layoutFix(){if(!started||document.body.classList.contains('vr'))return;
       document.querySelectorAll('#top button, #top div').forEach(e=>{const r=e.getBoundingClientRect();if(r.width&&r.height<50&&r.left<m.right+60&&r.top<m.top+20&&r.bottom>low)low=r.bottom;});
       if(low>m.top-2){mb.style.top=(low+5)+'px';const bt=$('mapBtns');if(bt&&innerHeight<500){bt.style.display='grid';bt.style.gridTemplateColumns='repeat(2,30px)';bt.style.gap='3px';}}}}}
 setInterval(()=>{try{layoutFix();}catch(e){}},800);
+// 🧹 explosions, rockets and TNT used to leave their shapes on the graphics chip forever (it slowly filled up in long battles) → free them when they're gone.
+// (only shapes — materials stay, so nothing has to be re-compiled = no freeze)
+let GEO_KEEP=null;function geoDisp(o){try{if(!o)return;if(!GEO_KEEP){GEO_KEEP=new Set();try{Object.values(GEO).forEach(g=>g&&g.isBufferGeometry&&GEO_KEEP.add(g));}catch(e){}try{SHARED_GEO.forEach(g=>GEO_KEEP.add(g));}catch(e){}try{GEO_KEEP.add(DZG);}catch(e){}}
+  o.traverse(m=>{if(m.geometry&&!m.isInstancedMesh&&!GEO_KEEP.has(m.geometry)&&!(typeof SHARED_GEO!=='undefined'&&SHARED_GEO.has(m.geometry))&&!m.geometry.userData.keep)m.geometry.dispose();});}catch(e){}}
 
 // ================================================================ v57: 🧠 the AI pilots KNOW the game — real answers to "what's the fastest vehicle", "how do I get money", "make it night", "get in a sub", secrets…
 function gqTntList(){try{return Object.values(TNTK).map(k=>k.n).join(', ');}catch(e){return'lots';}}
