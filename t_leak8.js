@@ -1,0 +1,6 @@
+const H=require('./harness');H(async({mk})=>{const P=await mk('P','http://127.0.0.1:8765/woods-rc-sim.html');await P.waitForTimeout(3000);await P.evaluate(()=>startGame('free'));await P.waitForTimeout(800);
+console.log(await P.evaluate(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const sp=JSON.parse(JSON.stringify(VPRESETS.car.tank));useSpec(JSON.parse(JSON.stringify(sp)));await w(400);
+ const G0=new Set();scene.traverse(o=>{if(o.geometry)G0.add(o.geometry);});const disp=[];const d0=THREE.BufferGeometry.prototype.dispose;THREE.BufferGeometry.prototype.dispose=function(){disp.push(this);return d0.apply(this,arguments);};
+ const a=renderer.info.memory.geometries;useSpec(JSON.parse(JSON.stringify(sp)));await w(400);const G1=new Set();scene.traverse(o=>{if(o.geometry)G1.add(o.geometry);});
+ let gone=0,goneDisp=0;G0.forEach(g=>{if(!G1.has(g)){gone++;if(disp.includes(g))goneDisp++;}});let added=0;const types={};G1.forEach(g=>{if(!G0.has(g)){added++;types[g.type]=(types[g.type]||0)+1;}});
+ return 'renderer +'+(renderer.info.memory.geometries-a)+' | left scene '+gone+' (disposed '+goneDisp+') | new in scene '+added+' '+JSON.stringify(types)+' | disposed total '+disp.length;}));});

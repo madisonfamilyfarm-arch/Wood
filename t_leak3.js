@@ -1,0 +1,7 @@
+const H=require('./harness');H(async({mk})=>{const P=await mk('P','http://127.0.0.1:8765/woods-rc-sim.html');await P.waitForTimeout(3000);
+await P.evaluate(()=>{startGame('free');window.__rm=[];const disposed=new WeakSet();const d0=THREE.BufferGeometry.prototype.dispose;THREE.BufferGeometry.prototype.dispose=function(){disposed.add(this);return d0.apply(this,arguments);};window.__disp=disposed;
+ const r0=THREE.Object3D.prototype.remove;THREE.Object3D.prototype.remove=function(...objs){for(const o of objs){if(!o)continue;const st=(new Error().stack||'').split('\n').slice(2,5).map(l=>l.trim().replace(/\(?http[^)]*:(\d+):\d+\)?/,'@$1')).join(' < ');o.traverse&&o.traverse(m=>{if(m.geometry&&!m.isInstancedMesh)__rm.push({g:m.geometry,st});});}return r0.apply(this,objs);};});
+await P.waitForTimeout(1000);const g0=await P.evaluate(()=>renderer.info.memory.geometries);
+await P.evaluate(async()=>{for(let i=0;i<10;i++){useSpec(JSON.parse(JSON.stringify([VPRESETS.car.tank,VPRESETS.plane.trainer,VPRESETS.heli.scale][i%3])));await new Promise(r=>setTimeout(r,200));}});await P.waitForTimeout(1000);
+console.log(await P.evaluate((g0)=>{const live=new Set();scene.traverse(o=>{if(o.geometry)live.add(o.geometry);});const by={};let n=0;for(const r of __rm){if(__disp.has(r.g)||live.has(r.g))continue;n++;by[r.st]=(by[r.st]||0)+1;}
+ return 'geos '+g0+'→'+renderer.info.memory.geometries+' leaked '+n+'\n'+Object.entries(by).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([k,v])=>v+' '+k.slice(0,200)).join('\n');},g0));});
