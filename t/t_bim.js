@@ -1,0 +1,10 @@
+const H0=require('./harness');
+H0(async({mk})=>{const P=await mk('P','http://127.0.0.1:8765/woods-rc-sim.html',{width:900,height:600});P.on('pageerror',e=>console.log('PAGEERR',e.message));await P.waitForTimeout(3000);
+console.log(await P.evaluate(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));startGame('free');await W(300);openWorkshop(false);
+ const its=WSI.filter(x=>x.t==='model');const o=['items '+its.map(x=>x.n).join(', ')];let x=-14;
+ for(const it of its.filter(x=>x.o&&x.o.mid)){const p=wsDefault(it,x,0,6);WS.parts.push(cleanPart(p));x+=14;}wsChanged();await W(800);
+ o.push('parts '+JSON.stringify(WS.parts.filter(p=>p.t==='model').map(p=>[p.mid,p.nm])));
+ const tl=$('wsTools');if(tl)tl.style.display='none';$('wsTray').style.display='none';$('wsMid').style.left='0';$('wsMid').style.right='0';window.dispatchEvent(new Event('resize'));await W(800);
+ const sp=wsSpec();closeWorkshop();useSpec(sp);await W(800);o.push('flying build ok '+!!DR);openWorkshop(true);await W(800);$('wsTools').style.display='none';$('wsTray').style.display='none';$('wsMid').style.left='0';$('wsMid').style.right='0';window.dispatchEvent(new Event('resize'));await W(800);
+ return o.join('\n');}));
+await P.screenshot({path:'/tmp/claude-0/-home-claude/45cffd64-7151-5ab5-acd7-339a16c71f6a/scratchpad/bim.png'});});
