@@ -4265,7 +4265,7 @@ function drawHud(dt){
     let t=course.pop?course.name+' · '+balloons.filter(b=>!b.alive).length+'/'+balloons.length+' popped':course.name+' · '+Math.min(cpI+1,n)+'/'+n;t+=' · '+fmt(cTime+cPen)+(best?' · best '+fmt(best):'')+(ghost?' · 👻':'');
     const others=Object.values(mp.peers).filter(pe=>pe.c===course.key);if(others.length)t+=' · '+others.map(pe=>pe.name+' '+pe.cp+'/'+n).join(' · ');$('courseTxt').textContent=t;
     const ni=nextInfo(),ac=$('arrow'),x=ac.getContext('2d');x.clearRect(0,0,92,92);if(ni){x.save();x.translate(46,46);x.rotate(-ni.rel);x.fillStyle='#33ff66';x.strokeStyle='#000';x.lineWidth=3;x.beginPath();x.moveTo(0,-36);x.lineTo(22,8);x.lineTo(6,2);x.lineTo(6,30);x.lineTo(-6,30);x.lineTo(-6,2);x.lineTo(-22,8);x.closePath();x.stroke();x.fill();x.restore();x.fillStyle='#fff';x.font='bold 15px sans-serif';x.textAlign='center';x.fillText(ni.dist.toFixed(0)+'m'+(ni.dy>1.5?' ▲':ni.dy<-1.5?' ▼':''),46,90);}}
-  const np=Object.keys(mp.peers).length;$('cMP').style.display=mpOpen()?'':'none';$('bChat').style.display=mpOpen()?'':'none';$('cMP').textContent='👥 '+(np+1);$('bWalk').textContent=WALK.on?'🚁':'🚶';
+  const np=Object.keys(mp.peers).length;$('cMP').style.display=mpOpen()?'':'none';$('bChat').style.display=mpOpen()?'':'none';$('cMP').textContent='👥 '+(np+1);(window.walkBtnLabel?walkBtnLabel():$('bWalk').textContent=WALK.on?'🚁':'🚶');
   $('cBat').classList.toggle('low',D.batt<15);if(D.batt<3&&D.state==='landed'&&!drawHud.bt){drawHud.bt=1;toast('🔋 Battery empty — tap the 🔋 at the top to put a fresh one in',3500);setTimeout(()=>drawHud.bt=0,9000);}
   if(rec)updBadge();drawMini();
 }
