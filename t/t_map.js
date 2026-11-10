@@ -1,13 +1,6 @@
-const H=require('./harness');
-H(async({mk})=>{const A=await mk('A','http://127.0.0.1:8765/woods-rc-sim.html');await A.waitForTimeout(2500);const ev=(f,x)=>A.evaluate(f,x);
-  await ev(()=>startGame('free'));await A.waitForTimeout(1500);await ev(()=>{MAP.d3=false;mapMode('big');});await A.waitForTimeout(800);
-  const r=await ev(()=>{const c=$('mini').getBoundingClientRect();return [c.left+c.width/2,c.top+c.height/2];});
-  const w0=await ev(r=>{const w=mapToWorld(r[0],r[1]);return [w.x,w.z];},r);
-  await A.mouse.move(r[0],r[1]);await A.mouse.down();for(let k=1;k<=10;k++){await A.mouse.move(r[0]+k*15,r[1]+k*10);await A.waitForTimeout(30);}await A.mouse.up();await A.waitForTimeout(300);
-  console.log('drag: grabbed point now under',await ev(([r,w0])=>{const s=MAP.T.transformPoint(new DOMPoint(w0[0],w0[1]));const c=$('mini').getBoundingClientRect();return [(s.x/MAP.dpr+c.left-r[0]).toFixed(0),(s.y/MAP.dpr+c.top-r[1]).toFixed(0)].join(',')+' (want 150,100)';},[r,w0]));
-  const p1=await ev(()=>[MAP.px,MAP.pz]);await ev(()=>{takeoff();});await A.waitForTimeout(2500);console.log('stays put while drone moves',await ev(p=>{const a=MAP.anc;return 'anc '+!!a;},p1));
-  await ev(()=>{const b=[...$('mapPad').children][0];b.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}));b.dispatchEvent(new PointerEvent('pointerup',{bubbles:true}));});console.log('pad ok');
-  await A.screenshot({path:'map2d.png'});
-  await ev(()=>{MAP.d3=true;MAP.px=MAP.pz=0;MAP.anc=null;MAP.view=60;});await A.waitForTimeout(1500);await A.screenshot({path:'map3d.png'});
-  console.log('3d tap',await ev(()=>{const R=$('mapBox').getBoundingClientRect();const w=mapToWorld(R.left+R.width/2,R.top+R.height/2);return w.x.toFixed(0)+','+w.z.toFixed(0)+' drone '+D.pos.x.toFixed(0)+','+D.pos.z.toFixed(0);}));
-});
+const H0=require('./harness');
+H0(async({mk})=>{const P=await mk('P','http://127.0.0.1:8765/woods-rc-sim.html');await P.waitForTimeout(3000);
+console.log(await P.evaluate(()=>{const o=[];try{o.push('places '+JSON.stringify(aiPlaces().map(p=>[p.n,Math.round(p.x),Math.round(p.z)])));}catch(e){o.push('noplaces '+e.message);}
+ o.push('RUNWAY '+JSON.stringify(typeof RUNWAY!=='undefined'?RUNWAY:null)+' TRACKC '+JSON.stringify(typeof TRACKC!=='undefined'?TRACKC:null));
+ // coarse map of blocked + water across +-1200
+ const rows=[];for(let z=-1200;z<=1200;z+=100){let r='';for(let x=-1200;x<=1200;x+=100){const h=H(x,z);r+=(typeof inWater==='function'&&inWater(x,z))?'~':blocked(x,z)?'#':h>14?'^':h>6?'+':'.';}rows.push(z.toString().padStart(6)+' '+r);}o.push(rows.join('\n'));return o.join('\n');}));});
