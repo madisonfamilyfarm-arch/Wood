@@ -1,0 +1,10 @@
+const H0=require('./harness');
+const S='/tmp/claude-0/-home-claude/45cffd64-7151-5ab5-acd7-339a16c71f6a/scratchpad/';
+H0(async({mk})=>{const P=await mk('P','http://127.0.0.1:8765/woods-rc-sim.html');P.on('pageerror',e=>console.log('PAGEERR',e.message));await P.waitForTimeout(3000);
+console.log(await P.evaluate(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const o=[];startGame('free');await W(800);o.push('flying: '+$('bWalk').textContent);
+ $('bWalk').click();await W(800);o.push('walking: '+$('bWalk').textContent);
+ const L=TRAIN.cars[0];WALK.pos.set(L.position.x+2,0,L.position.z);WALK.pos.y=H(WALK.pos.x,WALK.pos.z);await W(800);o.push('near train btn: '+($('trainRideB').style.display!=='none')+' "'+$('trainRideB').textContent+'"');
+ $('trainRideB').dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}));await W(800);o.push('riding '+TRAIN.ride+' btn "'+$('trainRideB').textContent+'"');
+ $('trainRideB').dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}));await W(600);o.push('riding '+TRAIN.ride);
+ $('bWalk').click();await W(800);o.push('back: walking '+WALK.on+' btn '+$('bWalk').textContent);
+ bsOpen('tank',null);bsClose();const sp=wsSpec();closeWorkshop();useSpec(sp);await W(800);$('bWalk').click();await W(600);o.push('tank walking: '+$('bWalk').textContent);return o.join('\n');}));});
