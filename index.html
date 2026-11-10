@@ -3267,7 +3267,7 @@ const VPRESETS={
     buggy:{kind:'car',name:'Race buggy (fast)',style:'buggy',wheel:5,power:8,grip:7,susp:5,weight:2.2,mah:4000,awd:true,colors:{body:'#ff9f0a',trim:'#111111',wheel:'#202020'}},
     monster:{kind:'car',name:'Monster truck (big jumps)',style:'monster',wheel:9,power:7,grip:5,susp:9,weight:3.6,mah:6000,awd:true,colors:{body:'#34c759',trim:'#111111',wheel:'#111111'}},
     rally:{kind:'car',name:'Rally car (drifty)',style:'rally',wheel:4.5,power:7,grip:3,susp:4,weight:1.8,mah:4000,awd:true,colors:{body:'#f2f2f2',trim:'#e0451f',wheel:'#222222'}},
-    tank:{kind:'car',name:'RC tank (paintball cannon)',style:'tank',wheel:5,power:4,grip:9,susp:3,weight:3.2,mah:5000,awd:true,colors:{body:'#4b5a32',trim:'#2b2f22',wheel:'#111111'}},
+    tank:{kind:'car',name:'🪖 Tank (turret + cannon)',style:'tank',wheel:5,power:4,grip:9,susp:3,weight:3.2,mah:5000,awd:true,colors:{body:'#4b5a32',trim:'#2b2f22',wheel:'#111111'}},
     crawler:{kind:'car',name:'Rock crawler (climbs anything)',style:'crawler',wheel:7,power:3,grip:10,susp:10,weight:2.0,mah:3000,awd:true,colors:{body:'#ffd60a',trim:'#111111',wheel:'#111111'}},
     grom:{kind:'car',name:'Mojave GROM (little basher)',style:'monster',wheel:5,power:5,grip:5,susp:7,weight:1.0,mah:2200,awd:true,colors:{body:'#e0451f',trim:'#111111',wheel:'#111111'}}}};
 function vSanitize(o){const c=(v,a,b,d)=>clamp(isFinite(+v)?+v:d,a,b);
@@ -11064,6 +11064,17 @@ function trainRideBtn(){let b=$('trainRideB');if(!b){b=document.createElement('b
   b.style.display=show?'':'none';if(show&&b.textContent!==t)b.textContent=t;}
 setInterval(trainRideBtn,250);
 {const w0=walkToggle;walkToggle=function(){const r=w0.apply(this,arguments);setTimeout(walkBtnLabel,0);setTimeout(walkBtnLabel,200);return r;};}
+// 🪖 one tap to the tank: Menu → "🪖 Tank (drive it now)" — no builder needed
+function tankGo(){try{if(menu.open)menuToggle(false);}catch(e){}try{if(WALK.on)walkToggle(false);}catch(e){}try{if(WS.open)closeWorkshop();}catch(e){}openKit('tank');const sp=wsSpec();closeWorkshop();sp.name='🪖 Tank';useSpec(sp);toast('🪖 Tank ready! Left stick = gas, right stick = steer, 🪖 turret stick = aim the barrel',4000);}
+{const m0=mainItems;mainItems=function(){const L=m0();const i=Math.max(0,L.findIndex(it=>{try{return /Flying tank/.test(it.label());}catch(e){return false;}}));L.splice(i,0,mItem('🪖 Tank (drive it now)',()=>tankGo()));return L;};}
+{const g0=mCatItems;mCatItems=function(k){const L=g0.apply(this,arguments);try{if(k==='games'||k==='fly'||k==='build'||k==='war')L.splice(0,0,mItem('🪖 Tank (drive it now)',()=>tankGo()));}catch(e){}return L;};}
+{const b0=buildItems;buildItems=function(){const L=b0();try{L.splice(1,0,mItem('🪖 Tank — drive it now',()=>{menuToggle(false);tankGo();}));}catch(e){}return L;};}
+// "give me a tank" / "i want to drive the tank" in chat
+{const s0=smartHear;smartHear=function(txt){try{const s=' '+String(txt||'').toLowerCase()+' ';if(/ (give me|i want|let me|can i|i wanna|switch me to|put me in|get me|spawn) (a |the |to drive a |to drive the |drive a |drive the )?tank /.test(s)&&!/flying tank/.test(s)){tankGo();const B=aiNear(1e9)[0];if(B)sbSay({B},'🪖 Here\'s your tank! Use the turret stick to aim.');return true;}if(/ (give me|i want|let me|can i|spawn) (a |the )?flying tank /.test(s)){ftankGo();return true;}}catch(e){}return s0.apply(this,arguments);};}
+// the old built-in "RC tank" (a car with a tank look) is replaced by the new tank everywhere you can pick it
+function newTankSpec(){const keep=WS.open;openKit('tank');const sp=wsSpec();if(!keep)closeWorkshop();sp.name='🪖 Tank';return sp;}
+{const u0=useSpec;useSpec=function(sp){try{if(sp&&!sp.parts&&sp.style==='tank'&&(sp.kind==='car'||!sp.kind)&&!WS.open){return u0.call(this,newTankSpec());}}catch(e){}return u0.apply(this,arguments);};}
+{const g0=startGame;startGame=function(){const r=g0.apply(this,arguments);try{if(SPEC&&!SPEC.parts&&SPEC.style==='tank')setTimeout(()=>{try{useSpec(newTankSpec());}catch(e){}},300);}catch(e){}return r;};}
 
 // =====================================================================================
 // ===== 🌎 REAL WORLD MAP (CesiumJS): the real Earth from satellite photos + real hills, starting over the farm =====
