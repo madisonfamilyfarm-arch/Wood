@@ -6,5 +6,5 @@ console.log(await P.evaluate(async()=>{const W=ms=>new Promise(r=>setTimeout(r,m
  const L=TRAIN.cars[0];WALK.pos.set(L.position.x+2,0,L.position.z);WALK.pos.y=H(WALK.pos.x,WALK.pos.z);await W(800);o.push('near train btn: '+($('trainRideB').style.display!=='none')+' "'+$('trainRideB').textContent+'"');
  $('trainRideB').dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}));await W(800);o.push('riding '+TRAIN.ride+' btn "'+$('trainRideB').textContent+'"');
  $('trainRideB').dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}));await W(600);o.push('riding '+TRAIN.ride);
- $('bWalk').click();await W(800);o.push('back: walking '+WALK.on+' btn '+$('bWalk').textContent);
+ WALK.pos.x+=20;await W(300);$('bWalk').click();await W(800);o.push('back: walking '+WALK.on+' btn '+$('bWalk').textContent);
  bsOpen('tank',null);bsClose();const sp=wsSpec();closeWorkshop();useSpec(sp);await W(800);$('bWalk').click();await W(600);o.push('tank walking: '+$('bWalk').textContent);return o.join('\n');}));});

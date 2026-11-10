@@ -232,4 +232,5 @@ rep("_a.set(0,-9.8,0).addScaledVector(_f,thrust/m).addScaledVector(_u,lift/m);",
 rep("  D.pos.addScaledVector(v,dt);\n  // ground\n","  {const vm=D.pos.y-gy>700?700:200,vl=v.length();if(vl>vm)v.multiplyScalar(vm/vl);}\n  D.pos.addScaledVector(v,dt);\n  // ground\n")
 r=r.replace("fun:'😊 Just for fun'","fun:'😊 Easy / friendly (they won\\'t shoot you)'")
 rep("WS.parts=(sp.parts?sp.parts:presetToParts(sp)).map(cleanPart);WS.name=sp.name;","WS.parts=(sp.parts?sp.parts:presetToParts(sp)).map(cleanPart);WS.wires=sp.wires||[];if(sp.flyAs)WS.flyAs=sp.flyAs;WS.bigF=sp.bigF||1;try{const bb=document.getElementById('wsBig');if(bb)bb.textContent='📏 Size in the world: '+WS.bigF+'×';}catch(e){}WS.name=sp.name;")
+r=r.replace("$('bWalk').textContent=WALK.on?'🚁':'🚶'","(window.walkBtnLabel?walkBtnLabel():$('bWalk').textContent=WALK.on?'🚁':'🚶')")
 open('rc.html','w').write(r);print('ok',len(r))
