@@ -1,0 +1,9 @@
+const H0=require('./harness');const fs=require('fs');
+const S='/tmp/claude-0/-home-claude/45cffd64-7151-5ab5-acd7-339a16c71f6a/scratchpad/bl/';
+H0(async({mk})=>{const P=await mk('P','http://127.0.0.1:8765/woods-rc-sim.html',{width:900,height:600});P.on('pageerror',e=>console.log('PAGEERR',e.message));await P.waitForTimeout(3000);
+for(const f of (process.env.F||'orig.json').split(',')){const j=JSON.parse(fs.readFileSync(S+f,'utf8'));
+console.log(await P.evaluate(async(j)=>{const W=ms=>new Promise(r=>setTimeout(r,ms));if(!window.__s){startGame('free');window.__s=1;}await W(300);
+ const sp=sanitize(j.spec);try{if(j.spec.wires)sp.wires=j.spec.wires;}catch(e){}const st=stats(sp);const I=partsInfo(sp);const ss=propStrikes(sp.parts,connectedParts(sp.parts)).map(k=>sp.parts[k.i].t+'@'+sp.parts[k.i].h+' x '+sp.parts[k.j].t);
+ const o=[sp.name+' why="'+(st.why||'')+'" flyAs '+st.flyAs+' combo '+st.combo+' loose '+I.loose.map(i=>sp.parts[i].t+'@'+sp.parts[i].h).join(',')+' strikes '+ss.join('|')+' mass '+(st.m||st.mass||'?')+' T '+(st.T||st.thrust||'?')+' twr '+(st.twr||'?')+' keys '+Object.keys(st).join(',')+' tw '+st.tw+' w '+st.w+' imb '+st.imb+' top '+st.top+' vz '+st.vz];
+ const tl=[];const t0=window.toast;window.toast=function(m){tl.push(String(m).slice(0,60));return t0.apply(this,arguments);};useSpec(sp);await W(800);const y0=D.pos.y;try{takeoff();}catch(e){}const kd=c=>dispatchEvent(new KeyboardEvent('keydown',{code:c,key:c}));const ku=c=>dispatchEvent(new KeyboardEvent('keyup',{code:c,key:c}));kd('ArrowUp');const ys=[];for(let i=0;i<8;i++){await W(1000);ys.push((D.pos.y-y0).toFixed(1)+D.state[0]+(D.batt!=null?'b'+Math.round(D.batt):''));}ku('ArrowUp');await W(3000);ys.push('rel '+(D.pos.y-y0).toFixed(1));o.push('  ys '+ys.join(' '));
+ o.push('  climbed '+(D.pos.y-y0).toFixed(1)+' state '+D.state+' kind '+vkind());try{resetDrone();}catch(e){}o.push('  toasts '+tl.join(' | '));return o.join('\n');},j));}});
