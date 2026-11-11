@@ -1,7 +1,7 @@
 // v80: 🌍 more world — two new long runways (with edge lights, centre lines, windsocks) and an UNDERGROUND TUNNEL you drive/fly
 //      down into: a ramp digs down into the ground, a long covered underground stretch with lights, then a ramp back up.
 const RW2=[{n:'the north runway',x:-330,z:-350,len:360,w:40,ax:'x'},{n:'the valley runway',x:450,z:-200,len:300,w:30,ax:'z'}];
-const TUN={n:'the underground tunnel',x:-300,z0:300,z1:540,w:14,D:10,ramp:50,cov0:80,cov1:160};
+const TUN={n:'the underground tunnel',x:-300,z0:300,z1:540,w:14,D:10,ramp:50,cov0:60,cov1:185};
 const _H=H;   // the original ground
 function rwLocal(r,x,z){const dx=x-r.x,dz=z-r.z;return r.ax==='x'?{u:dx,v:dz}:{u:dz,v:dx};}
 function rwFlat(r){if(r.fh==null){let s=0,n=0;for(let i=-4;i<=4;i++){const u=i*r.len/8;const x=r.ax==='x'?r.x+u:r.x,z=r.ax==='x'?r.z:r.z+u;s+=_H(x,z);n++;}r.fh=Math.max(0.3,s/n);}return r.fh;}
