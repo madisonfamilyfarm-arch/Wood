@@ -50,29 +50,31 @@ const MG={gates:[],next:0,t0:0,on:false,best:LS.get('megaBest',0)};
     const tx=-Math.sin(a)*rx,tz=Math.cos(a)*rz;const yaw=Math.atan2(tx,tz);const R=i===0?6:4.6;
     const g=new THREE.Group();g.position.set(x,y,z);g.rotation.y=yaw;ARNG.add(g);
     const ring=new THREE.Mesh(new THREE.TorusGeometry(R,0.45,10,40),new THREE.MeshBasicMaterial({color:0xff2bd6}));g.add(ring);
+    const hl=new THREE.Mesh(new THREE.TorusGeometry(R+0.8,0.2,8,40),new THREE.MeshBasicMaterial({color:0xff2bd6}));g.add(hl);
     if(i===0){const ck=new THREE.Mesh(new THREE.TorusGeometry(R+0.9,0.25,8,40),new THREE.MeshBasicMaterial({color:0xffffff}));g.add(ck);}
     // a support pole down to the ground
     const ph=y-R-fy;if(ph>0.5){const p=new THREE.Mesh(new THREE.CylinderGeometry(0.25,0.25,ph,6),new THREE.MeshLambertMaterial({color:0x444a55}));p.position.set(0,-R-ph/2,0);g.add(p);}
     // gate 5 + gate 11 are TUBES you fly through
     if(i===5||i===11){const tb=new THREE.Mesh(new THREE.CylinderGeometry(R,R,22,24,1,true),new THREE.MeshBasicMaterial({color:0x00e5ff,wireframe:true,transparent:true,opacity:0.55}));tb.rotation.x=Math.PI/2;g.add(tb);}
-    MG.gates.push({g,ring,x,y,z,R,yaw,n:i+1});}
+    MG.gates.push({g,ring,hl,x,y,z,R,yaw,n:i+1});}
   // slalom poles & floating cubes between gates for flavour
   const pm=new THREE.MeshBasicMaterial({color:0xffd60a});for(let i=0;i<10;i++){const a=(i+0.5)/10*Math.PI*2,x=ARN.x+Math.cos(a)*(ARN.ax-4)*0.45,z=ARN.z+Math.sin(a)*(ARN.bz-4)*0.45;const p=new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.35,14,8),pm);p.position.set(x,fy+7,z);ARNG.add(p);}
   megaScreen('Fly through the white ring to start!','Best: '+(MG.best?MG.best.toFixed(2)+'s':'— none yet —'));})();
 // HUD
 (function(){const d=document.createElement('div');d.id='megaHud';d.style.cssText='position:fixed;left:50%;transform:translateX(-50%);top:calc(92px + env(safe-area-inset-top));z-index:13;display:none;padding:6px 14px;border-radius:14px;background:linear-gradient(90deg,#ff2bd6cc,#00b8d9cc);color:#fff;font:800 15px system-ui,sans-serif;text-shadow:0 1px 2px #000;pointer-events:none;white-space:nowrap';document.body.appendChild(d);
   const st=document.createElement('style');st.textContent='body.pt #megaHud{top:calc(215px + env(safe-area-inset-top))}';document.head.appendChild(st);})();
-function megaReset(msg){MG.on=false;MG.next=0;MG.gates.forEach((G,i)=>G.ring.material.color.setHex(i===0?0xffffff:0xff2bd6));if(msg)toast(msg,3000);}
+function megaReset(msg){MG.on=false;MG.next=0;MG.gates.forEach((G,i)=>G.hl.material.color.setHex(i===0?0xffffff:0xff2bd6));if(msg)toast(msg,3000);}
 {let last=performance.now(),prev=null;const tk=()=>{const now=performance.now(),dt=Math.min(0.1,(now-last)/1000);last=now;try{if(started&&D&&D.pos){const p=D.pos;
+  if(course){MG.gates.forEach(G=>G.hl.visible=false);$('megaHud').style.display='none';if(MG.on)megaReset();if(window.FINDT&&window.FINDT.mega)window.FINDT=null;prev=null;requestAnimationFrame(tk);return;}MG.gates.forEach(G=>G.hl.visible=true);
   const near=Math.hypot((p.x-ARN.x)/ARN.ax,(p.z-ARN.z)/ARN.bz)<1.6;const hud=$('megaHud');
   // pulsing next gate
-  const t=now/1000;MG.gates.forEach((G,i)=>{if(i===MG.next){const s=1+Math.sin(t*6)*0.08;G.ring.scale.set(s,s,s);G.ring.material.color.setHex(MG.on?0x30d158:0xffffff);}else G.ring.scale.set(1,1,1);});
+  const t=now/1000;MG.gates.forEach((G,i)=>{if(i===MG.next){const s=1+Math.sin(t*6)*0.08;G.hl.scale.set(s,s,s);G.hl.material.color.setHex(MG.on?0x30d158:0xffffff);}else G.hl.scale.set(1,1,1);});
   // crowd bounces
   if(ARN.crowd&&near&&Math.floor(t*10)%2===0){}
   if(prev&&near&&!(WS&&WS.open)){const G=MG.gates[MG.next];const loc=new THREE.Vector3(p.x,p.y,p.z);G.g.worldToLocal(loc);const pl=new THREE.Vector3(prev.x,prev.y,prev.z);G.g.worldToLocal(pl);
     if(Math.sign(loc.z)!==Math.sign(pl.z)&&Math.hypot(loc.x,loc.y)<G.R+0.6){beep(MG.next===0?1046:880,0.12,0.12);
       if(MG.next===0&&!MG.on){MG.on=true;MG.t0=now;MG.next=1;toast('🏁 GO! Fly through the green rings in order',2200);}
-      else if(MG.on){G.ring.material.color.setHex(0x3a3a3a);MG.next++;if(MG.next>=MG.gates.length){const tt=(now-MG.t0)/1000;const nb=!MG.best||tt<MG.best;if(nb){MG.best=tt;LS.set('megaBest',tt);}
+      else if(MG.on){G.hl.material.color.setHex(0x3a3a3a);MG.next++;if(MG.next>=MG.gates.length){const tt=(now-MG.t0)/1000;const nb=!MG.best||tt<MG.best;if(nb){MG.best=tt;LS.set('megaBest',tt);}
           megaScreen('LAP '+tt.toFixed(2)+'s'+(nb?'  🏆 NEW BEST!':''),'Best: '+MG.best.toFixed(2)+'s');beep(1320,0.4,0.12);megaReset((nb?'🏆 NEW ARENA RECORD ':'🏁 Lap ')+tt.toFixed(2)+'s!'+(nb?'':' (best '+MG.best.toFixed(2)+'s)'));MG.next=0;}}}
     if(MG.on&&(now-MG.t0)>240000)megaReset('⏱ Race timed out');}
   if(near){hud.style.display='block';hud.textContent=MG.on?'🏁 Gate '+MG.next+'/'+MG.gates.length+' · '+((now-MG.t0)/1000).toFixed(1)+'s'+(MG.best?' · best '+MG.best.toFixed(1)+'s':''):'🏟 Fly through the ⚪ white ring to start the race'+(MG.best?' · best '+MG.best.toFixed(1)+'s':'');}else{hud.style.display='none';if(MG.on)megaReset('🏟 Left the arena — race cancelled');}
@@ -96,3 +98,13 @@ const TR={rings:[],pads:[],t0:0,on:false,best:LS.get('tunBest',0)};
     for(const pd of TR.pads){if(Math.abs(p.z-pd.z)<3&&Math.abs(p.x-TUN.x)<4&&p.y<tunSurf(p.z)-0.5&&(!pd.cool||now>pd.cool)){pd.cool=now+800;const sp=Math.hypot(D.vel.x,D.vel.z),dir=Math.sign(D.vel.z)||1;const ns=Math.min(Math.max(sp*1.6,sp+12),45);D.vel.z=dir*ns;D.vel.x*=0.5;beep(1500,0.15,0.1);toast('⚡ BOOST!',900);}}}}catch(e){}requestAnimationFrame(tk);};requestAnimationFrame(tk);}
 // AI knows the arena
 {const a0=aiPlaces;aiPlaces=function(){const L=a0.apply(this,arguments).slice();L.push({n:ARN.n,x:ARN.x,z:ARN.z-ARN.bz+20});L.push({n:'the race arena',x:ARN.x,z:ARN.z-ARN.bz+20});L.push({n:'the drone arena',x:ARN.x,z:ARN.z-ARN.bz+20});return L;};}
+
+// ---- the Mega Arena is also a proper race in the Races menu (with countdown, ghost, best time), next to the old Race Arena
+(function(){const cps=MG.gates.map(G=>{const sp=numberSprite();sp.position.set(G.x,G.y+G.R+1.6,G.z);sp.scale.multiplyScalar(2.2);sp.visible=false;
+    return{kind:'hoop',c:new V3(G.x,G.y,G.z),n:new V3(Math.sin(G.yaw),0,Math.cos(G.yaw)),R:G.R-0.1,mesh:[G.ring],label:sp};});
+  const g0=MG.gates[0],n0=cps[0].n;courses.mega={key:'mega',name:'🏟 Mega Drone Arena (new)',cps,start:{x:g0.x-n0.x*28,z:g0.z-n0.z*28,yaw:Math.atan2(-n0.x,-n0.z)}};
+  if(courses.arena)courses.arena.name='🏟️ Race Arena (old)';
+  const i=COURSE_ORDER.indexOf('arena');COURSE_ORDER.splice(i<0?COURSE_ORDER.length:i+1,0,'mega');
+  try{setCourseVisible();}catch(e){}
+  // start-screen button next to the old arena one
+  try{const b0=[...document.querySelectorAll('#start button')].find(b=>/startGame\('arena'\)/.test(b.getAttribute('onclick')||''));if(b0){b0.textContent='🏟️ Race Arena (old)';const b=b0.cloneNode(true);b.setAttribute('onclick',"startGame('mega')");b.textContent='🏟 Mega Arena (new)';b0.after(b);}}catch(e){}})();
